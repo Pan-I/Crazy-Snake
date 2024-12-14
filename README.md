@@ -68,7 +68,7 @@ If you would like to debug the game, you will need a C# IDE that is compatible w
 ---
 ## 🐛 Issues, Enhancements, & Progress 🔮
 
-There is a list of [known issues.](https://github.com/Pan-I/Crazy-Snake/issues) If you have suggestions, requests, or come across any problems, you can submit a [new issue ticket here.](https://github.com/Pan-I/Crazy-Snake/issues/new/choose) You can find the [progress of submitted tickets here.](https://github.com/users/Pan-I/projects/7/views/1) 
+There is a list of [known issues.](https://github.com/Pan-I/Crazy-Snake/issues) If you have suggestions, requests, or come across any problems, you can submit a [new issue ticket here.](https://github.com/Pan-I/Crazy-Snake/issues/new/choose) You can find the [progress of submitted tickets here.](https://github.com/users/Pan-I/projects/6)
 
 ---
 ## 🔧 Contributing 💾
