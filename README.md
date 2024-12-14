@@ -2,7 +2,7 @@
 
 
 
-<img src="https://raw.githubusercontent.com/Pan-I/Snake/refs/heads/main/readme_links/ReadMe%20ScreenShot.png" alt="broken link of game screenshot 1" width="700"/>
+<img src="https://raw.githubusercontent.com/Pan-I/Crazy-Snake/refs/heads/main/readme_links/ReadMe%20ScreenShot.png" alt="broken link of game screenshot 1" width="700"/>
 
 
 ##### ReadMe Table of Contents
@@ -21,7 +21,7 @@
 
 A remake of Snake, with some twists. An ongoing project with more to come soon.
 
-<img src="https://raw.githubusercontent.com/Pan-I/Snake/refs/heads/main/readme_links/ReadMe%20ScreenShot%20Small.png" alt="broken link of game screenshot 2" width="345"/> <img src="https://raw.githubusercontent.com/Pan-I/Snake/refs/heads/main/readme_links/ReadMe%20ScreenShot%20Small2.png" alt="broken link of game screenshot 3" width="345"/>
+<img src="https://raw.githubusercontent.com/Pan-I/Crazy-Snake/refs/heads/main/readme_links/ReadMe%20ScreenShot%20Small.png" alt="broken link of game screenshot 2" width="345"/> <img src="https://raw.githubusercontent.com/Pan-I/Crazy-Snake/refs/heads/main/readme_links/ReadMe%20ScreenShot%20Small2.png" alt="broken link of game screenshot 3" width="345"/>
 
 ---
 ## 🌟 Features 🎁
@@ -73,7 +73,7 @@ There is a list of [known issues.](https://github.com/Pan-I/Crazy-Snake/issues) 
 ---
 ## 🔧 Contributing 💾
 
-Contributing information found here: [CONTRIBUTING.md](https://github.com/Pan-I/Snake/blob/main/.github/CONTRIBUTING.md)
+Contributing information found here: [CONTRIBUTING.md](https://github.com/Pan-I/Crazy-Snake/blob/main/.github/CONTRIBUTING.md)
 
 ---
 ## 📍Attributions 👥
