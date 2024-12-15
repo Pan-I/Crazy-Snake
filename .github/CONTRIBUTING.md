@@ -15,3 +15,6 @@ Please update and or create any necessary attributions files if any additional r
 
 ##### Build Folder
 Please do not remove the "`builds/`" directory location from the `.gitignore` if you wish to contribute.
+
+##### Working Files Folder
+Please do not remove the "`/working_files`" directory location from the `.gitignore` if you wish to contribute.

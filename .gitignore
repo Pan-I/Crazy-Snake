@@ -8,6 +8,9 @@ assets/
 *.sln
 *.exe
 .obsidian/
+/working_files
+/builds
+
 
 # Godot 4+ specific ignores
 .godot/
