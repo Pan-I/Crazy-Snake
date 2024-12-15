@@ -81,11 +81,6 @@ The credits for the audio used, are in [**ATTRIBUTIONS.md**](https://github.com/
 
 This project was heavily inspired by the following videos:
 
-
-The following assets in `\assets` did use both Photoshop AI generation, and more traditional Photoshop editing techniques:
-
-Any sprites not listed here did ***not*** use AI generation.
-
 ---
 ## 📜 License 🔓
 
