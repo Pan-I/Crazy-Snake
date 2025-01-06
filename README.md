@@ -1,4 +1,4 @@
-#  🐍🎮 Crazy Snake 👾🪩 - v0.0.1.2
+#  🐍🎮 Crazy Snake 👾🪩 - v0.1.0.0
 
 
 <img src="https://raw.githubusercontent.com/Pan-I/Crazy-Snake/refs/heads/main/readme_links/Banner%20Image.png" alt="broken link of game screenshot 1" width="900"/>
@@ -18,9 +18,11 @@
 ---
 ## 🎉 Introduction 📣
 
-A remake of Snake, with some twists. An ongoing project with more to come soon.
+A remake of Snake, with some twists. 
 
-<img src="https://raw.githubusercontent.com/Pan-I/Crazy-Snake/refs/heads/main/readme_links/ReadMe%20ScreenShot%20Small.png" alt="broken link of game screenshot 2" width="345"/> <img src="https://raw.githubusercontent.com/Pan-I/Crazy-Snake/refs/heads/main/readme_links/ReadMe%20ScreenShot%20Small2.png" alt="broken link of game screenshot 3" width="345"/>
+The current version (v0.1.x) is only the base game of Snake. More to come soon..
+
+<img src="https://raw.githubusercontent.com/Pan-I/Crazy-Snake/refs/heads/main/readme_links/v0.1%20 Gameplay.gif" alt="broken link of game screenshot 2" width="900"/> 
 
 ---
 ## 🌟 Features 🎁
@@ -33,7 +35,7 @@ A remake of Snake, with some twists. An ongoing project with more to come soon.
 ---
 ## 🔨 Code Highlights 🔍
 
-##### (More to come later)
+Most of the project's code is in [`Main.cs`](https://github.com/Pan-I/Crazy-Snake/blob/main/scripts/Main.cs)
 
 ---
 ## 🏃 Getting Started 🚀
@@ -63,7 +65,6 @@ If you would like to debug the game, you will need a C# IDE that is compatible w
 	- [Rider](https://plugins.jetbrains.com/plugin/13882-godot-support)
 	- Visual Studio configuration unknown
 
-
 ---
 ## 🐛 Issues, Enhancements, & Progress 🔮
 
@@ -85,12 +86,11 @@ This project was heavily inspired by the following videos:
 ## 📜 License 🔓
 
 Crazy Snake, a remake of 'Snake'. A Godot project written in C#.
-Copyright GPL-2.0 (c) (2024) Ian Pommer
+Copyright GPL-2.0 (c) (2025) Ian Pommer
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version. [Click here for details](https://github.com/Pan-I/Crazy-Snake?tab=GPL-2.0-1-ov-file#readme)
 
-##### Sprites
-All sprites (.png files) are the products created solely by the repo owner (Pan-I, Ian Pommer). If separated from the Crazy Game product as a whole, the sprites are under [CC-BY-4.0 (2024) Ian Pommer.](https://creativecommons.org/licenses/by/4.0/legalcode.en) Please give proper credit if copied and redistributed, or remix, transform, and built upon. You must give [appropriate credit](https://creativecommons.org/licenses/by/4.0/#ref-appropriate-credit) , provide a link to the license, and [indicate if changes were made](https://creativecommons.org/licenses/by/4.0/#ref-indicate-changes) . You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+###### Sprites
 
 ##### Audio
 All audio files are under various creative commons or attribution licenses, further details and credits can be found here: [**ATTRIBUTIONS.md**](https://github.com/Pan-I/Crazy-Snake/tree/main/readme_links/ATTRIBUTIONS.md)
