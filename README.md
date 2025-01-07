@@ -1,4 +1,4 @@
-#  🐍🎮 Crazy Snake 👾🪩 - v0.1.1.0
+#  🐍🎮 Crazy Snake 👾🪩 - v0.1.1.1
 
 
 <img src="https://raw.githubusercontent.com/Pan-I/Crazy-Snake/refs/heads/main/readme_links/Banner%20Image.png" alt="broken link of game screenshot 1" width="900"/>
@@ -35,7 +35,7 @@ The current version (v0.1.x) is only the base game of Snake. More to come soon..
 ---
 ## 🔨 Code Highlights 🔍
 
-Most of the project's code is in [`Main.cs`](https://github.com/Pan-I/Crazy-Snake/blob/main/scripts/Main.cs)
+Most of the project's code is in [`Main.cs`](https://github.com/Pan-I/Crazy-Snake/blob/main/scripts/main.cs)
 
 ---
 ## 🏃 Getting Started 🚀
