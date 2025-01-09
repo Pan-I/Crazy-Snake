@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://05iqo4nqdjqp"]
+
+[ext_resource type="Texture2D" uid="uid://b7mv8obs30kdy" path="res://assets/sprites/Wall.png" id="1_00fxj"]
+
+[node name="Wall" type="Sprite2D" groups=["smallWalls"]]
+texture = ExtResource("1_00fxj")
+offset = Vector2(15, 15)

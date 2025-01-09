@@ -1,4 +1,4 @@
-#  🐍🎮 Crazy Snake 👾🪩 - v0.1.1.1
+#  🐍🎮 Crazy Snake 👾🪩 - v0.2.1.0
 
 
 <img src="https://raw.githubusercontent.com/Pan-I/Crazy-Snake/refs/heads/main/readme_links/Banner%20Image.png" alt="broken link of game screenshot 1" width="900"/>
@@ -20,9 +20,13 @@
 
 A remake of Snake, with some twists. 
 
-The current version (v0.1.x) is only the base game of Snake. More to come soon..
+The current version (v0.2.x) introduces a list of items that impact scoring and gameplay including:
+- Game ending walls
+- High scoring eggs
+- Negative scoring eggs
 
-<img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.1%20Gameplay.gif" alt="broken link of game screenshot 2" width="450"/> 
+<img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.2%20Gameplay1.gif" alt="broken link of game screenshot 2" width="450"/> 
+<img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.2%20Gameplay2.gif" alt="broken link of game screenshot 3" width="450"/> 
 
 ---
 ## 🌟 Features 🎁
