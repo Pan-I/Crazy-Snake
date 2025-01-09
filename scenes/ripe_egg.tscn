@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://soyxsm0myauj"]
+
+[ext_resource type="Texture2D" uid="uid://c8lt6kmp7jn5g" path="res://assets/sprites/Ripe Egg.png" id="1_cic01"]
+
+[node name="RipeEgg" type="Sprite2D"]
+texture = ExtResource("1_cic01")
+offset = Vector2(15, 15)

@@ -19,17 +19,29 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 The author can be contacted at pan.i.githubcontact@gmail.com
 */
 
-using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Godot;
 
-public partial class main : Node
+namespace Snake.scripts;
+
+public partial class Main : Node
 {
-	[Export] public PackedScene SnakeSegmentScene {get; set;}
+	[Export] public PackedScene SnakeSegmentPs {get; set;}
+	[Export] public PackedScene SmallWallPs {get; set;}
+	[Export] public PackedScene FreshEggPs {get; set;}
+	[Export] public PackedScene RipeEggPs { get; set;}
+	[Export] public PackedScene ShinyEggPs {get; set;}
+	[Export] public PackedScene AlienEggPs {get; set;}
+	[Export] public PackedScene DiscoEggPs {get; set;}
+	[Export] public PackedScene RottenEggPs {get; set;}
+	[Export] public PackedScene LavaEggPs {get; set;}
+	[Export] public PackedScene IceEggPs {get; set;}
+	
 
 	//Game Variables
-	private int _score;
+	private double _score;
 	private bool _gameStarted;
 	
 	//Grid Variables
@@ -41,9 +53,12 @@ public partial class main : Node
 	private List<Vector2I> _snakeData;
 	private List<Node2D> _snake;
 	
-	//Food Variables
-	private Vector2I _foodPosition;
-	private bool _foodRegen = true;
+	//Egg & Item Variables
+	private Vector2I _eggPosition;
+	private bool _itemRegen = true;
+	private List<Node2D> _items;
+	private List<Vector2I> _itemsData;
+	private Vector2I _newItemPosition;
 	
 	//Movement Variables
 	private Vector2I _startPosition = new (14, 16);
@@ -53,7 +68,8 @@ public partial class main : Node
 	private Vector2I _rightMove = new (1, 0);
 	private Vector2I _moveDirection;
 	private bool _canMove;
-	
+	private int _tally;
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -66,12 +82,22 @@ public partial class main : Node
 		GetTree().Paused = false;
 		GetTree().CallGroup("snake", "queue_free");
 		_score = 0;
+		_tally = 0;
+		if (_items != null)
+		{
+			foreach (Node2D node in _items)
+			{
+				node.QueueFree();
+			}
+		}
+		_items = new List<Node2D>();
+		_itemsData = new List<Vector2I>();
 		GetNode<CanvasLayer>("GameOverMenu").Visible = false;
-		GetNode<CanvasLayer>("Hud").GetNode<Label>("ScoreLabel").Text = $"Score: {_score.ToString()} ";
+		UpdateHudScore();
 		_moveDirection = _upMove;
 		_canMove = true;
 		GenerateSnake();
-		MoveFood();
+		MoveEgg();
 	}
 
 	private void GenerateSnake()
@@ -88,7 +114,7 @@ public partial class main : Node
 	private void AddSegment(Vector2I position)
 	{
 		_snakeData.Add(position);
-		var snakeSegment = SnakeSegmentScene.Instantiate<Node2D>();
+		var snakeSegment = SnakeSegmentPs.Instantiate<Node2D>();
 		snakeSegment.Position = (position * _cellPixelSize) + new Vector2I(0, _cellPixelSize);
 		AddChild(snakeSegment);
 		_snake.Add(snakeSegment);
@@ -153,7 +179,6 @@ public partial class main : Node
 	private void _on_move_timer_timeout()
 	{
 		_canMove = true;
-		//var test = Array.Empty<Vector2I>();
 		_oldData = _snakeData.ToList();
 		_snakeData[0] += _moveDirection;
 		for (int i = 0; i < _snakeData.Count; i++)
@@ -166,38 +191,211 @@ public partial class main : Node
 		}
 		CheckOutOfBound();
 		CheckSelfEaten();
-		CheckFoodEaten();
+		CheckEggEaten();
+		CheckItemHit();
 	}
 
-	private void MoveFood()
+	private void CheckGenerations()
+	{
+		Node2D newItem;
+		if (_tally % 1 == 0)
+		{
+			newItem = SmallWallPs.Instantiate<Node2D>();
+			GenerateItem(newItem);
+			newItem = FreshEggPs.Instantiate<Node2D>();
+			GenerateItem(newItem);
+		}
+		if (_tally % 2 == 0)
+		{
+			newItem = RipeEggPs.Instantiate<Node2D>();
+			GenerateItem(newItem);
+		}
+		if (_tally % 3 == 0)
+		{
+			newItem = RottenEggPs.Instantiate<Node2D>();
+			GenerateItem(newItem);
+		}
+		if (_tally % 5 == 0)
+		{
+			newItem = ShinyEggPs.Instantiate<Node2D>();
+			GenerateItem(newItem);
+		}
+		if (_tally % 8 == 0)
+		{
+			newItem = LavaEggPs.Instantiate<Node2D>();
+			GenerateItem(newItem);
+		}
+		if (_tally % 13 == 0)
+		{
+			newItem = AlienEggPs.Instantiate<Node2D>();
+			GenerateItem(newItem);
+		}
+		if (_tally % 21 == 0)
+		{
+			newItem = IceEggPs.Instantiate<Node2D>();
+			GenerateItem(newItem);
+		}
+		if (_tally % 34 == 0)
+		{
+			newItem = DiscoEggPs.Instantiate<Node2D>();
+			GenerateItem(newItem);
+		}
+	}
+	
+	private void ItemResult(Node2D item)
+	{
+		if (item.SceneFilePath == SmallWallPs.ResourcePath) 
+		{
+			EndGame();
+		}
+		if (item.SceneFilePath == FreshEggPs.ResourcePath)
+		{
+			_score += 25;
+			AddSegment(_oldData[^1]);
+			_tally++;
+			CheckGenerations();
+		}
+		if (item.SceneFilePath == RipeEggPs.ResourcePath)
+		{
+			_score += 150;
+			AddSegment(_oldData[^1]);
+			//_tally++;
+			//CheckGenerations();
+		}
+
+		if (item.SceneFilePath == ShinyEggPs.ResourcePath)
+		{
+			_score += 1000;
+			AddSegment(_oldData[^1]);
+		}
+
+		if (item.SceneFilePath == AlienEggPs.ResourcePath)
+		{
+			_score *= 2;
+			AddSegment(_oldData[^1]);
+		}
+
+		if (item.SceneFilePath == DiscoEggPs.ResourcePath)
+		{
+			_score *= _score;
+			AddSegment(_oldData[^1]);
+		}
+		if (item.SceneFilePath == RottenEggPs.ResourcePath)
+		{
+			_score -= 300;
+			AddSegment(_oldData[^1]);
+			_tally++;
+			CheckGenerations();
+		}
+		if(item.SceneFilePath == LavaEggPs.ResourcePath)
+		{			
+			_score /= 2;
+			AddSegment(_oldData[^1]);
+			_tally++;
+			CheckGenerations();
+		}
+
+		if (item.SceneFilePath == IceEggPs.ResourcePath)
+		{
+			_score = Math.Sqrt(_score);
+			AddSegment(_oldData[^1]);
+			_tally++;
+			CheckGenerations();
+		}
+	}
+
+
+	private void GenerateItem(Node2D newItem)
 	{
 		Random rndm = new Random();
 		do
 		{
-			_foodRegen = false;
-			_foodPosition = new Vector2I(rndm.Next(0, _boardCellSize - 1), rndm.Next(3, _boardCellSize - 1));
+			_itemRegen = false;
+			_newItemPosition = new Vector2I(rndm.Next(0, _boardCellSize - 1), rndm.Next(3, _boardCellSize - 1));
+			if (_newItemPosition == _eggPosition)
+			{
+				_itemRegen = true;
+			}
 			for (int i = 0; i < _snakeData.Count; i++)
 			{
-				if (_foodPosition == _snakeData[i])
+				if (_newItemPosition == _snakeData[i])
 				{
-					_foodRegen = true;
+					_itemRegen = true;
 				}
 			}
-		} while (_foodRegen);
+			for (int i = 0; i < _itemsData.Count; i++)
+			{
+				if (_newItemPosition == _itemsData[i])
+				{
+					_itemRegen = true;
+				}
+			}
+		} while (_itemRegen);
 		
-		GetNode<Node2D>("Food").Position = (_foodPosition * _cellPixelSize) + new Vector2I(0, _cellPixelSize);
-		_foodRegen = true;
+		newItem.Position = (_newItemPosition * _cellPixelSize) + new Vector2I(0, _cellPixelSize);
+		AddChild(newItem);
+		_items.Add(newItem);
+		_itemsData.Add(_newItemPosition);
 	}
 
-	private void CheckFoodEaten()
+	private void CheckItemHit()
 	{
-		if (_foodPosition == _snakeData[0])
+		for (int i = 0; i < _itemsData.Count; i++)
+		{
+			if (_snakeData[0] == _itemsData[i])
+			{
+				ItemResult(_items[i]);
+				UpdateHudScore();
+				_items[i].QueueFree();
+				_itemsData.RemoveAt(i);
+				_items.RemoveAt(i);
+			}
+		}
+	}
+	
+	private void MoveEgg()
+	{
+		Random rndm = new Random();
+		do
+		{
+			_itemRegen = false;
+			_eggPosition = new Vector2I(rndm.Next(0, _boardCellSize - 1), rndm.Next(3, _boardCellSize - 1));
+			for (int i = 0; i < _snakeData.Count; i++)
+			{
+				if (_eggPosition == _snakeData[i])
+				{
+					_itemRegen = true;
+				}
+			}
+			for (int i = 0; i < _itemsData.Count; i++)
+			{
+				if (_eggPosition == _itemsData[i])
+				{
+					_itemRegen = true;
+				}
+			}
+		} while (_itemRegen);
+		
+		GetNode<Node2D>("Egg").Position = (_eggPosition * _cellPixelSize) + new Vector2I(0, _cellPixelSize);
+		_itemRegen = true;
+	}
+
+	private void CheckEggEaten()
+	{
+		if (_eggPosition == _snakeData[0])
 		{
 			_score += 5;
-			GetNode<CanvasLayer>("Hud").GetNode<Label>("ScoreLabel").Text = $"Score: {_score.ToString()} ";
+			_tally++;
+			UpdateHudScore();
 			AddSegment(_oldData[^1]);
-			MoveFood();
+			MoveEgg();
+			CheckGenerations();
 		}
+	}
+
+	private void UpdateHudScore()
+	{
+		GetNode<CanvasLayer>("Hud").GetNode<Label>("ScoreLabel").Text = $"Score: {_score} ";
 	}
 
 	private void CheckSelfEaten()
@@ -214,7 +412,7 @@ public partial class main : Node
 	private void CheckOutOfBound()
 	{
 		if (_snakeData[0].X < 0 || _snakeData[0].X > _boardCellSize - 1 || _snakeData[0].Y < 1 ||
-			_snakeData[0].Y > _boardCellSize - 1)
+			_snakeData[0].Y > _boardCellSize)
 		{
 			EndGame();
 		}
