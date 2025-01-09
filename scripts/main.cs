@@ -433,7 +433,3 @@ public partial class Main : Node
 		NewGame();
 	}
 }
-
-
-
-
