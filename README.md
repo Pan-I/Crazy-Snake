@@ -25,8 +25,7 @@ The current version (v0.2.x) introduces a list of items that impact scoring and 
 - High scoring eggs
 - Negative scoring eggs
 
-<img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.2%20Gameplay1.gif" alt="broken link of game screenshot 2" width="300"/> 
-<img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.2%20Gameplay2.gif" alt="broken link of game screenshot 3" width="300"/> 
+<img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.2%20Gameplay1.gif" alt="broken link of game screenshot 2" width="450"/> <img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.2%20Gameplay2.gif" alt="broken link of game screenshot 3" width="450"/> 
 
 ---
 ## 🌟 Features 🎁
