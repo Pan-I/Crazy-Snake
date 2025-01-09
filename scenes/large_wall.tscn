@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://jq2phst1krey"]
+
+[ext_resource type="Texture2D" uid="uid://dagreiut8gn5s" path="res://assets/sprites/Large Wall.png" id="1_p7k3s"]
+
+[node name="LargeWall" type="Sprite2D"]
+texture = ExtResource("1_p7k3s")
+offset = Vector2(30, 30)

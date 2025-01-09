@@ -29,16 +29,6 @@ namespace Snake.scripts;
 public partial class Main : Node
 {
 	[Export] public PackedScene SnakeSegmentPs {get; set;}
-	[Export] public PackedScene SmallWallPs {get; set;}
-	[Export] public PackedScene FreshEggPs {get; set;}
-	[Export] public PackedScene RipeEggPs { get; set;}
-	[Export] public PackedScene ShinyEggPs {get; set;}
-	[Export] public PackedScene AlienEggPs {get; set;}
-	[Export] public PackedScene DiscoEggPs {get; set;}
-	[Export] public PackedScene RottenEggPs {get; set;}
-	[Export] public PackedScene LavaEggPs {get; set;}
-	[Export] public PackedScene IceEggPs {get; set;}
-	
 
 	//Game Variables
 	private double _score;
@@ -194,164 +184,6 @@ public partial class Main : Node
 		CheckEggEaten();
 		CheckItemHit();
 	}
-
-	private void CheckGenerations()
-	{
-		Node2D newItem;
-		if (_tally % 1 == 0)
-		{
-			newItem = SmallWallPs.Instantiate<Node2D>();
-			GenerateItem(newItem);
-			newItem = FreshEggPs.Instantiate<Node2D>();
-			GenerateItem(newItem);
-		}
-		if (_tally % 2 == 0)
-		{
-			newItem = RipeEggPs.Instantiate<Node2D>();
-			GenerateItem(newItem);
-		}
-		if (_tally % 3 == 0)
-		{
-			newItem = RottenEggPs.Instantiate<Node2D>();
-			GenerateItem(newItem);
-		}
-		if (_tally % 5 == 0)
-		{
-			newItem = ShinyEggPs.Instantiate<Node2D>();
-			GenerateItem(newItem);
-		}
-		if (_tally % 8 == 0)
-		{
-			newItem = LavaEggPs.Instantiate<Node2D>();
-			GenerateItem(newItem);
-		}
-		if (_tally % 13 == 0)
-		{
-			newItem = AlienEggPs.Instantiate<Node2D>();
-			GenerateItem(newItem);
-		}
-		if (_tally % 21 == 0)
-		{
-			newItem = IceEggPs.Instantiate<Node2D>();
-			GenerateItem(newItem);
-		}
-		if (_tally % 34 == 0)
-		{
-			newItem = DiscoEggPs.Instantiate<Node2D>();
-			GenerateItem(newItem);
-		}
-	}
-	
-	private void ItemResult(Node2D item)
-	{
-		if (item.SceneFilePath == SmallWallPs.ResourcePath) 
-		{
-			EndGame();
-		}
-		if (item.SceneFilePath == FreshEggPs.ResourcePath)
-		{
-			_score += 25;
-			AddSegment(_oldData[^1]);
-			_tally++;
-			CheckGenerations();
-		}
-		if (item.SceneFilePath == RipeEggPs.ResourcePath)
-		{
-			_score += 150;
-			AddSegment(_oldData[^1]);
-			//_tally++;
-			//CheckGenerations();
-		}
-
-		if (item.SceneFilePath == ShinyEggPs.ResourcePath)
-		{
-			_score += 1000;
-			AddSegment(_oldData[^1]);
-		}
-
-		if (item.SceneFilePath == AlienEggPs.ResourcePath)
-		{
-			_score *= 2;
-			AddSegment(_oldData[^1]);
-		}
-
-		if (item.SceneFilePath == DiscoEggPs.ResourcePath)
-		{
-			_score *= _score;
-			AddSegment(_oldData[^1]);
-		}
-		if (item.SceneFilePath == RottenEggPs.ResourcePath)
-		{
-			_score -= 300;
-			AddSegment(_oldData[^1]);
-			_tally++;
-			CheckGenerations();
-		}
-		if(item.SceneFilePath == LavaEggPs.ResourcePath)
-		{			
-			_score /= 2;
-			AddSegment(_oldData[^1]);
-			_tally++;
-			CheckGenerations();
-		}
-
-		if (item.SceneFilePath == IceEggPs.ResourcePath)
-		{
-			_score = Math.Sqrt(_score);
-			AddSegment(_oldData[^1]);
-			_tally++;
-			CheckGenerations();
-		}
-	}
-
-
-	private void GenerateItem(Node2D newItem)
-	{
-		Random rndm = new Random();
-		do
-		{
-			_itemRegen = false;
-			_newItemPosition = new Vector2I(rndm.Next(0, _boardCellSize - 1), rndm.Next(3, _boardCellSize - 1));
-			if (_newItemPosition == _eggPosition)
-			{
-				_itemRegen = true;
-			}
-			for (int i = 0; i < _snakeData.Count; i++)
-			{
-				if (_newItemPosition == _snakeData[i])
-				{
-					_itemRegen = true;
-				}
-			}
-			for (int i = 0; i < _itemsData.Count; i++)
-			{
-				if (_newItemPosition == _itemsData[i])
-				{
-					_itemRegen = true;
-				}
-			}
-		} while (_itemRegen);
-		
-		newItem.Position = (_newItemPosition * _cellPixelSize) + new Vector2I(0, _cellPixelSize);
-		AddChild(newItem);
-		_items.Add(newItem);
-		_itemsData.Add(_newItemPosition);
-	}
-
-	private void CheckItemHit()
-	{
-		for (int i = 0; i < _itemsData.Count; i++)
-		{
-			if (_snakeData[0] == _itemsData[i])
-			{
-				ItemResult(_items[i]);
-				UpdateHudScore();
-				_items[i].QueueFree();
-				_itemsData.RemoveAt(i);
-				_items.RemoveAt(i);
-			}
-		}
-	}
 	
 	private void MoveEgg()
 	{
@@ -397,6 +229,211 @@ public partial class Main : Node
 	{
 		GetNode<CanvasLayer>("Hud").GetNode<Label>("ScoreLabel").Text = $"Score: {_score} ";
 	}
+
+	#region Items
+	
+	private void CheckGenerations()
+	{
+		Node2D newItem;
+		if (_tally % 1 == 0)
+		{
+			newItem = (Node2D)GetNode<Node2D>("ItemManager/Wall").Duplicate();
+			GenerateItem(newItem);
+			newItem = (Node2D)GetNode<Node2D>("ItemManager/FreshEgg").Duplicate();
+			GenerateItem(newItem);
+		}
+		if (_tally % 2 == 0)
+		{
+			newItem = (Node2D)GetNode<Node2D>("ItemManager/RipeEgg").Duplicate();
+			GenerateItem(newItem);
+		}
+		if (_tally % 3 == 0)
+		{
+			newItem = (Node2D)GetNode<Node2D>("ItemManager/RottenEgg").Duplicate();
+			GenerateItem(newItem);
+		}
+
+		if (_tally % 4 == 0)
+		{
+			newItem = (Node2D)GetNode<Node2D>("ItemManager/Mushroom").Duplicate();
+			GenerateItem(newItem);
+		}
+		if (_tally % 5 == 0)
+		{
+			newItem = (Node2D)GetNode<Node2D>("ItemManager/ShinyEgg").Duplicate();
+			GenerateItem(newItem);
+		}
+
+		if (_tally % 6 == 0)
+		{
+			newItem = (Node2D)GetNode<Node2D>("ItemManager/Skull").Duplicate();
+			GenerateItem(newItem);
+		}
+		if (_tally % 7 == 0)
+		{
+			newItem = (Node2D)GetNode<Node2D>("ItemManager/DewDrop").Duplicate();
+			GenerateItem(newItem);
+		}
+		if (_tally % 8 == 0)
+		{
+			newItem = (Node2D)GetNode<Node2D>("ItemManager/LavaEgg").Duplicate();
+			GenerateItem(newItem);
+		}
+		if (_tally % 10 == 0)
+		{
+			newItem = (Node2D)GetNode<Node2D>("ItemManager/Frog").Duplicate();
+			GenerateItem(newItem);
+		}
+		if (_tally % 13 == 0)
+		{
+			newItem = (Node2D)GetNode<Node2D>("ItemManager/AlienEgg").Duplicate();
+			GenerateItem(newItem);
+		}
+		if (_tally % 21 == 0)
+		{
+			newItem = (Node2D)GetNode<Node2D>("ItemManager/IceEgg").Duplicate();
+			GenerateItem(newItem);
+		}
+		if (_tally % 22 == 0)
+		{
+			newItem = (Node2D)GetNode<Node2D>("ItemManager/Pill").Duplicate();
+			GenerateItem(newItem);
+		}
+		if (_tally % 34 == 0)
+		{
+			newItem = (Node2D)GetNode<Node2D>("ItemManager/DiscoEgg").Duplicate();
+			GenerateItem(newItem);
+		}
+	}
+	
+	private void ItemResult(Node2D item)
+	{
+		if (item.SceneFilePath == GetNode("ItemManager/Wall").SceneFilePath 
+			|| item.SceneFilePath == GetNode("ItemManager/LargeWall").SceneFilePath) 
+		{
+			EndGame();
+		}
+		if (item.SceneFilePath == GetNode("ItemManager/FreshEgg").SceneFilePath)
+		{
+			_score += 25;
+			AddSegment(_oldData[^1]);
+			//_tally++;
+			//CheckGenerations();
+		}
+		if (item.SceneFilePath == GetNode("ItemManager/RipeEgg").SceneFilePath)
+		{
+			_score *= 1.1;
+			AddSegment(_oldData[^1]);
+			//_tally++;
+			//CheckGenerations();
+		}
+
+		if (item.SceneFilePath == GetNode("ItemManager/ShinyEgg").SceneFilePath)
+		{
+			_score *= 1.25;
+			AddSegment(_oldData[^1]);
+		}
+
+		if (item.SceneFilePath == GetNode("ItemManager/AlienEgg").SceneFilePath)
+		{
+			_score *= 2;
+			AddSegment(_oldData[^1]);
+		}
+
+		if (item.SceneFilePath == GetNode("ItemManager/DiscoEgg").SceneFilePath)
+		{
+			_score *= _score;
+			AddSegment(_oldData[^1]);
+		}
+		if (item.SceneFilePath == GetNode("ItemManager/RottenEgg").SceneFilePath)
+		{
+			_score -= 25;
+			AddSegment(_oldData[^1]);
+			//_tally++;
+			//CheckGenerations();
+		}
+		if(item.SceneFilePath == GetNode("ItemManager/LavaEgg").SceneFilePath)
+		{			
+			_score /= 2;
+			AddSegment(_oldData[^1]);
+			//_tally++;
+			//CheckGenerations();
+		}
+		if (item.SceneFilePath == GetNode("ItemManager/IceEgg").SceneFilePath)
+		{
+			_score = Math.Sqrt(_score);
+			AddSegment(_oldData[^1]);
+			//_tally++;
+			//CheckGenerations();
+		}
+		if (item.SceneFilePath == GetNode("ItemManager/Mushroom").SceneFilePath)
+		{
+			_score += 75;
+		}
+		if (item.SceneFilePath == GetNode("ItemManager/DewDrop").SceneFilePath)
+		{
+			_score = Math.Abs(_score);
+		}
+		if (item.SceneFilePath == GetNode("ItemManager/Pill").SceneFilePath)
+		{
+			_score = Math.Abs(_score) * (Math.Abs(_score) + Math.Abs(_score));
+		}
+		if (item.SceneFilePath == GetNode("ItemManager/Skull").SceneFilePath)
+		{
+			_score -= 9999;
+		}
+			
+	}
+
+	private void GenerateItem(Node2D newItem)
+	{
+		newItem.Visible = true;
+		Random rndm = new Random();
+		do
+		{
+			_itemRegen = false;
+			_newItemPosition = new Vector2I(rndm.Next(0, _boardCellSize - 1), rndm.Next(3, _boardCellSize - 1));
+			if (_newItemPosition == _eggPosition)
+			{
+				_itemRegen = true;
+			}
+			for (int i = 0; i < _snakeData.Count; i++)
+			{
+				if (_newItemPosition == _snakeData[i])
+				{
+					_itemRegen = true;
+				}
+			}
+			for (int i = 0; i < _itemsData.Count; i++)
+			{
+				if (_newItemPosition == _itemsData[i])
+				{
+					_itemRegen = true;
+				}
+			}
+		} while (_itemRegen);
+		newItem.Position = (_newItemPosition * _cellPixelSize) + new Vector2I(0, _cellPixelSize);
+		AddChild(newItem);
+		_items.Add(newItem);
+		_itemsData.Add(_newItemPosition);
+	}
+
+	private void CheckItemHit()
+	{
+		for (int i = 0; i < _itemsData.Count; i++)
+		{
+			if (_snakeData[0] == _itemsData[i])
+			{
+				ItemResult(_items[i]);
+				UpdateHudScore();
+				_items[i].QueueFree();
+				_itemsData.RemoveAt(i);
+				_items.RemoveAt(i);
+			}
+		}
+	}
+
+	#endregion
 
 	private void CheckSelfEaten()
 	{

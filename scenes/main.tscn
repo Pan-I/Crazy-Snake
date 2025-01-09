@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://dwuicj4fifd38"]
+[gd_scene load_steps=17 format=3 uid="uid://dwuicj4fifd38"]
 
 [ext_resource type="Script" path="res://scripts/Main.cs" id="1_oifwq"]
 [ext_resource type="PackedScene" uid="uid://srvuytqmi2cm" path="res://scenes/snake_segments.tscn" id="2_0hqrm"]
@@ -15,6 +15,7 @@
 [ext_resource type="PackedScene" uid="uid://cfctjn2vcvoqy" path="res://scenes/disco_egg.tscn" id="8_rytji"]
 [ext_resource type="PackedScene" uid="uid://dl0l2obriypdb" path="res://scenes/lava_egg.tscn" id="10_4as1q"]
 [ext_resource type="PackedScene" uid="uid://bwk2be61q50p5" path="res://scenes/ice_egg.tscn" id="11_rha14"]
+[ext_resource type="PackedScene" uid="uid://bus8ubbqf6t8f" path="res://scenes/item_manager.tscn" id="16_xuxgj"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_oifwq")
@@ -45,6 +46,8 @@ offset = Vector2(15, 15)
 
 [node name="GameOverMenu" parent="." instance=ExtResource("6_n0b3j")]
 process_mode = 2
+
+[node name="ItemManager" parent="." instance=ExtResource("16_xuxgj")]
 
 [connection signal="timeout" from="MoveTimer" to="." method="_on_move_timer_timeout"]
 [connection signal="Restart" from="GameOverMenu" to="." method="_on_game_over_menu_restart"]
