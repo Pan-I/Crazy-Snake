@@ -42,6 +42,7 @@ public partial class Main : Node
 	//Snake Variables
 	private List<Vector2I> _oldData;
 	private List<Vector2I> _snakeData;
+	private List<Node2D> _oldSnake;
 	private List<Node2D> _snake;
 	
 	//Egg & Item Variables
@@ -125,6 +126,7 @@ public partial class Main : Node
 	{
 		_oldData = new List<Vector2I>();
 		_snakeData = new List<Vector2I>();
+		_oldSnake = new List<Node2D>();
 		_snake = new List<Node2D>();
 
 		for (int i = 0; i < 3; i++)
@@ -135,10 +137,15 @@ public partial class Main : Node
 	private void AddSegment(Vector2I position)
 	{
 		_snakeData.Add(position);
-		var snakeSegment = SnakeSegmentPs.Instantiate<Node2D>();
+		var snakeSegment = SnakeSegmentPs.Instantiate<AnimatedSprite2D>();
 		snakeSegment.Position = (position * _cellPixelSize) + new Vector2I(0, _cellPixelSize);
+		if (_snake.Count == 0)
+		{
+			snakeSegment.Frame = 1;
+		}
 		AddChild(snakeSegment);
 		_snake.Add(snakeSegment);
+		_oldSnake.Add(snakeSegment);
 	}
 
 
@@ -156,6 +163,7 @@ public partial class Main : Node
 			{
 				_moveDirection = _downMove;
 				_canMove = false;
+				//_snake[0].Rotation = 90;
 				if (!_gameStarted)
 				{
 					StartGame();
@@ -200,7 +208,11 @@ public partial class Main : Node
 	private void _on_move_timer_timeout()
 	{
 		_canMove = true;
-		_oldData = _snakeData.ToList();
+		_oldData = _snakeData.ToList(); //Shallow copy, so why does this work? 
+		for (int i = 0; i < _snake.Count; i++)
+		{
+			_oldSnake[i] = CloneAnimatedSprite2D((AnimatedSprite2D)_snake[i]);
+		}
 		_snakeData[0] += _moveDirection;
 		for (int i = 0; i < _snakeData.Count; i++)
 		{
@@ -209,6 +221,16 @@ public partial class Main : Node
 				_snakeData[i] = _oldData[i - 1];
 			}
 			_snake[i].Position = (_snakeData[i] * _cellPixelSize) + new Vector2I(0, _cellPixelSize);
+			if (_snakeData.Count > 4 && i == 2)
+			{
+				ChangeSnakeFrames();
+			}
+			if (_snakeData.Count > 4 && i > 1 && i < _snake.Count - 1)
+			{
+				var test = (AnimatedSprite2D)_snake[i];
+				var oldTest = (AnimatedSprite2D)_oldSnake[i - 1];
+				test.Frame = oldTest.Frame;
+			}
 		}
 		CheckOutOfBound();
 		CheckSelfEaten();
@@ -216,6 +238,73 @@ public partial class Main : Node
 		CheckItemHit();
 	}
 	
+	private void ChangeSnakeFrames()
+	{
+		AnimatedSprite2D neck = (AnimatedSprite2D)_snake[1];
+		Vector2 headPosition = _snake[0].Position;
+		Vector2 neckPosition = _snake[1].Position;
+		Vector2 tailPosition = _snake[2].Position;
+
+		// Check if the snake is in a straight line
+		if ((headPosition.X == neckPosition.X && neckPosition.X == tailPosition.X) ||
+		    (headPosition.Y == neckPosition.Y && neckPosition.Y == tailPosition.Y))
+		{
+			neck.Frame = 0;
+			return;
+		}
+
+		// Determine relative positions
+		bool isHeadAboveTail = headPosition.Y < tailPosition.Y;
+		bool isHeadBelowTail = headPosition.Y > tailPosition.Y;
+		bool isHeadRightOfTail = headPosition.X > tailPosition.X;
+		bool isHeadLeftOfTail = headPosition.X < tailPosition.X;
+
+		if (isHeadAboveTail)
+		{
+			if (isHeadRightOfTail)
+			{
+				neck.Frame = headPosition.X == neckPosition.X ? 2 : 5;
+			}
+			else if (isHeadLeftOfTail)
+			{
+				neck.Frame = headPosition.X == neckPosition.X ? 3 : 4;
+			}
+		}
+		else if (isHeadBelowTail)
+		{
+			if (isHeadRightOfTail)
+			{
+				neck.Frame = headPosition.X == neckPosition.X ? 4 : 3;
+			}
+			else if (isHeadLeftOfTail)
+			{
+				neck.Frame = headPosition.X == neckPosition.X ? 5 : 2;
+			}
+		}
+	}
+	
+	private AnimatedSprite2D CloneAnimatedSprite2D(AnimatedSprite2D original)
+	{
+		// Create a new instance
+		var copy = new AnimatedSprite2D();
+	
+		// Copy essential properties
+		copy.Name = original.Name;
+		copy.Position = original.Position;
+		copy.Offset = original.Offset;
+		copy.Scale = original.Scale;
+		copy.Rotation = original.Rotation;
+		copy.Visible = original.Visible;
+		copy.SpriteFrames = original.SpriteFrames;
+
+		// Copy animation-related properties
+		copy.Frame = original.Frame;
+		copy.Animation = original.Animation;
+		copy.Autoplay = original.Autoplay;
+
+		return copy;
+	}
+
 	private void MoveEgg()
 	{
 		_eggPosition = RandomPlacement();
