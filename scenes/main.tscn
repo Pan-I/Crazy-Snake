@@ -1,34 +1,16 @@
-[gd_scene load_steps=17 format=3 uid="uid://dwuicj4fifd38"]
+[gd_scene load_steps=8 format=3 uid="uid://dwuicj4fifd38"]
 
 [ext_resource type="Script" path="res://scripts/Main.cs" id="1_oifwq"]
 [ext_resource type="PackedScene" uid="uid://srvuytqmi2cm" path="res://scenes/snake_segments.tscn" id="2_0hqrm"]
 [ext_resource type="Texture2D" uid="uid://cg2newbicni8e" path="res://assets/sprites/Grid.png" id="2_a1cr7"]
 [ext_resource type="PackedScene" uid="uid://c04wsqka0wuf" path="res://scenes/hud.tscn" id="3_4f2l8"]
-[ext_resource type="PackedScene" uid="uid://05iqo4nqdjqp" path="res://scenes/wall.tscn" id="3_udli6"]
-[ext_resource type="PackedScene" uid="uid://bwrxc0no8k6f6" path="res://scenes/fresh_egg.tscn" id="4_78thg"]
 [ext_resource type="Texture2D" uid="uid://ddwki58wttho5" path="res://assets/sprites/Egg.png" id="5_5bxva"]
-[ext_resource type="PackedScene" uid="uid://soyxsm0myauj" path="res://scenes/ripe_egg.tscn" id="5_n4hn1"]
-[ext_resource type="PackedScene" uid="uid://dhncxvtgp7q3i" path="res://scenes/shiny_egg.tscn" id="6_fvrlk"]
 [ext_resource type="PackedScene" uid="uid://vvfybxmrur6n" path="res://scenes/game_over_menu.tscn" id="6_n0b3j"]
-[ext_resource type="PackedScene" uid="uid://bvrvfl566cjyb" path="res://scenes/rotten_egg.tscn" id="6_th5kl"]
-[ext_resource type="PackedScene" uid="uid://cdi0w667sb8ab" path="res://scenes/alien_egg.tscn" id="7_3crpu"]
-[ext_resource type="PackedScene" uid="uid://cfctjn2vcvoqy" path="res://scenes/disco_egg.tscn" id="8_rytji"]
-[ext_resource type="PackedScene" uid="uid://dl0l2obriypdb" path="res://scenes/lava_egg.tscn" id="10_4as1q"]
-[ext_resource type="PackedScene" uid="uid://bwk2be61q50p5" path="res://scenes/ice_egg.tscn" id="11_rha14"]
 [ext_resource type="PackedScene" uid="uid://bus8ubbqf6t8f" path="res://scenes/item_manager.tscn" id="16_xuxgj"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_oifwq")
 SnakeSegmentPs = ExtResource("2_0hqrm")
-SmallWallPs = ExtResource("3_udli6")
-FreshEggPs = ExtResource("4_78thg")
-RipeEggPs = ExtResource("5_n4hn1")
-ShinyEggPs = ExtResource("6_fvrlk")
-AlienEggPs = ExtResource("7_3crpu")
-DiscoEggPs = ExtResource("8_rytji")
-RottenEggPs = ExtResource("6_th5kl")
-LavaEggPs = ExtResource("10_4as1q")
-IceEggPs = ExtResource("11_rha14")
 
 [node name="Background" type="Sprite2D" parent="."]
 position = Vector2(450, 510)

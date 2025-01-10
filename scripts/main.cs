@@ -29,7 +29,8 @@ namespace Snake.scripts;
 public partial class Main : Node
 {
 	[Export] public PackedScene SnakeSegmentPs {get; set;}
-
+	private Node2D _wallNode;
+	
 	//Game Variables
 	private double _score;
 	private bool _gameStarted;
@@ -49,6 +50,20 @@ public partial class Main : Node
 	private List<Node2D> _items;
 	private List<Vector2I> _itemsData;
 	private Vector2I _newItemPosition;
+	private Node2D _freshEggNode;
+	private Node2D _ripeEggNode;
+	private Node2D _rottenEggNode;
+	private Node2D _mushroomNode;
+	private Node2D _shinyEggNode;
+	private Node2D _skullNode;
+	private Node2D _dewDropNode;
+	private Node2D _lavaEggNode;
+	private Node2D _frogNode;
+	private Node2D _alienEggNode;
+	private Node2D _iceEggNode;
+	private Node2D _pillItemNode;
+	private Node2D _discoEggNode;
+	private Node2D _largeWallNode;
 	
 	//Movement Variables
 	private Vector2I _startPosition = new (14, 16);
@@ -63,6 +78,22 @@ public partial class Main : Node
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		_wallNode = GetNode<Node2D>("ItemManager/Wall");
+		_freshEggNode = GetNode<Node2D>("ItemManager/FreshEgg");
+		_ripeEggNode = GetNode<Node2D>("ItemManager/RipeEgg");
+		_rottenEggNode = GetNode<Node2D>("ItemManager/RottenEgg");
+		_mushroomNode = GetNode<Node2D>("ItemManager/Mushroom");
+		_shinyEggNode = GetNode<Node2D>("ItemManager/ShinyEgg");
+		_skullNode = GetNode<Node2D>("ItemManager/Skull");
+		_dewDropNode = GetNode<Node2D>("ItemManager/DewDrop");
+		_lavaEggNode = GetNode<Node2D>("ItemManager/LavaEgg");
+		_frogNode = GetNode<Node2D>("ItemManager/Frog");
+		_alienEggNode = GetNode<Node2D>("ItemManager/AlienEgg");
+		_iceEggNode = GetNode<Node2D>("ItemManager/IceEgg");
+		_pillItemNode = GetNode<Node2D>("ItemManager/Pill");
+		_discoEggNode = GetNode<Node2D>("ItemManager/DiscoEgg");
+		_largeWallNode = GetNode<Node2D>("ItemManager/LargeWall");
+		
 		NewGame();
 	}
 
@@ -187,29 +218,40 @@ public partial class Main : Node
 	
 	private void MoveEgg()
 	{
+		_eggPosition = RandomPlacement();
+		GetNode<Node2D>("Egg").Position = (_eggPosition * _cellPixelSize) + new Vector2I(0, _cellPixelSize);
+	}
+
+	private Vector2I RandomPlacement()
+	{
+		Vector2I itemPlacement;
 		Random rndm = new Random();
 		do
 		{
 			_itemRegen = false;
-			_eggPosition = new Vector2I(rndm.Next(0, _boardCellSize - 1), rndm.Next(3, _boardCellSize - 1));
+			itemPlacement = new Vector2I(rndm.Next(0, _boardCellSize - 1), rndm.Next(3, _boardCellSize - 1));
+			if (itemPlacement == _eggPosition)
+			{
+				_itemRegen = true;
+			}
 			for (int i = 0; i < _snakeData.Count; i++)
 			{
-				if (_eggPosition == _snakeData[i])
+				if (itemPlacement == _snakeData[i])
 				{
 					_itemRegen = true;
 				}
 			}
 			for (int i = 0; i < _itemsData.Count; i++)
 			{
-				if (_eggPosition == _itemsData[i])
+				if (itemPlacement == _itemsData[i])
 				{
 					_itemRegen = true;
 				}
 			}
 		} while (_itemRegen);
 		
-		GetNode<Node2D>("Egg").Position = (_eggPosition * _cellPixelSize) + new Vector2I(0, _cellPixelSize);
 		_itemRegen = true;
+		return itemPlacement;
 	}
 
 	private void CheckEggEaten()
@@ -237,148 +279,139 @@ public partial class Main : Node
 		Node2D newItem;
 		if (_tally % 1 == 0)
 		{
-			newItem = (Node2D)GetNode<Node2D>("ItemManager/Wall").Duplicate();
+			newItem = (Node2D)_wallNode.Duplicate();
 			GenerateItem(newItem);
-			newItem = (Node2D)GetNode<Node2D>("ItemManager/FreshEgg").Duplicate();
+			newItem = (Node2D)_freshEggNode.Duplicate();
 			GenerateItem(newItem);
 		}
 		if (_tally % 2 == 0)
 		{
-			newItem = (Node2D)GetNode<Node2D>("ItemManager/RipeEgg").Duplicate();
+			newItem = (Node2D)_ripeEggNode.Duplicate();
 			GenerateItem(newItem);
 		}
 		if (_tally % 3 == 0)
 		{
-			newItem = (Node2D)GetNode<Node2D>("ItemManager/RottenEgg").Duplicate();
+			newItem = (Node2D)_rottenEggNode.Duplicate();
 			GenerateItem(newItem);
 		}
 
 		if (_tally % 4 == 0)
 		{
-			newItem = (Node2D)GetNode<Node2D>("ItemManager/Mushroom").Duplicate();
+			newItem = (Node2D)_mushroomNode.Duplicate();
 			GenerateItem(newItem);
 		}
 		if (_tally % 5 == 0)
 		{
-			newItem = (Node2D)GetNode<Node2D>("ItemManager/ShinyEgg").Duplicate();
+			newItem = (Node2D)_shinyEggNode.Duplicate();
 			GenerateItem(newItem);
 		}
 
 		if (_tally % 6 == 0)
 		{
-			newItem = (Node2D)GetNode<Node2D>("ItemManager/Skull").Duplicate();
+
+			newItem = (Node2D)_skullNode.Duplicate();
 			GenerateItem(newItem);
 		}
 		if (_tally % 7 == 0)
 		{
-			newItem = (Node2D)GetNode<Node2D>("ItemManager/DewDrop").Duplicate();
+			newItem = (Node2D)_dewDropNode.Duplicate();
 			GenerateItem(newItem);
 		}
 		if (_tally % 8 == 0)
 		{
-			newItem = (Node2D)GetNode<Node2D>("ItemManager/LavaEgg").Duplicate();
+			newItem = (Node2D)_lavaEggNode.Duplicate();
 			GenerateItem(newItem);
 		}
 		if (_tally % 10 == 0)
 		{
-			newItem = (Node2D)GetNode<Node2D>("ItemManager/Frog").Duplicate();
+			newItem = (Node2D)_frogNode.Duplicate();
 			GenerateItem(newItem);
 		}
 		if (_tally % 13 == 0)
 		{
-			newItem = (Node2D)GetNode<Node2D>("ItemManager/AlienEgg").Duplicate();
+			newItem = (Node2D)_alienEggNode.Duplicate();
 			GenerateItem(newItem);
 		}
 		if (_tally % 21 == 0)
 		{
-			newItem = (Node2D)GetNode<Node2D>("ItemManager/IceEgg").Duplicate();
+			newItem = (Node2D)_iceEggNode.Duplicate();
 			GenerateItem(newItem);
 		}
 		if (_tally % 22 == 0)
 		{
-			newItem = (Node2D)GetNode<Node2D>("ItemManager/Pill").Duplicate();
+			newItem = (Node2D)_pillItemNode.Duplicate();
 			GenerateItem(newItem);
 		}
 		if (_tally % 34 == 0)
 		{
-			newItem = (Node2D)GetNode<Node2D>("ItemManager/DiscoEgg").Duplicate();
+			newItem = (Node2D)_discoEggNode.Duplicate();
 			GenerateItem(newItem);
 		}
 	}
 	
 	private void ItemResult(Node2D item)
 	{
-		if (item.SceneFilePath == GetNode("ItemManager/Wall").SceneFilePath 
-			|| item.SceneFilePath == GetNode("ItemManager/LargeWall").SceneFilePath) 
+		if (item.SceneFilePath == _wallNode.SceneFilePath 
+			|| item.SceneFilePath == _largeWallNode.SceneFilePath) 
 		{
 			EndGame();
 		}
-		if (item.SceneFilePath == GetNode("ItemManager/FreshEgg").SceneFilePath)
+		if (item.SceneFilePath == _freshEggNode.SceneFilePath)
 		{
 			_score += 25;
 			AddSegment(_oldData[^1]);
-			//_tally++;
-			//CheckGenerations();
 		}
-		if (item.SceneFilePath == GetNode("ItemManager/RipeEgg").SceneFilePath)
+		if (item.SceneFilePath == _ripeEggNode.SceneFilePath)
 		{
 			_score *= 1.1;
 			AddSegment(_oldData[^1]);
-			//_tally++;
-			//CheckGenerations();
 		}
 
-		if (item.SceneFilePath == GetNode("ItemManager/ShinyEgg").SceneFilePath)
+		if (item.SceneFilePath == _shinyEggNode.SceneFilePath)
 		{
 			_score *= 1.25;
 			AddSegment(_oldData[^1]);
 		}
 
-		if (item.SceneFilePath == GetNode("ItemManager/AlienEgg").SceneFilePath)
+		if (item.SceneFilePath == _alienEggNode.SceneFilePath)
 		{
 			_score *= 2;
 			AddSegment(_oldData[^1]);
 		}
 
-		if (item.SceneFilePath == GetNode("ItemManager/DiscoEgg").SceneFilePath)
+		if (item.SceneFilePath == _discoEggNode.SceneFilePath)
 		{
 			_score *= _score;
 			AddSegment(_oldData[^1]);
 		}
-		if (item.SceneFilePath == GetNode("ItemManager/RottenEgg").SceneFilePath)
+		if (item.SceneFilePath == _rottenEggNode.SceneFilePath)
 		{
-			_score -= 25;
+			_score -= 75;
 			AddSegment(_oldData[^1]);
-			//_tally++;
-			//CheckGenerations();
 		}
-		if(item.SceneFilePath == GetNode("ItemManager/LavaEgg").SceneFilePath)
+		if(item.SceneFilePath == _lavaEggNode.SceneFilePath)
 		{			
 			_score /= 2;
 			AddSegment(_oldData[^1]);
-			//_tally++;
-			//CheckGenerations();
 		}
-		if (item.SceneFilePath == GetNode("ItemManager/IceEgg").SceneFilePath)
+		if (item.SceneFilePath == _iceEggNode.SceneFilePath)
 		{
 			_score = Math.Sqrt(_score);
 			AddSegment(_oldData[^1]);
-			//_tally++;
-			//CheckGenerations();
 		}
-		if (item.SceneFilePath == GetNode("ItemManager/Mushroom").SceneFilePath)
+		if (item.SceneFilePath == _mushroomNode.SceneFilePath)
 		{
-			_score += 75;
+			_score = Math.Pow(_score, 1.1);
 		}
-		if (item.SceneFilePath == GetNode("ItemManager/DewDrop").SceneFilePath)
+		if (item.SceneFilePath == _dewDropNode.SceneFilePath)
 		{
 			_score = Math.Abs(_score);
 		}
-		if (item.SceneFilePath == GetNode("ItemManager/Pill").SceneFilePath)
+		if (item.SceneFilePath == _pillItemNode.SceneFilePath)
 		{
 			_score = Math.Abs(_score) * (Math.Abs(_score) + Math.Abs(_score));
 		}
-		if (item.SceneFilePath == GetNode("ItemManager/Skull").SceneFilePath)
+		if (item.SceneFilePath == _skullNode.SceneFilePath)
 		{
 			_score -= 9999;
 		}
@@ -388,30 +421,7 @@ public partial class Main : Node
 	private void GenerateItem(Node2D newItem)
 	{
 		newItem.Visible = true;
-		Random rndm = new Random();
-		do
-		{
-			_itemRegen = false;
-			_newItemPosition = new Vector2I(rndm.Next(0, _boardCellSize - 1), rndm.Next(3, _boardCellSize - 1));
-			if (_newItemPosition == _eggPosition)
-			{
-				_itemRegen = true;
-			}
-			for (int i = 0; i < _snakeData.Count; i++)
-			{
-				if (_newItemPosition == _snakeData[i])
-				{
-					_itemRegen = true;
-				}
-			}
-			for (int i = 0; i < _itemsData.Count; i++)
-			{
-				if (_newItemPosition == _itemsData[i])
-				{
-					_itemRegen = true;
-				}
-			}
-		} while (_itemRegen);
+		_newItemPosition = RandomPlacement();
 		newItem.Position = (_newItemPosition * _cellPixelSize) + new Vector2I(0, _cellPixelSize);
 		AddChild(newItem);
 		_items.Add(newItem);
