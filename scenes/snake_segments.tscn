@@ -6,11 +6,11 @@
 [ext_resource type="Texture2D" uid="uid://cesg4do83awy1" path="res://assets/sprites/Body_DownRight.png" id="4_swu62"]
 [ext_resource type="Texture2D" uid="uid://cdlxc0ttmjih1" path="res://assets/sprites/Body_UpLeft.png" id="5_m071i"]
 [ext_resource type="Texture2D" uid="uid://bijkspi7bop2y" path="res://assets/sprites/Body_UpRight.png" id="6_ic85f"]
-[ext_resource type="Texture2D" uid="uid://dohu0pt1q226d" path="res://assets/sprites/TailBase.png" id="7_gamqq"]
-[ext_resource type="Texture2D" uid="uid://bdm2b1uhdtbrj" path="res://assets/sprites/TailMid.png" id="8_l3kss"]
-[ext_resource type="Texture2D" uid="uid://6fsnbicrhjup" path="res://assets/sprites/TailMidCurve.png" id="9_1q1wg"]
-[ext_resource type="Texture2D" uid="uid://bxr68wj2lkpbm" path="res://assets/sprites/TailEnd.png" id="10_trsnm"]
-[ext_resource type="Texture2D" uid="uid://clrhdkjmke7y0" path="res://assets/sprites/TailEndCurve.png" id="11_08pk6"]
+[ext_resource type="Texture2D" uid="uid://04xcchyqgibt" path="res://assets/sprites/TailBase.png" id="7_gamqq"]
+[ext_resource type="Texture2D" uid="uid://djudjknymtv81" path="res://assets/sprites/TailMid.png" id="8_l3kss"]
+[ext_resource type="Texture2D" uid="uid://b2n04ndrmvnph" path="res://assets/sprites/TailMidCurve.png" id="9_1q1wg"]
+[ext_resource type="Texture2D" uid="uid://brqagp7uselky" path="res://assets/sprites/TailEnd.png" id="10_trsnm"]
+[ext_resource type="Texture2D" uid="uid://dlfjkrw3uitw3" path="res://assets/sprites/TailEndCurve.png" id="11_08pk6"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_tfhym"]
 animations = [{

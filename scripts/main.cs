@@ -280,60 +280,48 @@ public partial class Main : Node
 				currentSegment.FlipV = false;
 				currentSegment.Rotation = 0f;
 			}
-			if (i == _snake.Count - 3 && _snake.Count > 5 || (i > 2 && _snake.Count < 5) || (i == 3 && _snake.Count == 5))
-			{
-				currentSegment = (AnimatedSprite2D)_snake[i];
-				currentSegment.Frame = 6;
-				var currentDirection = _snakeMoveData[i];
-				foreach (var action in _headDirection)
-				{
-					if (currentDirection == action.Key)
-					{
-						currentSegment.Rotation = action.Value.rotation;
-						currentSegment.Offset = action.Value.offset;
-						currentSegment.FlipV = action.Value.flipV;
-						currentSegment.FlipH = action.Value.flipH;
-					}
-				}
-			}
-			else if (i == _snake.Count - 2 && _snake.Count > 5 || (i > 3 && _snake.Count < 5) || (i == 4 && _snake.Count == 5))
-			{
-				currentSegment = (AnimatedSprite2D)_snake[i];
-				currentSegment.Frame = 7;
-				var currentDirection = _snakeMoveData[i];
-				foreach (var action in _headDirection)
-				{
-					if (currentDirection == action.Key)
-					{
-						currentSegment.Rotation = action.Value.rotation;
-						currentSegment.Offset = action.Value.offset;
-						currentSegment.FlipV = action.Value.flipV;
-						currentSegment.FlipH = action.Value.flipH;
-					}
-				}
-			}
-			else if (i == _snake.Count - 1 && _snake.Count > 5)
-			{
-				currentSegment = (AnimatedSprite2D)_snake[i];
-				currentSegment.Frame = 9;
-				var currentDirection = _snakeMoveData[i];
-				foreach (var action in _headDirection)
-				{
-					if (currentDirection == action.Key)
-					{
-						currentSegment.Rotation = action.Value.rotation;
-						currentSegment.Offset = action.Value.offset;
-						currentSegment.FlipV = action.Value.flipV;
-						currentSegment.FlipH = action.Value.flipH;
-					}
-				}
-			}
+			BendTail(i);
 		}
 		CheckOutOfBound();
 		CheckSelfEaten();
 		CheckEggEaten();
 		CheckItemHit();
 		CheckLargeItemHit();
+	}
+	
+	private void BendTail(int i)
+	{
+		var frame = -1;
+
+		// Determine the frame based on index and snake count
+		if ((i == _snake.Count - 3 && _snake.Count > 5) || (i > 2 && _snake.Count < 5) || (i == 3 && _snake.Count == 5))
+		{
+			frame = 6;
+		}
+		else if ((i == _snake.Count - 2 && _snake.Count > 5) || (i > 3 && _snake.Count < 5) || (i == 4 && _snake.Count == 5))
+		{
+			frame = 7;
+		}
+		else if (i == _snake.Count - 1 && _snake.Count > 5)
+		{
+			frame = 9;
+		}
+
+		// Apply frame and directional transformations if a valid frame is set
+		if (frame != -1)
+		{
+			var currentSegment = (AnimatedSprite2D)_snake[i];
+			currentSegment.Frame = frame;
+
+			var currentDirection = _snakeMoveData[i];
+			if (_headDirection.TryGetValue(currentDirection, out var directionData))
+			{
+				currentSegment.Rotation = directionData.rotation;
+				currentSegment.Offset = directionData.offset;
+				currentSegment.FlipV = directionData.flipV;
+				currentSegment.FlipH = directionData.flipH;
+			}
+		}
 	}
 
 	private void BendNeckSegment()
@@ -630,7 +618,14 @@ public partial class Main : Node
 		{
 			if (_snakeData[0] == _snakeData[i])
 			{
-				EndGame();
+				if (_snake.Count > 5 && i > _snake.Count - 3) //Snake can pass over last two segments of tail just fine (if tail is fully developed).
+				{
+					return;
+				}
+				else
+				{
+					EndGame();
+				}
 			}
 		}
 	}
