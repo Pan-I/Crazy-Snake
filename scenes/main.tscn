@@ -1,20 +1,43 @@
-[gd_scene load_steps=8 format=3 uid="uid://dwuicj4fifd38"]
+[gd_scene load_steps=12 format=3 uid="uid://dwuicj4fifd38"]
 
 [ext_resource type="Script" path="res://scripts/Main.cs" id="1_oifwq"]
 [ext_resource type="PackedScene" uid="uid://srvuytqmi2cm" path="res://scenes/snake_segments.tscn" id="2_0hqrm"]
 [ext_resource type="Texture2D" uid="uid://cg2newbicni8e" path="res://assets/sprites/Grid.png" id="2_a1cr7"]
 [ext_resource type="PackedScene" uid="uid://c04wsqka0wuf" path="res://scenes/hud.tscn" id="3_4f2l8"]
+[ext_resource type="Texture2D" uid="uid://b2xn8emhk8630" path="res://assets/sprites/Grid 2.png" id="4_ee02f"]
 [ext_resource type="Texture2D" uid="uid://ddwki58wttho5" path="res://assets/sprites/Egg.png" id="5_5bxva"]
+[ext_resource type="Texture2D" uid="uid://by4wf1wnplh6v" path="res://assets/sprites/Grid 3.png" id="5_6fup4"]
 [ext_resource type="PackedScene" uid="uid://vvfybxmrur6n" path="res://scenes/game_over_menu.tscn" id="6_n0b3j"]
+[ext_resource type="Texture2D" uid="uid://5407rv3qu7r8" path="res://assets/sprites/Grid 4.png" id="6_o8seh"]
 [ext_resource type="PackedScene" uid="uid://bus8ubbqf6t8f" path="res://scenes/item_manager.tscn" id="16_xuxgj"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_tp2o2"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_a1cr7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_ee02f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_6fup4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_o8seh")
+}],
+"loop": true,
+"name": &"default",
+"speed": 0.0
+}]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_oifwq")
 SnakeSegmentPs = ExtResource("2_0hqrm")
 
-[node name="Background" type="Sprite2D" parent="."]
+[node name="Background" type="AnimatedSprite2D" parent="."]
 position = Vector2(450, 510)
-texture = ExtResource("2_a1cr7")
+sprite_frames = SubResource("SpriteFrames_tp2o2")
 
 [node name="Hud" parent="." instance=ExtResource("3_4f2l8")]
 

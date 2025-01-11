@@ -450,18 +450,26 @@ public partial class Main : Node
 		if (item.SceneFilePath == _mushroomNode.SceneFilePath)
 		{
 			_score = Math.Pow(_score, 1.1);
+			var test = GetNode<AnimatedSprite2D>("Background");
+			test.Frame = 1;
 		}
 		if (item.SceneFilePath == _dewDropNode.SceneFilePath)
 		{
 			_score = Math.Abs(_score);
+			var test = GetNode<AnimatedSprite2D>("Background");
+			test.Frame = 0;
 		}
 		if (item.SceneFilePath == _pillItemNode.SceneFilePath)
 		{
 			_score = Math.Abs(_score) * (Math.Abs(_score) + Math.Abs(_score));
+			var test = GetNode<AnimatedSprite2D>("Background");
+			test.Frame = 2;
 		}
 		if (item.SceneFilePath == _skullNode.SceneFilePath)
 		{
 			_score -= 9999;
+			var test = GetNode<AnimatedSprite2D>("Background");
+			test.Frame = 3;
 		}
 			
 	}
@@ -521,6 +529,8 @@ public partial class Main : Node
 		GetNode<CanvasLayer>("GameOverMenu").Visible = true;
 		string message = $"Game Over!\nScore: {_score}";
 		GetNode<CanvasLayer>("GameOverMenu").GetNode<Panel>("GameOverPanel").GetNode<Label>("GameOverLabel").Text = message;
+		var test = GetNode<AnimatedSprite2D>("Background");
+		test.Frame = 0;
 	}
 	
 	private void _on_game_over_menu_restart()
