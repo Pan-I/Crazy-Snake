@@ -280,7 +280,10 @@ public partial class Main : Node
 				currentSegment.FlipV = false;
 				currentSegment.Rotation = 0f;
 			}
-			BendTail(i);
+			if (_snake.Count > 4)
+			{
+				BendTail(i);
+			}
 		}
 		CheckOutOfBound();
 		CheckSelfEaten();
@@ -292,21 +295,59 @@ public partial class Main : Node
 	private void BendTail(int i)
 	{
 		var frame = -1;
+		AnimatedSprite2D tailBase = (AnimatedSprite2D)_snake[^3];
+		AnimatedSprite2D tailShaft = (AnimatedSprite2D)_snake[^2];
+		AnimatedSprite2D tailTip = (AnimatedSprite2D)_snake[^1];
+		Vector2 tailBasePosition = _snake[^3].Position;
+		Vector2 tailShaftPosition = _snake[^2].Position;
+		Vector2 tailTipPosition = _snake[^1].Position;
 
-		// Determine the frame based on index and snake count
-		if ((i == _snake.Count - 3 && _snake.Count > 5) || (i > 2 && _snake.Count < 5) || (i == 3 && _snake.Count == 5))
+		// Check if the tail is in a straight line
+		if ((tailBasePosition.X == tailShaftPosition.X && tailShaftPosition.X == tailTipPosition.X) ||
+			(tailBasePosition.Y == tailShaftPosition.Y && tailShaftPosition.Y == tailBasePosition.Y))
 		{
-			frame = 6;
+			tailBase.Frame = 6;
+			tailShaft.Frame = 7;
+			tailTip.Frame = 9;
 		}
-		else if ((i == _snake.Count - 2 && _snake.Count > 5) || (i > 3 && _snake.Count < 5) || (i == 4 && _snake.Count == 5))
-		{
-			frame = 7;
-		}
-		else if (i == _snake.Count - 1 && _snake.Count > 5)
-		{
-			frame = 9;
-		}
+		// Determine relative positions
+		bool isBaseAboveTip = tailBasePosition.Y < tailTipPosition.Y;
+		bool isBaseBelowTip = tailBasePosition.Y > tailTipPosition.Y;
+		bool isBaseRightOfTip = tailBasePosition.X > tailTipPosition.X;
+		bool isBaseLeftOfTip = tailBasePosition.X < tailTipPosition.X;
 
+		if (isBaseAboveTip)
+		{
+			if (isBaseRightOfTip)
+			{
+				tailShaft.Frame = 8;
+				tailTip.Frame = 10;
+			}
+			else if (isBaseLeftOfTip)
+			{
+				tailShaft.Frame = 8;
+				tailTip.Frame = 10;
+			}
+		}
+		else if (isBaseBelowTip)
+		{
+			if (isBaseRightOfTip)
+			{
+				tailShaft.Frame = 8;
+				tailTip.Frame = 10;
+			}
+			else if (isBaseLeftOfTip)
+			{
+				tailShaft.Frame = 8;
+				tailTip.Frame = 10;
+			}
+		}
+		else
+		{
+			tailBase.Frame = 6;
+			tailShaft.Frame = 7;
+			tailTip.Frame = 9;
+		}
 		// Apply frame and directional transformations if a valid frame is set
 		if (frame != -1)
 		{
