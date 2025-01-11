@@ -171,6 +171,24 @@ public partial class Main : Node
 			snakeSegment.Offset = new Vector2(-15, 15);
 			snakeSegment.Rotation = 4.7183f;
 		}
+		/*if (_snake.Count == 1)
+		{
+			snakeSegment.Frame = 6;
+			snakeSegment.Offset = new Vector2(-15, -15);
+			snakeSegment.Rotation = 3.1416f;
+		}
+		if (_snake.Count == 2)
+		{
+			snakeSegment.Frame = 7;
+			snakeSegment.Offset = new Vector2(-15, -15);
+			snakeSegment.Rotation = 3.1416f;
+		}
+		if (_snake.Count == 3)
+		{
+			snakeSegment.Frame = 9;
+			snakeSegment.Offset = new Vector2(-15, -15);
+			snakeSegment.Rotation = 3.1416f;
+		}*/
 		AddChild(snakeSegment);
 		_snake.Add(snakeSegment);
 		_oldSnake.Add(snakeSegment);
@@ -186,7 +204,6 @@ public partial class Main : Node
 	private void MoveSnake()
 	{
 		if (!_canMove) return;
-
 		foreach (var action in _headDirection)
 		{
 			if (Input.IsActionPressed(action.Key) && _moveDirection != -action.Value.direction)
@@ -358,6 +375,7 @@ public partial class Main : Node
 
 	private void UpdateHudScore()
 	{
+		_score = Math.Round(_score, 0);
 		GetNode<CanvasLayer>("Hud").GetNode<Label>("ScoreLabel").Text = $"Score: {_score} ";
 	}
 

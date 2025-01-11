@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://srvuytqmi2cm"]
+[gd_scene load_steps=13 format=3 uid="uid://srvuytqmi2cm"]
 
 [ext_resource type="Texture2D" uid="uid://ct7l5i88k1ljp" path="res://assets/sprites/Body.png" id="1_88t40"]
 [ext_resource type="Texture2D" uid="uid://bd8jfw78d0bv3" path="res://assets/sprites/Head.png" id="2_63hyv"]
@@ -6,6 +6,11 @@
 [ext_resource type="Texture2D" uid="uid://cesg4do83awy1" path="res://assets/sprites/Body_DownRight.png" id="4_swu62"]
 [ext_resource type="Texture2D" uid="uid://cdlxc0ttmjih1" path="res://assets/sprites/Body_UpLeft.png" id="5_m071i"]
 [ext_resource type="Texture2D" uid="uid://bijkspi7bop2y" path="res://assets/sprites/Body_UpRight.png" id="6_ic85f"]
+[ext_resource type="Texture2D" uid="uid://dohu0pt1q226d" path="res://assets/sprites/TailBase.png" id="7_gamqq"]
+[ext_resource type="Texture2D" uid="uid://bdm2b1uhdtbrj" path="res://assets/sprites/TailMid.png" id="8_l3kss"]
+[ext_resource type="Texture2D" uid="uid://6fsnbicrhjup" path="res://assets/sprites/TailMidCurve.png" id="9_1q1wg"]
+[ext_resource type="Texture2D" uid="uid://bxr68wj2lkpbm" path="res://assets/sprites/TailEnd.png" id="10_trsnm"]
+[ext_resource type="Texture2D" uid="uid://clrhdkjmke7y0" path="res://assets/sprites/TailEndCurve.png" id="11_08pk6"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_tfhym"]
 animations = [{
@@ -27,6 +32,21 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": ExtResource("6_ic85f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_gamqq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_l3kss")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_1q1wg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_trsnm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_08pk6")
 }],
 "loop": true,
 "name": &"default",
