@@ -353,7 +353,7 @@ public partial class Main : Node
 		HashSet<Vector2I> occupiedPositions = new HashSet<Vector2I>(_snakeData);
 		occupiedPositions.Add(_eggPosition);
 		occupiedPositions.UnionWith(_itemsData);
-		occupiedPositions.UnionWith(_largeItemsData); //TODO: Needs a way to fill the other cells.
+		occupiedPositions.UnionWith(_largeItemsData); //TODO: Needs a way to fill the other cells. Otherwise items may place in non-origin cells of larger items.
 		
 
 		Vector2I itemPlacement;
@@ -455,19 +455,19 @@ public partial class Main : Node
 		if (item.SceneFilePath == _mushroomNode.SceneFilePath)
 		{
 			_score = Math.Pow(Math.Abs(_score), 1.05);
-			var test = GetNode<AnimatedSprite2D>("Background");
+			//var test = GetNode<AnimatedSprite2D>("Background");
 			//test.Frame = 1;
 		}
 		if (item.SceneFilePath == _dewDropNode.SceneFilePath)
 		{
 			_score = Math.Abs(_score);
-			var test = GetNode<AnimatedSprite2D>("Background");
+			//var test = GetNode<AnimatedSprite2D>("Background");
 			//test.Frame = 0;
 		}
 		if (item.SceneFilePath == _pillItemNode.SceneFilePath)
 		{
 			_score = Math.Pow(Math.Abs(_score), 1.5);
-			var test = GetNode<AnimatedSprite2D>("Background");
+			//var test = GetNode<AnimatedSprite2D>("Background");
 			//test.Frame = 2;
 		}
 		if (item.SceneFilePath == _skullNode.SceneFilePath)
