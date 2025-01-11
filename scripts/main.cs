@@ -44,10 +44,24 @@ public partial class Main : Node
 	private List<Vector2I> _snakeData;
 	private List<Node2D> _oldSnake;
 	private List<Node2D> _snake;
+	private Dictionary<string, (Vector2 offset, float rotation, bool flipV, bool flipH, Vector2 direction)> _headDirection;
+	private List<string> _snakeMoveData;
+	private List<string> _oldSnakeMoveData;
+	
+	//Movement Variables
+	private Vector2I _startPosition = new (14, 16);
+	private bool _canMove;
+	private Vector2I _upMove = new (0, -1);
+	private Vector2I _downMove = new (0, 1);
+	private Vector2I _leftMove = new (-1, 0);
+	private Vector2I _rightMove = new (1, 0);
+	private Vector2I _moveDirection;
 	
 	//Egg & Item Variables
 	private Vector2I _eggPosition;
 	private bool _itemRegen = true;
+	private int _tally;
+	private Dictionary<int, List<Node2D>> _itemRates;
 	private List<Node2D> _items;
 	private List<Vector2I> _itemsData;
 	private List<Vector2I> _largeItemsData;
@@ -61,23 +75,12 @@ public partial class Main : Node
 	private Node2D _dewDropNode;
 	private Node2D _lavaEggNode;
 	private Node2D _frogNode;
+	private Node2D _largeWallNode;
 	private Node2D _alienEggNode;
 	private Node2D _iceEggNode;
 	private Node2D _pillItemNode;
 	private Node2D _discoEggNode;
-	private Node2D _largeWallNode;
 	
-	//Movement Variables
-	private Vector2I _startPosition = new (14, 16);
-	private Vector2I _upMove = new (0, -1);
-	private Vector2I _downMove = new (0, 1);
-	private Vector2I _leftMove = new (-1, 0);
-	private Vector2I _rightMove = new (1, 0);
-	private Vector2I _moveDirection;
-	private bool _canMove;
-	private int _tally;
-	private Dictionary<string, (Vector2 offset, float rotation, bool flipV, bool flipH, Vector2 direction)> _headDirection;
-	private Dictionary<int, List<Node2D>> _itemRates;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -157,6 +160,8 @@ public partial class Main : Node
 		_snakeData = new List<Vector2I>();
 		_oldSnake = new List<Node2D>();
 		_snake = new List<Node2D>();
+		_snakeMoveData = new List<string>();
+		_oldSnakeMoveData = new List<string>();
 
 		for (int i = 0; i < 3; i++)
 		{
@@ -166,6 +171,7 @@ public partial class Main : Node
 	private void AddSegment(Vector2I position)
 	{
 		_snakeData.Add(position);
+		_snakeMoveData.Add("");
 		var snakeSegment = SnakeSegmentPs.Instantiate<AnimatedSprite2D>();
 		snakeSegment.Position = (position * _cellPixelSize) + new Vector2I(0, _cellPixelSize);
 		if (_snake.Count == 0)
@@ -173,6 +179,24 @@ public partial class Main : Node
 			snakeSegment.Frame = 1;
 			snakeSegment.Offset = new Vector2(-15, 15);
 			snakeSegment.Rotation = 4.7183f;
+		}
+		if (_snake.Count > 3)
+		{
+			snakeSegment.Frame = 6;
+			snakeSegment.Offset = new Vector2(-15, -15);
+			snakeSegment.Rotation = 3.1416f;
+		}
+		if (_snake.Count > 4)
+		{
+			snakeSegment.Frame = 7;
+			snakeSegment.Offset = new Vector2(-15, -15);
+			snakeSegment.Rotation = 3.1416f;
+		}
+		if (_snake.Count > 5)
+		{
+			snakeSegment.Frame = 9;
+			snakeSegment.Offset = new Vector2(-15, -15);
+			snakeSegment.Rotation = 3.1416f;
 		}
 		AddChild(snakeSegment);
 		_snake.Add(snakeSegment);
@@ -194,6 +218,7 @@ public partial class Main : Node
 			if (Input.IsActionPressed(action.Key) && _moveDirection != -action.Value.direction)
 			{
 				_moveDirection = (Vector2I)action.Value.direction;
+				_snakeMoveData[0] = action.Key; 
 				_canMove = false;
 
 				var headSprite = (AnimatedSprite2D)_snake[0];
@@ -221,6 +246,7 @@ public partial class Main : Node
 	{
 		_canMove = true;
 		_oldData = _snakeData.ToList(); // Shallow copy for snake positions
+		_oldSnakeMoveData = _snakeMoveData.ToList(); //Shallow copy //TODO: confirm through testing.
 		// Create a deep copy of the snake to keep visual bend.
 		for (int i = 0; i < _snake.Count; i++)
 		{
@@ -233,6 +259,7 @@ public partial class Main : Node
 			if (i > 0)
 			{
 				_snakeData[i] = _oldData[i - 1];
+				_snakeMoveData[i] = _oldSnakeMoveData[i - 1];
 			}
 			// Update the position of the segment sprite
 			_snake[i].Position = (_snakeData[i] * _cellPixelSize) + new Vector2I(0, _cellPixelSize);
@@ -249,29 +276,58 @@ public partial class Main : Node
 				var previousSegment = (AnimatedSprite2D)_oldSnake[i - 1];
 				currentSegment.Frame = previousSegment.Frame;
 				currentSegment.Offset = new Vector2(15, 15);
+				currentSegment.FlipH = false;
+				currentSegment.FlipV = false;
 				currentSegment.Rotation = 0f;
 			}
-			/*if (i == _snake.Count - 3 && _snake.Count > 3)
+			if (i == _snake.Count - 3 && _snake.Count > 5 || (i > 2 && _snake.Count < 5) || (i == 3 && _snake.Count == 5))
 			{
 				currentSegment = (AnimatedSprite2D)_snake[i];
 				currentSegment.Frame = 6;
-				currentSegment.Offset = new Vector2(-15, -15);
-				currentSegment.Rotation = 3.1416f;
+				var currentDirection = _snakeMoveData[i];
+				foreach (var action in _headDirection)
+				{
+					if (currentDirection == action.Key)
+					{
+						currentSegment.Rotation = action.Value.rotation;
+						currentSegment.Offset = action.Value.offset;
+						currentSegment.FlipV = action.Value.flipV;
+						currentSegment.FlipH = action.Value.flipH;
+					}
+				}
 			}
-			if (i == _snake.Count - 2 && _snake.Count > 4)
+			else if (i == _snake.Count - 2 && _snake.Count > 5 || (i > 3 && _snake.Count < 5) || (i == 4 && _snake.Count == 5))
 			{
 				currentSegment = (AnimatedSprite2D)_snake[i];
 				currentSegment.Frame = 7;
-				currentSegment.Offset = new Vector2(-15, -15);
-				currentSegment.Rotation = 3.1416f;
+				var currentDirection = _snakeMoveData[i];
+				foreach (var action in _headDirection)
+				{
+					if (currentDirection == action.Key)
+					{
+						currentSegment.Rotation = action.Value.rotation;
+						currentSegment.Offset = action.Value.offset;
+						currentSegment.FlipV = action.Value.flipV;
+						currentSegment.FlipH = action.Value.flipH;
+					}
+				}
 			}
-			if (i == _snake.Count - 1 && _snake.Count > 4)
+			else if (i == _snake.Count - 1 && _snake.Count > 5)
 			{
 				currentSegment = (AnimatedSprite2D)_snake[i];
 				currentSegment.Frame = 9;
-				currentSegment.Offset = new Vector2(-15, -15);
-				currentSegment.Rotation = 3.1416f;
-			}*/
+				var currentDirection = _snakeMoveData[i];
+				foreach (var action in _headDirection)
+				{
+					if (currentDirection == action.Key)
+					{
+						currentSegment.Rotation = action.Value.rotation;
+						currentSegment.Offset = action.Value.offset;
+						currentSegment.FlipV = action.Value.flipV;
+						currentSegment.FlipH = action.Value.flipH;
+					}
+				}
+			}
 		}
 		CheckOutOfBound();
 		CheckSelfEaten();
@@ -369,8 +425,8 @@ public partial class Main : Node
 		{
 			itemPlacement = new Vector2I(rndm.Next(0, _boardCellSize - 1), rndm.Next(3, _boardCellSize - 1));
 		} while (occupiedPositions. Count < 899 &&  //TODO: this 899 limit doesn't account for large items either.
-		         (occupiedPositions.Contains(itemPlacement) || 
-		         IsWithinRadius(itemPlacement, _snakeData[0], 3))); //Don't place too close to snake.
+				 (occupiedPositions.Contains(itemPlacement) || 
+				 IsWithinRadius(itemPlacement, _snakeData[0], 3))); //Don't place too close to snake.
 
 		// Helper function to check if a position is within a given radius
 		bool IsWithinRadius(Vector2I position, Vector2I center, int radius)
