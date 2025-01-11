@@ -174,6 +174,13 @@ public partial class Main : Node
 			snakeSegment.Offset = new Vector2(-15, 15);
 			snakeSegment.Rotation = 4.7183f;
 		}
+
+		if (_snake.Count > 5)
+		{
+			snakeSegment.Frame = 9;
+			snakeSegment.Offset = new Vector2(-15, -15);
+			snakeSegment.Rotation = 3.1416f;
+		}
 		AddChild(snakeSegment);
 		_snake.Add(snakeSegment);
 		_oldSnake.Add(snakeSegment);
@@ -251,27 +258,27 @@ public partial class Main : Node
 				currentSegment.Offset = new Vector2(15, 15);
 				currentSegment.Rotation = 0f;
 			}
-			/*if (i == _snake.Count - 3 && _snake.Count > 3)
+			if (i == _snake.Count - 3 && _snake.Count > 5 || (i > 2 && _snake.Count < 5) || (i == 3 && _snake.Count == 5))
 			{
 				currentSegment = (AnimatedSprite2D)_snake[i];
 				currentSegment.Frame = 6;
 				currentSegment.Offset = new Vector2(-15, -15);
 				currentSegment.Rotation = 3.1416f;
 			}
-			if (i == _snake.Count - 2 && _snake.Count > 4)
+			if (i == _snake.Count - 2 && _snake.Count > 5 || (i > 3 && _snake.Count < 5) || (i == 4 && _snake.Count == 5))
 			{
 				currentSegment = (AnimatedSprite2D)_snake[i];
 				currentSegment.Frame = 7;
 				currentSegment.Offset = new Vector2(-15, -15);
 				currentSegment.Rotation = 3.1416f;
 			}
-			if (i == _snake.Count - 1 && _snake.Count > 4)
+			if (i == _snake.Count - 1 && _snake.Count > 5)
 			{
 				currentSegment = (AnimatedSprite2D)_snake[i];
 				currentSegment.Frame = 9;
 				currentSegment.Offset = new Vector2(-15, -15);
 				currentSegment.Rotation = 3.1416f;
-			}*/
+			}
 		}
 		CheckOutOfBound();
 		CheckSelfEaten();
@@ -369,8 +376,8 @@ public partial class Main : Node
 		{
 			itemPlacement = new Vector2I(rndm.Next(0, _boardCellSize - 1), rndm.Next(3, _boardCellSize - 1));
 		} while (occupiedPositions. Count < 899 &&  //TODO: this 899 limit doesn't account for large items either.
-		         (occupiedPositions.Contains(itemPlacement) || 
-		         IsWithinRadius(itemPlacement, _snakeData[0], 3))); //Don't place too close to snake.
+				 (occupiedPositions.Contains(itemPlacement) || 
+				 IsWithinRadius(itemPlacement, _snakeData[0], 3))); //Don't place too close to snake.
 
 		// Helper function to check if a position is within a given radius
 		bool IsWithinRadius(Vector2I position, Vector2I center, int radius)
