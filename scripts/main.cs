@@ -75,6 +75,7 @@ public partial class Main : Node
 	private Vector2I _moveDirection;
 	private bool _canMove;
 	private int _tally;
+	private Dictionary<string, (Vector2 offset, float rotation, bool flipV, bool flipH, Vector2 direction)> movements;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -94,6 +95,15 @@ public partial class Main : Node
 		_pillItemNode = GetNode<Node2D>("ItemManager/Pill");
 		_discoEggNode = GetNode<Node2D>("ItemManager/DiscoEgg");
 		_largeWallNode = GetNode<Node2D>("ItemManager/LargeWall");
+		
+		// Map input actions to movement directions and settings
+		movements = new Dictionary<string, (Vector2 offset, float rotation, bool flipV, bool flipH, Vector2 direction)>
+		{
+			{ "move_down",  (new Vector2(15, -15), 1.5708f, false, false, _downMove) },
+			{ "move_up",    (new Vector2(-15, 15), 4.7183f, false, false, _upMove) },
+			{ "move_left",  (new Vector2(-16, -15), 3.1416f, true, false, _leftMove) },
+			{ "move_right", (new Vector2(15, 15), 0f, false, false, _rightMove) }
+		};
 		
 		NewGame();
 	}
@@ -142,6 +152,8 @@ public partial class Main : Node
 		if (_snake.Count == 0)
 		{
 			snakeSegment.Frame = 1;
+			snakeSegment.Offset = new Vector2(-15, 15);
+			snakeSegment.Rotation = 4.7183f;
 		}
 		AddChild(snakeSegment);
 		_snake.Add(snakeSegment);
@@ -157,44 +169,26 @@ public partial class Main : Node
 	
 	private void MoveSnake()
 	{
-		if (_canMove)
+		if (!_canMove) return;
+
+		foreach (var action in movements)
 		{
-			if (Input.IsActionPressed("move_down") && _moveDirection != _upMove)
+			if (Input.IsActionPressed(action.Key) && _moveDirection != -action.Value.direction)
 			{
-				_moveDirection = _downMove;
+				_moveDirection = (Vector2I)action.Value.direction;
 				_canMove = false;
-				//_snake[0].Rotation = 90;
+
+				var headSprite = (AnimatedSprite2D)_snake[0];
+				headSprite.Rotation = action.Value.rotation;
+				headSprite.Offset = action.Value.offset;
+				headSprite.FlipV = action.Value.flipV;
+				headSprite.FlipH = action.Value.flipH;
+
 				if (!_gameStarted)
 				{
 					StartGame();
 				}
-			}
-			if (Input.IsActionPressed("move_up") && _moveDirection != _downMove)
-			{
-				_moveDirection = _upMove;
-				_canMove = false;
-				if (!_gameStarted)
-				{
-					StartGame();
-				}
-			}
-			if (Input.IsActionPressed("move_left") && _moveDirection != _rightMove)
-			{
-				_moveDirection = _leftMove;
-				_canMove = false;
-				if (!_gameStarted)
-				{
-					StartGame();
-				}
-			}
-			if (Input.IsActionPressed("move_right") && _moveDirection != _leftMove)
-			{
-				_moveDirection = _rightMove;
-				_canMove = false;
-				if (!_gameStarted)
-				{
-					StartGame();
-				}
+				break; // Exit the loop once a movement is processed
 			}
 		}
 	}
@@ -247,7 +241,7 @@ public partial class Main : Node
 
 		// Check if the snake is in a straight line
 		if ((headPosition.X == neckPosition.X && neckPosition.X == tailPosition.X) ||
-		    (headPosition.Y == neckPosition.Y && neckPosition.Y == tailPosition.Y))
+			(headPosition.Y == neckPosition.Y && neckPosition.Y == tailPosition.Y))
 		{
 			neck.Frame = 0;
 			return;
@@ -446,6 +440,7 @@ public partial class Main : Node
 			EndGame();
 		}
 		if (item.SceneFilePath == _freshEggNode.SceneFilePath)
+			
 		{
 			_score += 25;
 			AddSegment(_oldData[^1]);
