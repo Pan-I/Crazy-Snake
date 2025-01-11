@@ -38,6 +38,7 @@ SnakeSegmentPs = ExtResource("2_0hqrm")
 [node name="Background" type="AnimatedSprite2D" parent="."]
 position = Vector2(450, 510)
 sprite_frames = SubResource("SpriteFrames_tp2o2")
+speed_scale = 0.0
 
 [node name="Hud" parent="." instance=ExtResource("3_4f2l8")]
 

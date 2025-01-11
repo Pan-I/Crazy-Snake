@@ -50,6 +50,7 @@ public partial class Main : Node
 	private bool _itemRegen = true;
 	private List<Node2D> _items;
 	private List<Vector2I> _itemsData;
+	private List<Vector2I> _largeItemsData;
 	private Vector2I _newItemPosition;
 	private Node2D _freshEggNode;
 	private Node2D _ripeEggNode;
@@ -116,6 +117,7 @@ public partial class Main : Node
 			{ 7, new List<Node2D> { _dewDropNode } },
 			{ 8, new List<Node2D> { _lavaEggNode } },
 			{ 10, new List<Node2D> { _frogNode } },
+			{ 12, new List<Node2D> { _largeWallNode } },
 			{ 13, new List<Node2D> { _alienEggNode } },
 			{ 21, new List<Node2D> { _iceEggNode } },
 			{ 22, new List<Node2D> { _pillItemNode } },
@@ -140,6 +142,7 @@ public partial class Main : Node
 		}
 		_items = new List<Node2D>();
 		_itemsData = new List<Vector2I>();
+		_largeItemsData = new List<Vector2I>();
 		GetNode<CanvasLayer>("GameOverMenu").Visible = false;
 		UpdateHudScore();
 		_moveDirection = _upMove;
@@ -268,9 +271,9 @@ public partial class Main : Node
 		CheckSelfEaten();
 		CheckEggEaten();
 		CheckItemHit();
+		CheckLargeItemHit();
 	}
 
-	
 	private void BendNeckSegment()
 	{
 		AnimatedSprite2D neck = (AnimatedSprite2D)_snake[1];
@@ -350,6 +353,8 @@ public partial class Main : Node
 		HashSet<Vector2I> occupiedPositions = new HashSet<Vector2I>(_snakeData);
 		occupiedPositions.Add(_eggPosition);
 		occupiedPositions.UnionWith(_itemsData);
+		occupiedPositions.UnionWith(_largeItemsData); //TODO: Needs a way to fill the other cells.
+		
 
 		Vector2I itemPlacement;
 		do
@@ -411,19 +416,19 @@ public partial class Main : Node
 		}
 		if (item.SceneFilePath == _ripeEggNode.SceneFilePath)
 		{
-			_score *= 1.1;
+			_score *= 1.5;
 			AddSegment(_oldData[^1]);
 		}
 
 		if (item.SceneFilePath == _shinyEggNode.SceneFilePath)
 		{
-			_score *= 1.25;
+			_score *= 2;
 			AddSegment(_oldData[^1]);
 		}
 
 		if (item.SceneFilePath == _alienEggNode.SceneFilePath)
 		{
-			_score *= 2;
+			_score *= 5;
 			AddSegment(_oldData[^1]);
 		}
 
@@ -444,32 +449,48 @@ public partial class Main : Node
 		}
 		if (item.SceneFilePath == _iceEggNode.SceneFilePath)
 		{
-			_score = Math.Sqrt(_score);
+			_score = Math.Sqrt(Math.Abs(_score));
 			AddSegment(_oldData[^1]);
 		}
 		if (item.SceneFilePath == _mushroomNode.SceneFilePath)
 		{
-			_score = Math.Pow(_score, 1.1);
+			_score = Math.Pow(Math.Abs(_score), 1.05);
 			var test = GetNode<AnimatedSprite2D>("Background");
-			test.Frame = 1;
+			//test.Frame = 1;
 		}
 		if (item.SceneFilePath == _dewDropNode.SceneFilePath)
 		{
 			_score = Math.Abs(_score);
 			var test = GetNode<AnimatedSprite2D>("Background");
-			test.Frame = 0;
+			//test.Frame = 0;
 		}
 		if (item.SceneFilePath == _pillItemNode.SceneFilePath)
 		{
-			_score = Math.Abs(_score) * (Math.Abs(_score) + Math.Abs(_score));
+			_score = Math.Pow(Math.Abs(_score), 1.5);
 			var test = GetNode<AnimatedSprite2D>("Background");
-			test.Frame = 2;
+			//test.Frame = 2;
 		}
 		if (item.SceneFilePath == _skullNode.SceneFilePath)
 		{
-			_score -= 9999;
-			var test = GetNode<AnimatedSprite2D>("Background");
-			test.Frame = 3;
+			//create a Random object for randomizing starting player
+			Random rnd = new Random();
+			int result;
+			do
+			{
+				result = rnd.Next(-1, 2);
+			} while (result == 0 || result== 2); //results can only be 1 or -1
+			if (result == 1)
+			{
+				_score = -9999;
+			}
+			else if (result == -1)
+			{
+				_score -= 9999;
+			}
+			else //shouldn't hit
+			{
+				_score = 0;
+			}
 		}
 			
 	}
@@ -481,7 +502,14 @@ public partial class Main : Node
 		newItem.Position = (_newItemPosition * _cellPixelSize) + new Vector2I(0, _cellPixelSize);
 		AddChild(newItem);
 		_items.Add(newItem);
-		_itemsData.Add(_newItemPosition);
+		if (newItem.SceneFilePath == _largeWallNode.SceneFilePath)
+		{
+			_largeItemsData.Add(_newItemPosition);
+		}
+		else
+		{
+			_itemsData.Add(_newItemPosition);
+		}
 	}
 
 	private void CheckItemHit()
@@ -492,9 +520,30 @@ public partial class Main : Node
 			{
 				ItemResult(_items[i]);
 				UpdateHudScore();
-				_items[i].QueueFree();
-				_itemsData.RemoveAt(i);
-				_items.RemoveAt(i);
+				if (_items[i].SceneFilePath != _wallNode.SceneFilePath)
+				{
+					_items[i].QueueFree();
+					_itemsData.RemoveAt(i);
+					_items.RemoveAt(i);
+				}
+			}
+		}
+	}
+	
+	private void CheckLargeItemHit()
+	{
+		for (int i = 0; i < _largeItemsData.Count; i++)
+		{
+			Vector2I q2 = new Vector2I(x: _largeItemsData[i].X, y: _largeItemsData[i].Y + 1);
+			Vector2I q3 = new Vector2I(x: _largeItemsData[i].X + 1, y: _largeItemsData[i].Y + 1);
+			Vector2I q4 = new Vector2I(x: _largeItemsData[i].X + 1, y: _largeItemsData[i].Y);
+			
+			if (_snakeData[0] == _largeItemsData[i] ||
+				_snakeData[0] == q2 ||
+				_snakeData[0] == q3 ||
+				_snakeData[0] == q4 )
+			{
+				EndGame();
 			}
 		}
 	}
