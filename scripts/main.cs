@@ -198,6 +198,10 @@ public partial class Main : Node
 			snakeSegment.Offset = new Vector2(-15, -15);
 			snakeSegment.Rotation = 3.1416f;
 		}
+		if (_snake.Count > 6)
+		{
+			snakeSegment.Visible = false;
+		}
 		AddChild(snakeSegment);
 		_snake.Add(snakeSegment);
 		_oldSnake.Add(snakeSegment);
@@ -254,10 +258,13 @@ public partial class Main : Node
 		}
 		_snakeData[0] += _moveDirection;// Update snake's head position data
 		// Update other body segments data
+		AnimatedSprite2D currentSegment;
 		for (int i = 0; i < _snakeData.Count; i++)
 		{
 			if (i > 0)
 			{
+				currentSegment = (AnimatedSprite2D)_snake[i];
+				currentSegment.Visible = true;
 				_snakeData[i] = _oldData[i - 1];
 				_snakeMoveData[i] = _oldSnakeMoveData[i - 1];
 			}
@@ -269,7 +276,7 @@ public partial class Main : Node
 				BendNeckSegment();
 			}
 			// Copy frame data for other body segments
-			AnimatedSprite2D currentSegment;
+			currentSegment = null;
 			if (i > 1 && i < _snake.Count - 1)
 			{
 				currentSegment = (AnimatedSprite2D)_snake[i];
@@ -294,7 +301,7 @@ public partial class Main : Node
 	
 	private void BendTail(int i)
 	{
-		var frame = -1;
+		var valid = false;
 		AnimatedSprite2D tailBase = (AnimatedSprite2D)_snake[^3];
 		AnimatedSprite2D tailShaft = (AnimatedSprite2D)_snake[^2];
 		AnimatedSprite2D tailTip = (AnimatedSprite2D)_snake[^1];
@@ -342,18 +349,23 @@ public partial class Main : Node
 				tailTip.Frame = 10;
 			}
 		}
-		else
+		if (_snake.Count > 5)
 		{
-			tailBase.Frame = 6;
-			tailShaft.Frame = 7;
-			tailTip.Frame = 9;
+			valid = (i == _snake.Count - 3) || (i == _snake.Count - 2) || (i == _snake.Count - 1);
+		}
+		else if (_snake.Count == 5)
+		{
+			valid = (i == 3) || (i == 4);
+		}
+		else if (_snake.Count < 5)
+		{
+			valid = i > 2;
 		}
 		// Apply frame and directional transformations if a valid frame is set
-		if (frame != -1)
+		if (valid)
 		{
+			// Apply frame and directional transformations if a valid frame is set
 			var currentSegment = (AnimatedSprite2D)_snake[i];
-			currentSegment.Frame = frame;
-
 			var currentDirection = _snakeMoveData[i];
 			if (_headDirection.TryGetValue(currentDirection, out var directionData))
 			{
