@@ -174,7 +174,18 @@ public partial class Main : Node
 			snakeSegment.Offset = new Vector2(-15, 15);
 			snakeSegment.Rotation = 4.7183f;
 		}
-
+		if (_snake.Count > 3)
+		{
+			snakeSegment.Frame = 6;
+			snakeSegment.Offset = new Vector2(-15, -15);
+			snakeSegment.Rotation = 3.1416f;
+		}
+		if (_snake.Count > 4)
+		{
+			snakeSegment.Frame = 7;
+			snakeSegment.Offset = new Vector2(-15, -15);
+			snakeSegment.Rotation = 3.1416f;
+		}
 		if (_snake.Count > 5)
 		{
 			snakeSegment.Frame = 9;
