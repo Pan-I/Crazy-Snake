@@ -174,24 +174,6 @@ public partial class Main : Node
 			snakeSegment.Offset = new Vector2(-15, 15);
 			snakeSegment.Rotation = 4.7183f;
 		}
-		/*if (_snake.Count == 1)
-		{
-			snakeSegment.Frame = 6;
-			snakeSegment.Offset = new Vector2(-15, -15);
-			snakeSegment.Rotation = 3.1416f;
-		}
-		if (_snake.Count == 2)
-		{
-			snakeSegment.Frame = 7;
-			snakeSegment.Offset = new Vector2(-15, -15);
-			snakeSegment.Rotation = 3.1416f;
-		}
-		if (_snake.Count == 3)
-		{
-			snakeSegment.Frame = 9;
-			snakeSegment.Offset = new Vector2(-15, -15);
-			snakeSegment.Rotation = 3.1416f;
-		}*/
 		AddChild(snakeSegment);
 		_snake.Add(snakeSegment);
 		_oldSnake.Add(snakeSegment);
@@ -260,12 +242,36 @@ public partial class Main : Node
 				BendNeckSegment();
 			}
 			// Copy frame data for other body segments
+			AnimatedSprite2D currentSegment;
 			if (i > 1 && i < _snake.Count - 1)
 			{
-				var currentSegment = (AnimatedSprite2D)_snake[i];
+				currentSegment = (AnimatedSprite2D)_snake[i];
 				var previousSegment = (AnimatedSprite2D)_oldSnake[i - 1];
 				currentSegment.Frame = previousSegment.Frame;
+				currentSegment.Offset = new Vector2(15, 15);
+				currentSegment.Rotation = 0f;
 			}
+			/*if (i == _snake.Count - 3 && _snake.Count > 3)
+			{
+				currentSegment = (AnimatedSprite2D)_snake[i];
+				currentSegment.Frame = 6;
+				currentSegment.Offset = new Vector2(-15, -15);
+				currentSegment.Rotation = 3.1416f;
+			}
+			if (i == _snake.Count - 2 && _snake.Count > 4)
+			{
+				currentSegment = (AnimatedSprite2D)_snake[i];
+				currentSegment.Frame = 7;
+				currentSegment.Offset = new Vector2(-15, -15);
+				currentSegment.Rotation = 3.1416f;
+			}
+			if (i == _snake.Count - 1 && _snake.Count > 4)
+			{
+				currentSegment = (AnimatedSprite2D)_snake[i];
+				currentSegment.Frame = 9;
+				currentSegment.Offset = new Vector2(-15, -15);
+				currentSegment.Rotation = 3.1416f;
+			}*/
 		}
 		CheckOutOfBound();
 		CheckSelfEaten();
@@ -286,6 +292,8 @@ public partial class Main : Node
 			(headPosition.Y == neckPosition.Y && neckPosition.Y == tailPosition.Y))
 		{
 			neck.Frame = 0;
+			neck.Offset = new Vector2(15, 15);
+			neck.Rotation = 0f;
 			return;
 		}
 
@@ -354,14 +362,24 @@ public partial class Main : Node
 		occupiedPositions.Add(_eggPosition);
 		occupiedPositions.UnionWith(_itemsData);
 		occupiedPositions.UnionWith(_largeItemsData); //TODO: Needs a way to fill the other cells. Otherwise items may place in non-origin cells of larger items.
+		//
 		
-
 		Vector2I itemPlacement;
 		do
 		{
 			itemPlacement = new Vector2I(rndm.Next(0, _boardCellSize - 1), rndm.Next(3, _boardCellSize - 1));
-		} while (occupiedPositions.Contains(itemPlacement));
+		} while (occupiedPositions. Count < 899 &&  //TODO: this 899 limit doesn't account for large items either.
+		         (occupiedPositions.Contains(itemPlacement) || 
+		         IsWithinRadius(itemPlacement, _snakeData[0], 3))); //Don't place too close to snake.
 
+		// Helper function to check if a position is within a given radius
+		bool IsWithinRadius(Vector2I position, Vector2I center, int radius)
+		{
+			int dx = Math.Abs(position.X - center.X);
+			int dy = Math.Abs(position.Y - center.Y);
+			return dx <= radius && dy <= radius;
+		}
+		
 		return itemPlacement;
 	}
 
@@ -578,8 +596,8 @@ public partial class Main : Node
 		GetNode<CanvasLayer>("GameOverMenu").Visible = true;
 		string message = $"Game Over!\nScore: {_score}";
 		GetNode<CanvasLayer>("GameOverMenu").GetNode<Panel>("GameOverPanel").GetNode<Label>("GameOverLabel").Text = message;
-		var test = GetNode<AnimatedSprite2D>("Background");
-		test.Frame = 0;
+		//var test = GetNode<AnimatedSprite2D>("Background");
+		//test.Frame = 0;
 	}
 	
 	private void _on_game_over_menu_restart()
