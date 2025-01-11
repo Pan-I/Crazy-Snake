@@ -75,8 +75,8 @@ public partial class Main : Node
 	private Vector2I _moveDirection;
 	private bool _canMove;
 	private int _tally;
-	private Dictionary<string, (Vector2 offset, float rotation, bool flipV, bool flipH, Vector2 direction)> movements;
-
+	private Dictionary<string, (Vector2 offset, float rotation, bool flipV, bool flipH, Vector2 direction)> _headDirection;
+	private Dictionary<int, List<Node2D>> _itemRates;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -97,7 +97,7 @@ public partial class Main : Node
 		_largeWallNode = GetNode<Node2D>("ItemManager/LargeWall");
 		
 		// Map input actions to movement directions and settings
-		movements = new Dictionary<string, (Vector2 offset, float rotation, bool flipV, bool flipH, Vector2 direction)>
+		_headDirection = new Dictionary<string, (Vector2 offset, float rotation, bool flipV, bool flipH, Vector2 direction)>
 		{
 			{ "move_down",  (new Vector2(15, -15), 1.5708f, false, false, _downMove) },
 			{ "move_up",    (new Vector2(-15, 15), 4.7183f, false, false, _upMove) },
@@ -105,9 +105,25 @@ public partial class Main : Node
 			{ "move_right", (new Vector2(15, 15), 0f, false, false, _rightMove) }
 		};
 		
+		_itemRates = new Dictionary<int, List<Node2D>>
+		{
+			{ 1, new List<Node2D> { _wallNode, _freshEggNode } },
+			{ 2, new List<Node2D> { _ripeEggNode } },
+			{ 3, new List<Node2D> { _rottenEggNode } },
+			{ 4, new List<Node2D> { _mushroomNode } },
+			{ 5, new List<Node2D> { _shinyEggNode } },
+			{ 6, new List<Node2D> { _skullNode } },
+			{ 7, new List<Node2D> { _dewDropNode } },
+			{ 8, new List<Node2D> { _lavaEggNode } },
+			{ 10, new List<Node2D> { _frogNode } },
+			{ 13, new List<Node2D> { _alienEggNode } },
+			{ 21, new List<Node2D> { _iceEggNode } },
+			{ 22, new List<Node2D> { _pillItemNode } },
+			{ 34, new List<Node2D> { _discoEggNode } }
+		};
+		
 		NewGame();
 	}
-
 
 	public void NewGame()
 	{
@@ -171,7 +187,7 @@ public partial class Main : Node
 	{
 		if (!_canMove) return;
 
-		foreach (var action in movements)
+		foreach (var action in _headDirection)
 		{
 			if (Input.IsActionPressed(action.Key) && _moveDirection != -action.Value.direction)
 			{
@@ -202,28 +218,33 @@ public partial class Main : Node
 	private void _on_move_timer_timeout()
 	{
 		_canMove = true;
-		_oldData = _snakeData.ToList(); //Shallow copy, so why does this work? 
+		_oldData = _snakeData.ToList(); // Shallow copy for snake positions
+		// Create a deep copy of the snake to keep visual bend.
 		for (int i = 0; i < _snake.Count; i++)
 		{
 			_oldSnake[i] = CloneAnimatedSprite2D((AnimatedSprite2D)_snake[i]);
 		}
-		_snakeData[0] += _moveDirection;
+		_snakeData[0] += _moveDirection;// Update snake's head position data
+		// Update other body segments data
 		for (int i = 0; i < _snakeData.Count; i++)
 		{
 			if (i > 0)
 			{
 				_snakeData[i] = _oldData[i - 1];
 			}
+			// Update the position of the segment sprite
 			_snake[i].Position = (_snakeData[i] * _cellPixelSize) + new Vector2I(0, _cellPixelSize);
-			if (_snakeData.Count > 4 && i == 2)
+			// Handle new neck bending for the second segment
+			if (i == 2)
 			{
-				ChangeSnakeFrames();
+				BendNeckSegment();
 			}
-			if (_snakeData.Count > 4 && i > 1 && i < _snake.Count - 1)
+			// Copy frame data for other body segments
+			if (i > 1 && i < _snake.Count - 1)
 			{
-				var test = (AnimatedSprite2D)_snake[i];
-				var oldTest = (AnimatedSprite2D)_oldSnake[i - 1];
-				test.Frame = oldTest.Frame;
+				var currentSegment = (AnimatedSprite2D)_snake[i];
+				var previousSegment = (AnimatedSprite2D)_oldSnake[i - 1];
+				currentSegment.Frame = previousSegment.Frame;
 			}
 		}
 		CheckOutOfBound();
@@ -231,8 +252,9 @@ public partial class Main : Node
 		CheckEggEaten();
 		CheckItemHit();
 	}
+
 	
-	private void ChangeSnakeFrames()
+	private void BendNeckSegment()
 	{
 		AnimatedSprite2D neck = (AnimatedSprite2D)_snake[1];
 		Vector2 headPosition = _snake[0].Position;
@@ -307,33 +329,17 @@ public partial class Main : Node
 
 	private Vector2I RandomPlacement()
 	{
-		Vector2I itemPlacement;
 		Random rndm = new Random();
+		HashSet<Vector2I> occupiedPositions = new HashSet<Vector2I>(_snakeData);
+		occupiedPositions.Add(_eggPosition);
+		occupiedPositions.UnionWith(_itemsData);
+
+		Vector2I itemPlacement;
 		do
 		{
-			_itemRegen = false;
 			itemPlacement = new Vector2I(rndm.Next(0, _boardCellSize - 1), rndm.Next(3, _boardCellSize - 1));
-			if (itemPlacement == _eggPosition)
-			{
-				_itemRegen = true;
-			}
-			for (int i = 0; i < _snakeData.Count; i++)
-			{
-				if (itemPlacement == _snakeData[i])
-				{
-					_itemRegen = true;
-				}
-			}
-			for (int i = 0; i < _itemsData.Count; i++)
-			{
-				if (itemPlacement == _itemsData[i])
-				{
-					_itemRegen = true;
-				}
-			}
-		} while (_itemRegen);
-		
-		_itemRegen = true;
+		} while (occupiedPositions.Contains(itemPlacement));
+
 		return itemPlacement;
 	}
 
@@ -359,76 +365,16 @@ public partial class Main : Node
 	
 	private void CheckGenerations()
 	{
-		Node2D newItem;
-		if (_tally % 1 == 0)
+		foreach (var rule in _itemRates)
 		{
-			newItem = (Node2D)_wallNode.Duplicate();
-			GenerateItem(newItem);
-			newItem = (Node2D)_freshEggNode.Duplicate();
-			GenerateItem(newItem);
-		}
-		if (_tally % 2 == 0)
-		{
-			newItem = (Node2D)_ripeEggNode.Duplicate();
-			GenerateItem(newItem);
-		}
-		if (_tally % 3 == 0)
-		{
-			newItem = (Node2D)_rottenEggNode.Duplicate();
-			GenerateItem(newItem);
-		}
-
-		if (_tally % 4 == 0)
-		{
-			newItem = (Node2D)_mushroomNode.Duplicate();
-			GenerateItem(newItem);
-		}
-		if (_tally % 5 == 0)
-		{
-			newItem = (Node2D)_shinyEggNode.Duplicate();
-			GenerateItem(newItem);
-		}
-
-		if (_tally % 6 == 0)
-		{
-
-			newItem = (Node2D)_skullNode.Duplicate();
-			GenerateItem(newItem);
-		}
-		if (_tally % 7 == 0)
-		{
-			newItem = (Node2D)_dewDropNode.Duplicate();
-			GenerateItem(newItem);
-		}
-		if (_tally % 8 == 0)
-		{
-			newItem = (Node2D)_lavaEggNode.Duplicate();
-			GenerateItem(newItem);
-		}
-		if (_tally % 10 == 0)
-		{
-			newItem = (Node2D)_frogNode.Duplicate();
-			GenerateItem(newItem);
-		}
-		if (_tally % 13 == 0)
-		{
-			newItem = (Node2D)_alienEggNode.Duplicate();
-			GenerateItem(newItem);
-		}
-		if (_tally % 21 == 0)
-		{
-			newItem = (Node2D)_iceEggNode.Duplicate();
-			GenerateItem(newItem);
-		}
-		if (_tally % 22 == 0)
-		{
-			newItem = (Node2D)_pillItemNode.Duplicate();
-			GenerateItem(newItem);
-		}
-		if (_tally % 34 == 0)
-		{
-			newItem = (Node2D)_discoEggNode.Duplicate();
-			GenerateItem(newItem);
+			if (_tally % rule.Key == 0)
+			{
+				foreach (var itemNode in rule.Value)
+				{
+					var newItem = (Node2D)itemNode.Duplicate();
+					GenerateItem(newItem);
+				}
+			}
 		}
 	}
 	
