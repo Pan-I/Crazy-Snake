@@ -43,7 +43,7 @@ speed_scale = 0.0
 [node name="Hud" parent="." instance=ExtResource("3_4f2l8")]
 
 [node name="MoveTimer" type="Timer" parent="."]
-wait_time = 0.2
+wait_time = 0.75
 
 [node name="Egg" type="Sprite2D" parent="."]
 position = Vector2(60, 60)

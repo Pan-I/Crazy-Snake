@@ -80,10 +80,15 @@ public partial class Main : Node
 	private Node2D _iceEggNode;
 	private Node2D _pillItemNode;
 	private Node2D _discoEggNode;
+
+	private bool _pause;
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		// The WaitTime is the amount of seconds between each snake movement. .1-.2 is a good regular gameplay speed; .75 is a good debug speed for animations etc.
+		GetNode<Timer>("MoveTimer").WaitTime = 0.75;
+		
 		_wallNode = GetNode<Node2D>("ItemManager/Wall");
 		_freshEggNode = GetNode<Node2D>("ItemManager/FreshEgg");
 		_ripeEggNode = GetNode<Node2D>("ItemManager/RipeEgg");
@@ -126,10 +131,12 @@ public partial class Main : Node
 			{ 22, new List<Node2D> { _pillItemNode } },
 			{ 34, new List<Node2D> { _discoEggNode } }
 		};
-		
+		_pause = false;
 		NewGame();
 	}
 
+	#region Game Handling
+	
 	public void NewGame()
 	{
 		GetTree().Paused = false;
@@ -153,7 +160,108 @@ public partial class Main : Node
 		GenerateSnake();
 		MoveEgg();
 	}
+	
+	private void StartGame()
+	{
+		_gameStarted = true;
+		GetNode<Timer>("MoveTimer").Start();
+	}
+	
+	private void EndGame()
+	{
+		GetTree().Paused = true;
+		_gameStarted = false;
+		GetNode<Timer>("MoveTimer").Stop();
+		GetNode<CanvasLayer>("GameOverMenu").Visible = true;
+		string message = $"Game Over!\nScore: {_score}";
+		GetNode<CanvasLayer>("GameOverMenu").GetNode<Panel>("GameOverPanel").GetNode<Label>("GameOverLabel").Text = message;
+		//var test = GetNode<AnimatedSprite2D>("Background");
+		//test.Frame = 0;
+	}
 
+	// Called every frame. 'delta' is the elapsed time since the previous frame.
+	public override void _Process(double delta)
+	{
+		if (Input.IsActionPressed("pause"))
+		{
+			if (!_pause)
+			{
+				GetNode<Timer>("MoveTimer").Stop();
+				_canMove = false;
+				_pause = true;
+			}
+			else
+			{
+				GetNode<Timer>("MoveTimer").Start();
+				_canMove = true;
+				_pause = false;
+			}
+
+		}
+		MoveSnake();
+	}
+	
+		
+	private void _on_move_timer_timeout()
+	{
+		_canMove = true;
+		_oldData = _snakeData.ToList();
+		_oldSnakeMoveData = _snakeMoveData.ToList();
+		// Create a deep copy of the snake sprites to keep visual bend.
+		for (int i = 0; i < _snake.Count; i++)
+		{
+			_oldSnake[i] = CloneAnimatedSprite2D((AnimatedSprite2D)_snake[i]);
+		}
+		_snakeData[0] += _moveDirection;// Update snake's head position data
+		// Update other body segments data
+		AnimatedSprite2D currentSegment;
+		for (int i = 0; i < _snakeData.Count; i++)
+		{
+			// Copy frame data for other body segments
+			currentSegment = null;
+			if (i > 1 && i < _snake.Count - 1)
+			{
+				currentSegment = (AnimatedSprite2D)_snake[i];
+				var previousSegment = (AnimatedSprite2D)_oldSnake[i - 1];
+				currentSegment.Frame = previousSegment.Frame;
+				currentSegment.Offset = new Vector2(15, 15);
+				currentSegment.FlipH = false;
+				currentSegment.FlipV = false;
+				currentSegment.Rotation = 0f;
+			}
+			if (i > 0)
+			{
+				currentSegment = (AnimatedSprite2D)_snake[i];
+				currentSegment.Visible = true;
+				_snakeData[i] = _oldData[i - 1];
+				_snakeMoveData[i] = _oldSnakeMoveData[i - 1];
+			}
+			HandleTailSegments(currentSegment, i);
+			if ((_snake.Count > 4 && i > 4))
+			{
+				BendTail(i);
+			}
+			// Update the position of the segment sprite
+			_snake[i].Position = (_snakeData[i] * _cellPixelSize) + new Vector2I(0, _cellPixelSize);
+			// Handle new neck bending for the second segment
+			if (i == 2)
+			{
+				BendNeckSegment();
+			}
+		}
+		
+		CheckOutOfBound();
+		CheckSelfEaten();
+		CheckEggEaten();
+		CheckItemHit();
+		CheckLargeItemHit();
+	}
+	
+	#endregion Game Handling
+
+	
+	#region Snake Methods
+	
 	private void GenerateSnake()
 	{
 		_oldData = new List<Vector2I>();
@@ -169,6 +277,7 @@ public partial class Main : Node
 		}
 	}
 	private void AddSegment(Vector2I position)
+	
 	{
 		_snakeData.Add(position);
 		_snakeMoveData.Add("");
@@ -182,38 +291,12 @@ public partial class Main : Node
 		}
 		if (_snake.Count > 3)
 		{
-			snakeSegment.Frame = 6;
-			snakeSegment.Offset = new Vector2(-15, -15);
-			snakeSegment.Rotation = 3.1416f;
-		}
-		if (_snake.Count > 4)
-		{
-			snakeSegment.Frame = 7;
-			snakeSegment.Offset = new Vector2(-15, -15);
-			snakeSegment.Rotation = 3.1416f;
-		}
-		if (_snake.Count > 5)
-		{
-			snakeSegment.Frame = 9;
-			snakeSegment.Offset = new Vector2(-15, -15);
-			snakeSegment.Rotation = 3.1416f;
-		}
-		if (_snake.Count > 6)
-		{
 			snakeSegment.Visible = false;
 		}
 		AddChild(snakeSegment);
 		_snake.Add(snakeSegment);
 		_oldSnake.Add(snakeSegment);
 	}
-
-
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
-	{
-		MoveSnake();
-	}
-	
 	private void MoveSnake()
 	{
 		if (!_canMove) return;
@@ -239,64 +322,56 @@ public partial class Main : Node
 			}
 		}
 	}
-
-	private void StartGame()
+	private void HandleTailSegments(AnimatedSprite2D currentSegment, int i)
 	{
-		_gameStarted = true;
-		GetNode<Timer>("MoveTimer").Start();
-	}
-
-	private void _on_move_timer_timeout()
-	{
-		_canMove = true;
-		_oldData = _snakeData.ToList(); // Shallow copy for snake positions
-		_oldSnakeMoveData = _snakeMoveData.ToList(); //Shallow copy //TODO: confirm through testing.
-		// Create a deep copy of the snake to keep visual bend.
-		for (int i = 0; i < _snake.Count; i++)
+		if (i == _snake.Count - 3 && _snake.Count > 5 || (i > 2 && _snake.Count < 5) || (i == 3 && _snake.Count == 5))
 		{
-			_oldSnake[i] = CloneAnimatedSprite2D((AnimatedSprite2D)_snake[i]);
-		}
-		_snakeData[0] += _moveDirection;// Update snake's head position data
-		// Update other body segments data
-		AnimatedSprite2D currentSegment;
-		for (int i = 0; i < _snakeData.Count; i++)
-		{
-			if (i > 0)
+			currentSegment = (AnimatedSprite2D)_snake[i];
+			currentSegment.Frame = 6;
+			var currentDirection = _snakeMoveData[i];
+			foreach (var action in _headDirection)
 			{
-				currentSegment = (AnimatedSprite2D)_snake[i];
-				currentSegment.Visible = true;
-				_snakeData[i] = _oldData[i - 1];
-				_snakeMoveData[i] = _oldSnakeMoveData[i - 1];
-			}
-			// Update the position of the segment sprite
-			_snake[i].Position = (_snakeData[i] * _cellPixelSize) + new Vector2I(0, _cellPixelSize);
-			// Handle new neck bending for the second segment
-			if (i == 2)
-			{
-				BendNeckSegment();
-			}
-			// Copy frame data for other body segments
-			currentSegment = null;
-			if (i > 1 && i < _snake.Count - 1)
-			{
-				currentSegment = (AnimatedSprite2D)_snake[i];
-				var previousSegment = (AnimatedSprite2D)_oldSnake[i - 1];
-				currentSegment.Frame = previousSegment.Frame;
-				currentSegment.Offset = new Vector2(15, 15);
-				currentSegment.FlipH = false;
-				currentSegment.FlipV = false;
-				currentSegment.Rotation = 0f;
-			}
-			if (_snake.Count > 4)
-			{
-				BendTail(i);
+				if (currentDirection == action.Key)
+				{
+					currentSegment.Rotation = action.Value.rotation;
+					currentSegment.Offset = action.Value.offset;
+					currentSegment.FlipV = action.Value.flipV;
+					currentSegment.FlipH = action.Value.flipH;
+				}
 			}
 		}
-		CheckOutOfBound();
-		CheckSelfEaten();
-		CheckEggEaten();
-		CheckItemHit();
-		CheckLargeItemHit();
+		else if (i == _snake.Count - 2 && _snake.Count > 5 || (i > 3 && _snake.Count < 5) || (i == 4 && _snake.Count == 5))
+		{
+			currentSegment = (AnimatedSprite2D)_snake[i];
+			currentSegment.Frame = 7;
+			var currentDirection = _snakeMoveData[i];
+			foreach (var action in _headDirection)
+			{
+				if (currentDirection == action.Key)
+				{
+					currentSegment.Rotation = action.Value.rotation;
+					currentSegment.Offset = action.Value.offset;
+					currentSegment.FlipV = action.Value.flipV;
+					currentSegment.FlipH = action.Value.flipH;
+				}
+			}
+		}
+		else if (i == _snake.Count - 1 && _snake.Count > 5)
+		{
+			currentSegment = (AnimatedSprite2D)_snake[i];
+			currentSegment.Frame = 9;
+			var currentDirection = _snakeMoveData[i];
+			foreach (var action in _headDirection)
+			{
+				if (currentDirection == action.Key)
+				{
+					currentSegment.Rotation = action.Value.rotation;
+					currentSegment.Offset = action.Value.offset;
+					currentSegment.FlipV = action.Value.flipV;
+					currentSegment.FlipH = action.Value.flipH;
+				}
+			}
+		}
 	}
 	
 	private void BendTail(int i)
@@ -349,44 +424,18 @@ public partial class Main : Node
 				tailTip.Frame = 10;
 			}
 		}
-		if (_snake.Count > 5)
-		{
-			valid = (i == _snake.Count - 3) || (i == _snake.Count - 2) || (i == _snake.Count - 1);
-		}
-		else if (_snake.Count == 5)
-		{
-			valid = (i == 3) || (i == 4);
-		}
-		else if (_snake.Count < 5)
-		{
-			valid = i > 2;
-		}
-		// Apply frame and directional transformations if a valid frame is set
-		if (valid)
-		{
-			// Apply frame and directional transformations if a valid frame is set
-			var currentSegment = (AnimatedSprite2D)_snake[i];
-			var currentDirection = _snakeMoveData[i];
-			if (_headDirection.TryGetValue(currentDirection, out var directionData))
-			{
-				currentSegment.Rotation = directionData.rotation;
-				currentSegment.Offset = directionData.offset;
-				currentSegment.FlipV = directionData.flipV;
-				currentSegment.FlipH = directionData.flipH;
-			}
-		}
 	}
-
+	
 	private void BendNeckSegment()
 	{
 		AnimatedSprite2D neck = (AnimatedSprite2D)_snake[1];
 		Vector2 headPosition = _snake[0].Position;
 		Vector2 neckPosition = _snake[1].Position;
-		Vector2 tailPosition = _snake[2].Position;
+		Vector2 bodyPosition = _snake[2].Position;
 
 		// Check if the snake is in a straight line
-		if ((headPosition.X == neckPosition.X && neckPosition.X == tailPosition.X) ||
-			(headPosition.Y == neckPosition.Y && neckPosition.Y == tailPosition.Y))
+		if ((headPosition.X == neckPosition.X && neckPosition.X == bodyPosition.X) ||
+			(headPosition.Y == neckPosition.Y && neckPosition.Y == bodyPosition.Y))
 		{
 			neck.Frame = 0;
 			neck.Offset = new Vector2(15, 15);
@@ -395,57 +444,39 @@ public partial class Main : Node
 		}
 
 		// Determine relative positions
-		bool isHeadAboveTail = headPosition.Y < tailPosition.Y;
-		bool isHeadBelowTail = headPosition.Y > tailPosition.Y;
-		bool isHeadRightOfTail = headPosition.X > tailPosition.X;
-		bool isHeadLeftOfTail = headPosition.X < tailPosition.X;
+		bool isHeadAboveBody = headPosition.Y < bodyPosition.Y;
+		bool isHeadBelowBody = headPosition.Y > bodyPosition.Y;
+		bool isHeadRightOfBody = headPosition.X > bodyPosition.X;
+		bool isHeadLeftOfBody = headPosition.X < bodyPosition.X;
 
-		if (isHeadAboveTail)
+		if (isHeadAboveBody)
 		{
-			if (isHeadRightOfTail)
+			if (isHeadRightOfBody)
 			{
 				neck.Frame = headPosition.X == neckPosition.X ? 2 : 5;
 			}
-			else if (isHeadLeftOfTail)
+			else if (isHeadLeftOfBody)
 			{
 				neck.Frame = headPosition.X == neckPosition.X ? 3 : 4;
 			}
 		}
-		else if (isHeadBelowTail)
+		else if (isHeadBelowBody)
 		{
-			if (isHeadRightOfTail)
+			if (isHeadRightOfBody)
 			{
 				neck.Frame = headPosition.X == neckPosition.X ? 4 : 3;
 			}
-			else if (isHeadLeftOfTail)
+			else if (isHeadLeftOfBody)
 			{
 				neck.Frame = headPosition.X == neckPosition.X ? 5 : 2;
 			}
 		}
 	}
 	
-	private AnimatedSprite2D CloneAnimatedSprite2D(AnimatedSprite2D original)
-	{
-		// Create a new instance
-		var copy = new AnimatedSprite2D();
+	#endregion Snake Methods
+
+	#region Items
 	
-		// Copy essential properties
-		copy.Name = original.Name;
-		copy.Position = original.Position;
-		copy.Offset = original.Offset;
-		copy.Scale = original.Scale;
-		copy.Rotation = original.Rotation;
-		copy.Visible = original.Visible;
-		copy.SpriteFrames = original.SpriteFrames;
-
-		// Copy animation-related properties
-		copy.Frame = original.Frame;
-		copy.Animation = original.Animation;
-		copy.Autoplay = original.Autoplay;
-
-		return copy;
-	}
-
 	private void MoveEgg()
 	{
 		_eggPosition = RandomPlacement();
@@ -454,6 +485,8 @@ public partial class Main : Node
 
 	private Vector2I RandomPlacement()
 	{
+		//TODO: possible parameter for introducing larger objects when being placed to avoid placing on top of other items.
+		//Large walls have been spotted spawning on snake segments, and other items (https://github.com/users/Pan-I/projects/6/views/3?pane=issue&itemId=93374486&issue=Pan-I%7CCrazy-Snake%7C9)
 		Random rndm = new Random();
 		HashSet<Vector2I> occupiedPositions = new HashSet<Vector2I>(_snakeData);
 		occupiedPositions.Add(_eggPosition);
@@ -465,10 +498,11 @@ public partial class Main : Node
 		do
 		{
 			itemPlacement = new Vector2I(rndm.Next(0, _boardCellSize - 1), rndm.Next(3, _boardCellSize - 1));
-		} while (occupiedPositions. Count < 899 &&  //TODO: this 899 limit doesn't account for large items either.
-				 (occupiedPositions.Contains(itemPlacement) || 
-				 IsWithinRadius(itemPlacement, _snakeData[0], 3))); //Don't place too close to snake.
-
+		} while (occupiedPositions. Count < 899 && //TODO: this 899 limit doesn't account for large items either.
+				 (occupiedPositions.Contains(itemPlacement) || //Don't place on an occupied position.
+				  IsWithinRadius(itemPlacement, _snakeData[0], 3) || //Don't place too close to snake head.
+				  !IsWithinRadius(itemPlacement, _snakeData[^1], 7) //Place within 7 cells of the tail. Temporary rule? I kind of like it.
+				 ));
 		// Helper function to check if a position is within a given radius
 		bool IsWithinRadius(Vector2I position, Vector2I center, int radius)
 		{
@@ -479,29 +513,8 @@ public partial class Main : Node
 		
 		return itemPlacement;
 	}
-
-	private void CheckEggEaten()
-	{
-		if (_eggPosition == _snakeData[0])
-		{
-			_score += 5;
-			_tally++;
-			UpdateHudScore();
-			AddSegment(_oldData[^1]);
-			MoveEgg();
-			CheckGenerations();
-		}
-	}
-
-	private void UpdateHudScore()
-	{
-		_score = Math.Round(_score, 0);
-		GetNode<CanvasLayer>("Hud").GetNode<Label>("ScoreLabel").Text = $"Score: {_score} ";
-	}
-
-	#region Items
 	
-	private void CheckGenerations()
+	private void GenerateFromItemLookup()
 	{
 		foreach (var rule in _itemRates)
 		{
@@ -510,9 +523,26 @@ public partial class Main : Node
 				foreach (var itemNode in rule.Value)
 				{
 					var newItem = (Node2D)itemNode.Duplicate();
-					GenerateItem(newItem);
+					SpawnItem(newItem);
 				}
 			}
+		}
+	}
+	
+	private void SpawnItem(Node2D newItem)
+	{
+		newItem.Visible = true;
+		_newItemPosition = RandomPlacement();
+		newItem.Position = (_newItemPosition * _cellPixelSize) + new Vector2I(0, _cellPixelSize);
+		AddChild(newItem);
+		_items.Add(newItem);
+		if (newItem.SceneFilePath == _largeWallNode.SceneFilePath)
+		{
+			_largeItemsData.Add(_newItemPosition);
+		}
+		else
+		{
+			_itemsData.Add(_newItemPosition);
 		}
 	}
 	
@@ -570,24 +600,17 @@ public partial class Main : Node
 		if (item.SceneFilePath == _mushroomNode.SceneFilePath)
 		{
 			_score = Math.Pow(Math.Abs(_score), 1.05);
-			//var test = GetNode<AnimatedSprite2D>("Background");
-			//test.Frame = 1;
 		}
 		if (item.SceneFilePath == _dewDropNode.SceneFilePath)
 		{
 			_score = Math.Abs(_score);
-			//var test = GetNode<AnimatedSprite2D>("Background");
-			//test.Frame = 0;
 		}
 		if (item.SceneFilePath == _pillItemNode.SceneFilePath)
 		{
 			_score = Math.Pow(Math.Abs(_score), 1.5);
-			//var test = GetNode<AnimatedSprite2D>("Background");
-			//test.Frame = 2;
 		}
 		if (item.SceneFilePath == _skullNode.SceneFilePath)
 		{
-			//create a Random object for randomizing starting player
 			Random rnd = new Random();
 			int result;
 			do
@@ -609,21 +632,27 @@ public partial class Main : Node
 		}
 			
 	}
+	
+	#endregion Items
 
-	private void GenerateItem(Node2D newItem)
+	#region GUI_Checks_Events
+	
+	private void UpdateHudScore()
 	{
-		newItem.Visible = true;
-		_newItemPosition = RandomPlacement();
-		newItem.Position = (_newItemPosition * _cellPixelSize) + new Vector2I(0, _cellPixelSize);
-		AddChild(newItem);
-		_items.Add(newItem);
-		if (newItem.SceneFilePath == _largeWallNode.SceneFilePath)
+		_score = Math.Round(_score, 0);
+		GetNode<CanvasLayer>("Hud").GetNode<Label>("ScoreLabel").Text = $"Score: {_score} ";
+	}
+	
+	private void CheckEggEaten()
+	{
+		if (_eggPosition == _snakeData[0])
 		{
-			_largeItemsData.Add(_newItemPosition);
-		}
-		else
-		{
-			_itemsData.Add(_newItemPosition);
+			_score += 5;
+			_tally++;
+			UpdateHudScore();
+			AddSegment(_oldData[^1]);
+			MoveEgg();
+			GenerateFromItemLookup();
 		}
 	}
 
@@ -663,8 +692,6 @@ public partial class Main : Node
 		}
 	}
 
-	#endregion
-
 	private void CheckSelfEaten()
 	{
 		for (int i = 1; i < _snakeData.Count; i++)
@@ -691,21 +718,35 @@ public partial class Main : Node
 			EndGame();
 		}
 	}
-
-	private void EndGame()
-	{
-		GetTree().Paused = true;
-		_gameStarted = false;
-		GetNode<Timer>("MoveTimer").Stop();
-		GetNode<CanvasLayer>("GameOverMenu").Visible = true;
-		string message = $"Game Over!\nScore: {_score}";
-		GetNode<CanvasLayer>("GameOverMenu").GetNode<Panel>("GameOverPanel").GetNode<Label>("GameOverLabel").Text = message;
-		//var test = GetNode<AnimatedSprite2D>("Background");
-		//test.Frame = 0;
-	}
 	
 	private void _on_game_over_menu_restart()
 	{
 		NewGame();
 	}
+	
+	#endregion GUI_Checks_Events
+	
+	#region Helper Methods
+	private AnimatedSprite2D CloneAnimatedSprite2D(AnimatedSprite2D original)
+	{
+		// Create a new instance
+		var copy = new AnimatedSprite2D();
+	
+		// Copy essential properties
+		copy.Name = original.Name;
+		copy.Position = original.Position;
+		copy.Offset = original.Offset;
+		copy.Scale = original.Scale;
+		copy.Rotation = original.Rotation;
+		copy.Visible = original.Visible;
+		copy.SpriteFrames = original.SpriteFrames;
+
+		// Copy animation-related properties
+		copy.Frame = original.Frame;
+		copy.Animation = original.Animation;
+		copy.Autoplay = original.Autoplay;
+
+		return copy;
+	}
+	#endregion Helper Methods
 }
