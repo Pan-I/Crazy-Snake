@@ -20,12 +20,21 @@
 
 A remake of Snake, with some twists. 
 
-The current version (v0.2.x) introduces a list of items that impact scoring and gameplay including:
+The current version (v0.2.x) introduces a rough 'animation' for the snake including face, bending neck, and winding tail; also a list of items that impact scoring and gameplay including:
 - Game ending walls
 - High scoring eggs
 - Negative scoring eggs
+- Complex score modifiers
 
-<img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.2%20Gameplay1.gif" alt="broken link of game screenshot 2" width="450"/> <img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.2%20Gameplay2.gif" alt="broken link of game screenshot 3" width="450"/> 
+<p>
+    <img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.2%20Gameplay1.gif" alt="broken link of game screenshot 2" width="450"/>
+    
+    <em>Where 0.2 started...</em>
+</p>
+<p> 
+	<img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.2.2%20Gameplay2.gif" alt="broken link of game screenshot 3" width="450"/> 
+    <em>Where 0.2.x is now...</em>
+</p>
 
 ---
 ## 🌟 Features 🎁

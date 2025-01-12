@@ -87,7 +87,7 @@ public partial class Main : Node
 	public override void _Ready()
 	{
 		// The WaitTime is the amount of seconds between each snake movement. .1-.2 is a good regular gameplay speed; .75 is a good debug speed for animations etc.
-		GetNode<Timer>("MoveTimer").WaitTime = 0.75;
+		GetNode<Timer>("MoveTimer").WaitTime = 0.15;
 		
 		_wallNode = GetNode<Node2D>("ItemManager/Wall");
 		_freshEggNode = GetNode<Node2D>("ItemManager/FreshEgg");
@@ -501,7 +501,7 @@ public partial class Main : Node
 		} while (occupiedPositions. Count < 899 && //TODO: this 899 limit doesn't account for large items either.
 				 (occupiedPositions.Contains(itemPlacement) || //Don't place on an occupied position.
 				  IsWithinRadius(itemPlacement, _snakeData[0], 3) || //Don't place too close to snake head.
-				  !IsWithinRadius(itemPlacement, _snakeData[^1], 7) //Place within 7 cells of the tail. Temporary rule? I kind of like it.
+				  !IsWithinRadius(itemPlacement, _snakeData[^1], 20) //Place within 7 cells of the tail. Temporary rule? I kind of like it.
 				 ));
 		// Helper function to check if a position is within a given radius
 		bool IsWithinRadius(Vector2I position, Vector2I center, int radius)
