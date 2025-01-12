@@ -26,15 +26,15 @@ The current version (v0.2.x) introduces a rough 'animation' for the snake includ
 - Negative scoring eggs
 - Complex score modifiers
 
-<p>
-    <img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.2%20Gameplay1.gif" alt="broken link of game screenshot 2" width="450"/>
-    
-    <em>Where 0.2 started...</em>
-</p>
-<p> 
-	<img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.2.2%20Gameplay2.gif" alt="broken link of game screenshot 3" width="450"/> 
-    <em>Where 0.2.x is now...</em>
-</p>
+| *Where v0.2.x is now* |
+|:--:| 
+| <img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.2.2%20Gameplay2.gif" alt="broken link of game screenshot 3" width="450"/> | 
+| *Where v0.2.x is now* |
+
+| *Where v0.2 started* |
+|:--:| 
+| <img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.2%20Gameplay1.gif" alt="broken link of game screenshot 2" width="450"/> | 
+| *Where v0.2 started* |
 
 ---
 ## 🌟 Features 🎁
