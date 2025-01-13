@@ -187,18 +187,18 @@ public partial class Main : Node
 			if (!_pause)
 			{
 				GetNode<Timer>("MoveTimer").Stop();
-				_canMove = false;
 				_pause = true;
 			}
 			else
 			{
 				GetNode<Timer>("MoveTimer").Start();
-				_canMove = true;
 				_pause = false;
 			}
-
 		}
-		MoveSnake();
+		if (!_pause)
+		{
+			MoveSnake();
+		}
 	}
 	
 		
