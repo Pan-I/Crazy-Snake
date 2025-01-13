@@ -1,0 +1,72 @@
+[gd_scene load_steps=18 format=3 uid="uid://bus8ubbqf6t8f"]
+
+[ext_resource type="PackedScene" uid="uid://cdi0w667sb8ab" path="res://scenes/alien_egg.tscn" id="1_rle3g"]
+[ext_resource type="PackedScene" uid="uid://cfctjn2vcvoqy" path="res://scenes/disco_egg.tscn" id="2_6s0vm"]
+[ext_resource type="PackedScene" uid="uid://bwrxc0no8k6f6" path="res://scenes/fresh_egg.tscn" id="3_g4pkn"]
+[ext_resource type="PackedScene" uid="uid://bwk2be61q50p5" path="res://scenes/ice_egg.tscn" id="4_w5cvd"]
+[ext_resource type="PackedScene" uid="uid://dl0l2obriypdb" path="res://scenes/lava_egg.tscn" id="5_yl1h0"]
+[ext_resource type="PackedScene" uid="uid://qujuucwpjsc3" path="res://scenes/dew_drop.tscn" id="6_gdbg0"]
+[ext_resource type="PackedScene" uid="uid://cp8qumyiyakoj" path="res://scenes/frog.tscn" id="7_rib1o"]
+[ext_resource type="PackedScene" uid="uid://jq2phst1krey" path="res://scenes/large_wall.tscn" id="8_18nsa"]
+[ext_resource type="PackedScene" uid="uid://bmacokslpunqr" path="res://scenes/mushroom.tscn" id="9_sfqck"]
+[ext_resource type="PackedScene" uid="uid://bx8dta5fps4ip" path="res://scenes/pill.tscn" id="10_kxwjl"]
+[ext_resource type="PackedScene" uid="uid://isfmmrx7d22g" path="res://scenes/speaker.tscn" id="11_jxili"]
+[ext_resource type="PackedScene" uid="uid://dmi1c0nq7gd4p" path="res://scenes/shades.tscn" id="12_t3v2t"]
+[ext_resource type="PackedScene" uid="uid://kl7umuvdq3fo" path="res://scenes/skull.tscn" id="13_5yjub"]
+[ext_resource type="PackedScene" uid="uid://soyxsm0myauj" path="res://scenes/ripe_egg.tscn" id="14_nm47m"]
+[ext_resource type="PackedScene" uid="uid://bvrvfl566cjyb" path="res://scenes/rotten_egg.tscn" id="15_252it"]
+[ext_resource type="PackedScene" uid="uid://dhncxvtgp7q3i" path="res://scenes/shiny_egg.tscn" id="16_fq3dh"]
+[ext_resource type="PackedScene" uid="uid://05iqo4nqdjqp" path="res://scenes/wall.tscn" id="17_13usj"]
+
+[node name="ItemManager" type="ResourcePreloader"]
+
+[node name="AlienEgg" parent="." instance=ExtResource("1_rle3g")]
+visible = false
+
+[node name="DiscoEgg" parent="." instance=ExtResource("2_6s0vm")]
+visible = false
+
+[node name="FreshEgg" parent="." instance=ExtResource("3_g4pkn")]
+visible = false
+
+[node name="IceEgg" parent="." instance=ExtResource("4_w5cvd")]
+visible = false
+
+[node name="LavaEgg" parent="." instance=ExtResource("5_yl1h0")]
+visible = false
+
+[node name="DewDrop" parent="." instance=ExtResource("6_gdbg0")]
+visible = false
+
+[node name="Frog" parent="." instance=ExtResource("7_rib1o")]
+visible = false
+
+[node name="LargeWall" parent="." instance=ExtResource("8_18nsa")]
+visible = false
+
+[node name="Mushroom" parent="." instance=ExtResource("9_sfqck")]
+visible = false
+
+[node name="Pill" parent="." instance=ExtResource("10_kxwjl")]
+visible = false
+
+[node name="Speaker" parent="." instance=ExtResource("11_jxili")]
+visible = false
+
+[node name="Shades" parent="." instance=ExtResource("12_t3v2t")]
+visible = false
+
+[node name="Skull" parent="." instance=ExtResource("13_5yjub")]
+visible = false
+
+[node name="RipeEgg" parent="." instance=ExtResource("14_nm47m")]
+visible = false
+
+[node name="RottenEgg" parent="." instance=ExtResource("15_252it")]
+visible = false
+
+[node name="ShinyEgg" parent="." instance=ExtResource("16_fq3dh")]
+visible = false
+
+[node name="Wall" parent="." instance=ExtResource("17_13usj")]
+visible = false
