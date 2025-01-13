@@ -611,23 +611,31 @@ public partial class Main : Node
 		}
 		if (item.SceneFilePath == _skullNode.SceneFilePath)
 		{
+			_tally = 0;
+			
 			Random rnd = new Random();
 			int result;
-			do
-			{
-				result = rnd.Next(-1, 2);
-			} while (result == 0 || result== 2); //results can only be 1 or -1
-			if (result == 1)
+			do { result = rnd.Next(-1, 7); } while (result % 2 == 0); //results can only be odd
+			
+			if (result == -1)
 			{
 				_score = -9999;
 			}
-			else if (result == -1)
+			else if (result == 1)
 			{
-				_score -= 9999;
+				_score -= -9999;
 			}
-			else //shouldn't hit
-			{
+			else if (result == 3)
+			{ 
 				_score = 0;
+			}
+			else if (result == 5)
+			{ 
+				_score += 9999;	
+			}
+			else
+			{
+				_score = 9999;
 			}
 		}
 			
