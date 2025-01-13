@@ -453,22 +453,22 @@ public partial class Main : Node
 		{
 			if (isHeadRightOfBody)
 			{
-				neck.Frame = headPosition.X == neckPosition.X ? 2 : 5;
+				neck.Frame = headPosition.X == neckPosition.X ? 4 : 2;
 			}
 			else if (isHeadLeftOfBody)
 			{
-				neck.Frame = headPosition.X == neckPosition.X ? 3 : 4;
+				neck.Frame = headPosition.X == neckPosition.X ? 5 : 3;
 			}
 		}
 		else if (isHeadBelowBody)
 		{
 			if (isHeadRightOfBody)
 			{
-				neck.Frame = headPosition.X == neckPosition.X ? 4 : 3;
+				neck.Frame = headPosition.X == neckPosition.X ? 3 : 5;
 			}
 			else if (isHeadLeftOfBody)
 			{
-				neck.Frame = headPosition.X == neckPosition.X ? 5 : 2;
+				neck.Frame = headPosition.X == neckPosition.X ? 2 : 4;
 			}
 		}
 	}
