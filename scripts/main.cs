@@ -87,7 +87,7 @@ public partial class Main : Node
 	public override void _Ready()
 	{
 		// The WaitTime is the amount of seconds between each snake movement. .1-.2 is a good regular gameplay speed; .75 is a good debug speed for animations etc.
-		GetNode<Timer>("MoveTimer").WaitTime = 0.15;
+		GetNode<Timer>("MoveTimer").WaitTime = 0.5;
 		
 		_wallNode = GetNode<Node2D>("ItemManager/Wall");
 		_freshEggNode = GetNode<Node2D>("ItemManager/FreshEgg");
@@ -289,7 +289,7 @@ public partial class Main : Node
 			snakeSegment.Offset = new Vector2(-15, 15);
 			snakeSegment.Rotation = 4.7183f;
 		}
-		if (_snake.Count > 3)
+		if (_snake.Count >= 3)
 		{
 			snakeSegment.Visible = false;
 		}
@@ -343,7 +343,7 @@ public partial class Main : Node
 		else if (i == _snake.Count - 2 && _snake.Count > 5 || (i > 3 && _snake.Count < 5) || (i == 4 && _snake.Count == 5))
 		{
 			currentSegment = (AnimatedSprite2D)_snake[i];
-			currentSegment.Frame = 7;
+			currentSegment.Frame = 8;
 			var currentDirection = _snakeMoveData[i];
 			foreach (var action in _headDirection)
 			{
@@ -359,7 +359,7 @@ public partial class Main : Node
 		else if (i == _snake.Count - 1 && _snake.Count > 5)
 		{
 			currentSegment = (AnimatedSprite2D)_snake[i];
-			currentSegment.Frame = 9;
+			currentSegment.Frame = 10;
 			var currentDirection = _snakeMoveData[i];
 			foreach (var action in _headDirection)
 			{
@@ -380,49 +380,37 @@ public partial class Main : Node
 		AnimatedSprite2D tailBase = (AnimatedSprite2D)_snake[^3];
 		AnimatedSprite2D tailShaft = (AnimatedSprite2D)_snake[^2];
 		AnimatedSprite2D tailTip = (AnimatedSprite2D)_snake[^1];
-		Vector2 tailBasePosition = _snake[^3].Position;
-		Vector2 tailShaftPosition = _snake[^2].Position;
-		Vector2 tailTipPosition = _snake[^1].Position;
-
-		// Check if the tail is in a straight line
-		if ((tailBasePosition.X == tailShaftPosition.X && tailShaftPosition.X == tailTipPosition.X) ||
-			(tailBasePosition.Y == tailShaftPosition.Y && tailShaftPosition.Y == tailBasePosition.Y))
+		string tailBaseMovement = _snakeMoveData[^3];
+		string tailShaftMovement = _snakeMoveData[^2];
+		string tailTipMovement = _snakeMoveData[^1];
+		//If all segments are going in a straight line
+		if (tailBaseMovement == tailShaftMovement && tailShaftMovement == tailTipMovement)
 		{
 			tailBase.Frame = 6;
-			tailShaft.Frame = 7;
-			tailTip.Frame = 9;
+			tailShaft.Frame = 8;
+			tailTip.Frame = 10;
+			
 		}
-		// Determine relative positions
-		bool isBaseAboveTip = tailBasePosition.Y < tailTipPosition.Y;
-		bool isBaseBelowTip = tailBasePosition.Y > tailTipPosition.Y;
-		bool isBaseRightOfTip = tailBasePosition.X > tailTipPosition.X;
-		bool isBaseLeftOfTip = tailBasePosition.X < tailTipPosition.X;
-
-		if (isBaseAboveTip)
+		//If the base segment is the only turning segment
+		if (tailBaseMovement != tailShaftMovement && tailShaftMovement == tailTipMovement)
 		{
-			if (isBaseRightOfTip)
-			{
-				tailShaft.Frame = 8;
-				tailTip.Frame = 10;
-			}
-			else if (isBaseLeftOfTip)
-			{
-				tailShaft.Frame = 8;
-				tailTip.Frame = 10;
-			}
+			tailBase.Frame = 7;
+			tailShaft.Frame = 8;
+			tailTip.Frame = 10;
 		}
-		else if (isBaseBelowTip)
+		//if the shaft is the only turning segment
+		if (tailBaseMovement == tailShaftMovement && tailShaftMovement != tailTipMovement)
 		{
-			if (isBaseRightOfTip)
-			{
-				tailShaft.Frame = 8;
-				tailTip.Frame = 10;
-			}
-			else if (isBaseLeftOfTip)
-			{
-				tailShaft.Frame = 8;
-				tailTip.Frame = 10;
-			}
+			tailBase.Frame = 6;
+			tailShaft.Frame = 9;
+			tailTip.Frame = 10;
+		}
+		//if both segments are turning
+		if (tailBaseMovement != tailShaftMovement && tailShaftMovement != tailTipMovement)
+		{
+			tailBase.Frame = 7;
+			tailShaft.Frame = 9;
+			tailTip.Frame = 10;
 		}
 	}
 	
