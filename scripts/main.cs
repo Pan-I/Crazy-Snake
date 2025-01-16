@@ -383,6 +383,10 @@ public partial class Main : Node
 		string tailBaseMovement = _snakeMoveData[^3];
 		string tailShaftMovement = _snakeMoveData[^2];
 		string tailTipMovement = _snakeMoveData[^1];
+		
+		tailBase.FlipV = false;
+		tailShaft.FlipV = false;
+		
 		//If all segments are going in a straight line
 		if (tailBaseMovement == tailShaftMovement && tailShaftMovement == tailTipMovement)
 		{
@@ -395,6 +399,50 @@ public partial class Main : Node
 		if (tailBaseMovement != tailShaftMovement && tailShaftMovement == tailTipMovement)
 		{
 			tailBase.Frame = 7;
+			if (tailBaseMovement is "move_right")
+			{
+				if (tailShaftMovement is "move_up")
+				{
+					tailBase.FlipV = true;
+				}
+				else
+				{
+					tailBase.FlipV = false;
+				}
+			}
+			if (tailBaseMovement is "move_up")
+			{
+				if (tailShaftMovement is "move_left")
+				{
+					tailBase.FlipV = true;
+				}
+				else
+				{
+					tailBase.FlipV = false;
+				}
+			}
+			if (tailBaseMovement is "move_left")
+			{
+				if (tailShaftMovement is "move_down")
+				{
+					tailBase.FlipV = true;
+				}
+				else
+				{
+					tailBase.FlipV = false;
+				}
+			}
+			if (tailBaseMovement is "move_down")
+			{
+				if (tailShaftMovement is "move_right")
+				{
+					tailBase.FlipV = true;
+				}
+				else
+				{
+					tailBase.FlipV = false;
+				}
+			}
 			tailShaft.Frame = 8;
 			tailTip.Frame = 10;
 		}
@@ -403,13 +451,145 @@ public partial class Main : Node
 		{
 			tailBase.Frame = 6;
 			tailShaft.Frame = 9;
+			if (tailShaftMovement is "move_right")
+			{
+				if (tailTipMovement is "move_down")
+				{
+					tailShaft.FlipV = true;
+				}
+				else
+				{
+					tailShaft.FlipV = false;
+				}
+			}
+			if (tailShaftMovement is "move_up")
+			{
+				if (tailTipMovement is "move_right")
+				{
+					tailShaft.FlipV = true;
+				}
+				else
+				{
+					tailShaft.FlipV = false;
+				}
+			}
+			if (tailShaftMovement is "move_left")
+			{
+				if (tailTipMovement is "move_up")
+				{
+					tailShaft.FlipV = true;
+				}
+				else
+				{
+					tailShaft.FlipV = false;
+				}
+			}
+			if (tailShaftMovement is "move_down")
+			{
+				if (tailTipMovement is "move_left")
+				{
+					tailShaft.FlipV = true;
+				}
+				else
+				{
+					tailShaft.FlipV = false;
+				}
+			}
 			tailTip.Frame = 10;
 		}
 		//if both segments are turning
 		if (tailBaseMovement != tailShaftMovement && tailShaftMovement != tailTipMovement)
 		{
 			tailBase.Frame = 7;
+			if (tailBaseMovement is "move_right")
+			{
+				if (tailShaftMovement is "move_up")
+				{
+					tailBase.FlipV = true;
+				}
+				else
+				{
+					tailBase.FlipV = false;
+				}
+			}
+			if (tailBaseMovement is "move_up")
+			{
+				if (tailShaftMovement is "move_left")
+				{
+					tailBase.FlipV = true;
+				}
+				else
+				{
+					tailBase.FlipV = false;
+				}
+			}
+			if (tailBaseMovement is "move_left")
+			{
+				if (tailShaftMovement is "move_down")
+				{
+					tailBase.FlipV = true;
+				}
+				else
+				{
+					tailBase.FlipV = false;
+				}
+			}
+			if (tailBaseMovement is "move_down")
+			{
+				if (tailShaftMovement is "move_right")
+				{
+					tailBase.FlipV = true;
+				}
+				else
+				{
+					tailBase.FlipV = false;
+				}
+			}
 			tailShaft.Frame = 9;
+			if (tailShaftMovement is "move_right")
+			{
+				if (tailTipMovement is "move_down")
+				{
+					tailShaft.FlipV = true;
+				}
+				else
+				{
+					tailShaft.FlipV = false;
+				}
+			}
+			if (tailShaftMovement is "move_up")
+			{
+				if (tailTipMovement is "move_right")
+				{
+					tailShaft.FlipV = true;
+				}
+				else
+				{
+					tailShaft.FlipV = false;
+				}
+			}
+			if (tailShaftMovement is "move_left")
+			{
+				if (tailTipMovement is "move_up")
+				{
+					tailShaft.FlipV = true;
+				}
+				else
+				{
+					tailShaft.FlipV = false;
+				}
+			}
+			if (tailShaftMovement is "move_down")
+			{
+				if (tailTipMovement is "move_left")
+				{
+					tailShaft.FlipV = true;
+				}
+				else
+				{
+					tailShaft.FlipV = false;
+				}
+			}
 			tailTip.Frame = 10;
 		}
 	}
