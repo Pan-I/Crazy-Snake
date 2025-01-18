@@ -87,7 +87,7 @@ public partial class Main : Node
 	public override void _Ready()
 	{
 		// The WaitTime is the amount of seconds between each snake movement. .1-.2 is a good regular gameplay speed; .75 is a good debug speed for animations etc.
-		GetNode<Timer>("MoveTimer").WaitTime = 0.15;
+		GetNode<Timer>("MoveTimer").WaitTime = 0.12;
 		
 		_wallNode = GetNode<Node2D>("ItemManager/Wall");
 		_freshEggNode = GetNode<Node2D>("ItemManager/FreshEgg");
@@ -110,7 +110,7 @@ public partial class Main : Node
 		{
 			{ "move_down",  (new Vector2(15, -15), 1.5708f, false, false, _downMove) },
 			{ "move_up",    (new Vector2(-15, 15), 4.7183f, false, false, _upMove) },
-			{ "move_left",  (new Vector2(-16, -15), 3.1416f, true, false, _leftMove) },
+			{ "move_left",  (new Vector2(-15, -15), 3.1416f, true, false, _leftMove) },
 			{ "move_right", (new Vector2(15, 15), 0f, false, false, _rightMove) }
 		};
 		
@@ -241,6 +241,10 @@ public partial class Main : Node
 			{
 				BendTail(i);
 			}
+			if ((_snake.Count == 5 && i > 3))
+			{
+				BendTail(i, false);
+			}
 			// Update the position of the segment sprite
 			_snake[i].Position = (_snakeData[i] * _cellPixelSize) + new Vector2I(0, _cellPixelSize);
 			// Handle new neck bending for the second segment
@@ -289,7 +293,7 @@ public partial class Main : Node
 			snakeSegment.Offset = new Vector2(-15, 15);
 			snakeSegment.Rotation = 4.7183f;
 		}
-		if (_snake.Count > 3)
+		if (_snake.Count >= 3)
 		{
 			snakeSegment.Visible = false;
 		}
@@ -324,6 +328,7 @@ public partial class Main : Node
 	}
 	private void HandleTailSegments(AnimatedSprite2D currentSegment, int i)
 	{
+		//if (currentSegment == null) throw new ArgumentNullException();
 		if (i == _snake.Count - 3 && _snake.Count > 5 || (i > 2 && _snake.Count < 5) || (i == 3 && _snake.Count == 5))
 		{
 			currentSegment = (AnimatedSprite2D)_snake[i];
@@ -343,7 +348,7 @@ public partial class Main : Node
 		else if (i == _snake.Count - 2 && _snake.Count > 5 || (i > 3 && _snake.Count < 5) || (i == 4 && _snake.Count == 5))
 		{
 			currentSegment = (AnimatedSprite2D)_snake[i];
-			currentSegment.Frame = 7;
+			currentSegment.Frame = 8;
 			var currentDirection = _snakeMoveData[i];
 			foreach (var action in _headDirection)
 			{
@@ -359,7 +364,7 @@ public partial class Main : Node
 		else if (i == _snake.Count - 1 && _snake.Count > 5)
 		{
 			currentSegment = (AnimatedSprite2D)_snake[i];
-			currentSegment.Frame = 9;
+			currentSegment.Frame = 10;
 			var currentDirection = _snakeMoveData[i];
 			foreach (var action in _headDirection)
 			{
@@ -374,55 +379,236 @@ public partial class Main : Node
 		}
 	}
 	
-	private void BendTail(int i)
+	private void BendTail(int i, bool fullTail = true)
 	{
-		var valid = false;
-		AnimatedSprite2D tailBase = (AnimatedSprite2D)_snake[^3];
-		AnimatedSprite2D tailShaft = (AnimatedSprite2D)_snake[^2];
-		AnimatedSprite2D tailTip = (AnimatedSprite2D)_snake[^1];
-		Vector2 tailBasePosition = _snake[^3].Position;
-		Vector2 tailShaftPosition = _snake[^2].Position;
-		Vector2 tailTipPosition = _snake[^1].Position;
-
-		// Check if the tail is in a straight line
-		if ((tailBasePosition.X == tailShaftPosition.X && tailShaftPosition.X == tailTipPosition.X) ||
-			(tailBasePosition.Y == tailShaftPosition.Y && tailShaftPosition.Y == tailBasePosition.Y))
+		
+		AnimatedSprite2D tailBase = fullTail ? (AnimatedSprite2D)_snake[^3] : (AnimatedSprite2D)_snake[^2];
+		AnimatedSprite2D tailShaft = fullTail ? (AnimatedSprite2D)_snake[^2] : (AnimatedSprite2D)_snake[^1];
+		AnimatedSprite2D tailTip = fullTail ? (AnimatedSprite2D)_snake[^1] : null;
+		string tailBaseMovement = fullTail ? _snakeMoveData[^3] : _snakeMoveData[^2];
+		string tailShaftMovement = fullTail ? _snakeMoveData[^2] : _snakeMoveData[^1];
+		string tailTipMovement = fullTail ? _snakeMoveData[^1] : null;
+		
+		tailBase.FlipV = false;
+		tailShaft.FlipV = false;
+		
+		
+		//If all segments are going in a straight line
+		if (tailBaseMovement == tailShaftMovement && tailShaftMovement == tailTipMovement)
 		{
 			tailBase.Frame = 6;
-			tailShaft.Frame = 7;
-			tailTip.Frame = 9;
+			tailShaft.Frame = 8;
+			if (tailTip != null)
+			{
+				tailTip.FlipV = false;
+				tailTip.Frame = 10;
+			}
 		}
-		// Determine relative positions
-		bool isBaseAboveTip = tailBasePosition.Y < tailTipPosition.Y;
-		bool isBaseBelowTip = tailBasePosition.Y > tailTipPosition.Y;
-		bool isBaseRightOfTip = tailBasePosition.X > tailTipPosition.X;
-		bool isBaseLeftOfTip = tailBasePosition.X < tailTipPosition.X;
+		//If the base segment is the only turning segment
+		if (tailBaseMovement != tailShaftMovement && (tailShaftMovement == tailTipMovement || tailTipMovement == null))
+		{
+			tailBase.Frame = 7;
+			if (tailBaseMovement is "move_right")
+			{
+				if (tailShaftMovement is "move_up")
+				{
+					tailBase.FlipV = true;
+				}
+				else
+				{
+					tailBase.FlipV = false;
+				}
+			}
+			if (tailBaseMovement is "move_up")
+			{
+				if (tailShaftMovement is "move_left")
+				{
+					tailBase.FlipV = true;
+				}
+				else
+				{
+					tailBase.FlipV = false;
+				}
+			}
+			if (tailBaseMovement is "move_left")
+			{
+				if (tailShaftMovement is "move_down")
+				{
+					tailBase.FlipV = true;
+				}
+				else
+				{
+					tailBase.FlipV = false;
+				}
+			}
+			if (tailBaseMovement is "move_down")
+			{
+				if (tailShaftMovement is "move_right")
+				{
+					tailBase.FlipV = true;
+				}
+				else
+				{
+					tailBase.FlipV = false;
+				}
+			}
+			tailShaft.Frame = 8;
+			if (tailTip != null)
+			{
+				tailTip.FlipV = false;
+				tailTip.Frame = 10;
+			}
+		}
+		//if the shaft is the only turning segment
+		if (tailTipMovement != null && tailBaseMovement == tailShaftMovement && tailShaftMovement != tailTipMovement)
+		{
+			tailBase.Frame = 6;
+			tailShaft.Frame = 9;
+			if (tailShaftMovement is "move_right")
+			{
+				if (tailTipMovement is "move_down")
+				{
+					tailShaft.FlipV = true;
+				}
+				else
+				{
+					tailShaft.FlipV = false;
+				}
+			}
+			if (tailShaftMovement is "move_up")
+			{
+				if (tailTipMovement is "move_right")
+				{
+					tailShaft.FlipV = true;
+				}
+				else
+				{
+					tailShaft.FlipV = false;
+				}
+			}
+			if (tailShaftMovement is "move_left")
+			{
+				if (tailTipMovement is "move_up")
+				{
+					tailShaft.FlipV = true;
+				}
+				else
+				{
+					tailShaft.FlipV = false;
+				}
+			}
+			if (tailShaftMovement is "move_down")
+			{
+				if (tailTipMovement is "move_left")
+				{
+					tailShaft.FlipV = true;
+				}
+				else
+				{
+					tailShaft.FlipV = false;
+				}
+			}
 
-		if (isBaseAboveTip)
-		{
-			if (isBaseRightOfTip)
+			if (tailTip != null)
 			{
-				tailShaft.Frame = 8;
-				tailTip.Frame = 10;
-			}
-			else if (isBaseLeftOfTip)
-			{
-				tailShaft.Frame = 8;
+				tailTip.FlipV = false;
 				tailTip.Frame = 10;
 			}
 		}
-		else if (isBaseBelowTip)
+		//if both segments are turning
+		if (tailTipMovement != null && tailBaseMovement != tailShaftMovement && tailShaftMovement != tailTipMovement)
 		{
-			if (isBaseRightOfTip)
+			tailBase.Frame = 7;
+			if (tailBaseMovement is "move_right")
 			{
-				tailShaft.Frame = 8;
-				tailTip.Frame = 10;
+				if (tailShaftMovement is "move_up")
+				{
+					tailBase.FlipV = true;
+				}
+				else
+				{
+					tailBase.FlipV = false;
+				}
 			}
-			else if (isBaseLeftOfTip)
+			if (tailBaseMovement is "move_up")
 			{
-				tailShaft.Frame = 8;
-				tailTip.Frame = 10;
+				if (tailShaftMovement is "move_left")
+				{
+					tailBase.FlipV = true;
+				}
+				else
+				{
+					tailBase.FlipV = false;
+				}
 			}
+			if (tailBaseMovement is "move_left")
+			{
+				if (tailShaftMovement is "move_down")
+				{
+					tailBase.FlipV = true;
+				}
+				else
+				{
+					tailBase.FlipV = false;
+				}
+			}
+			if (tailBaseMovement is "move_down")
+			{
+				if (tailShaftMovement is "move_right")
+				{
+					tailBase.FlipV = true;
+				}
+				else
+				{
+					tailBase.FlipV = false;
+				}
+			}
+			tailShaft.Frame = 9;
+			if (tailShaftMovement is "move_right")
+			{
+				if (tailTipMovement is "move_down")
+				{
+					tailShaft.FlipV = true;
+				}
+				else
+				{
+					tailShaft.FlipV = false;
+				}
+			}
+			if (tailShaftMovement is "move_up")
+			{
+				if (tailTipMovement is "move_right")
+				{
+					tailShaft.FlipV = true;
+				}
+				else
+				{
+					tailShaft.FlipV = false;
+				}
+			}
+			if (tailShaftMovement is "move_left")
+			{
+				if (tailTipMovement is "move_up")
+				{
+					tailShaft.FlipV = true;
+				}
+				else
+				{
+					tailShaft.FlipV = false;
+				}
+			}
+			if (tailShaftMovement is "move_down")
+			{
+				if (tailTipMovement is "move_left")
+				{
+					tailShaft.FlipV = true;
+				}
+				else
+				{
+					tailShaft.FlipV = false;
+				}
+			}
+			tailTip.Frame = 10;
 		}
 	}
 	
@@ -453,22 +639,22 @@ public partial class Main : Node
 		{
 			if (isHeadRightOfBody)
 			{
-				neck.Frame = headPosition.X == neckPosition.X ? 2 : 5;
+				neck.Frame = headPosition.X == neckPosition.X ? 4 : 2;
 			}
 			else if (isHeadLeftOfBody)
 			{
-				neck.Frame = headPosition.X == neckPosition.X ? 3 : 4;
+				neck.Frame = headPosition.X == neckPosition.X ? 5 : 3;
 			}
 		}
 		else if (isHeadBelowBody)
 		{
 			if (isHeadRightOfBody)
 			{
-				neck.Frame = headPosition.X == neckPosition.X ? 4 : 3;
+				neck.Frame = headPosition.X == neckPosition.X ? 3 : 5;
 			}
 			else if (isHeadLeftOfBody)
 			{
-				neck.Frame = headPosition.X == neckPosition.X ? 5 : 2;
+				neck.Frame = headPosition.X == neckPosition.X ? 2 : 4;
 			}
 		}
 	}
@@ -611,23 +797,31 @@ public partial class Main : Node
 		}
 		if (item.SceneFilePath == _skullNode.SceneFilePath)
 		{
+			_tally = 0;
+			
 			Random rnd = new Random();
 			int result;
-			do
-			{
-				result = rnd.Next(-1, 2);
-			} while (result == 0 || result== 2); //results can only be 1 or -1
-			if (result == 1)
+			do { result = rnd.Next(-1, 7); } while (result % 2 == 0); //results can only be odd
+			
+			if (result == -1)
 			{
 				_score = -9999;
 			}
-			else if (result == -1)
+			else if (result == 1)
 			{
-				_score -= 9999;
+				_score -= -9999;
 			}
-			else //shouldn't hit
-			{
+			else if (result == 3)
+			{ 
 				_score = 0;
+			}
+			else if (result == 5)
+			{ 
+				_score += 9999;	
+			}
+			else
+			{
+				_score = 9999;
 			}
 		}
 			
