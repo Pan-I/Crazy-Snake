@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bwrxc0no8k6f6"]
 
-[ext_resource type="Texture2D" uid="uid://bh44cmoulbi8l" path="res://assets/sprites/Fresh Egg.png" id="1_b17sg"]
+[ext_resource type="Texture2D" uid="uid://crgdmr55nqo7o" path="res://assets/sprites/Fresh Egg.png" id="1_b17sg"]
 
 [node name="FreshEgg" type="Sprite2D"]
 texture = ExtResource("1_b17sg")

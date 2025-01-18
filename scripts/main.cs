@@ -87,7 +87,7 @@ public partial class Main : Node
 	public override void _Ready()
 	{
 		// The WaitTime is the amount of seconds between each snake movement. .1-.2 is a good regular gameplay speed; .75 is a good debug speed for animations etc.
-		GetNode<Timer>("MoveTimer").WaitTime = 0.5;
+		GetNode<Timer>("MoveTimer").WaitTime = 0.12;
 		
 		_wallNode = GetNode<Node2D>("ItemManager/Wall");
 		_freshEggNode = GetNode<Node2D>("ItemManager/FreshEgg");
@@ -110,7 +110,7 @@ public partial class Main : Node
 		{
 			{ "move_down",  (new Vector2(15, -15), 1.5708f, false, false, _downMove) },
 			{ "move_up",    (new Vector2(-15, 15), 4.7183f, false, false, _upMove) },
-			{ "move_left",  (new Vector2(-16, -15), 3.1416f, true, false, _leftMove) },
+			{ "move_left",  (new Vector2(-15, -15), 3.1416f, true, false, _leftMove) },
 			{ "move_right", (new Vector2(15, 15), 0f, false, false, _rightMove) }
 		};
 		
@@ -328,7 +328,7 @@ public partial class Main : Node
 	}
 	private void HandleTailSegments(AnimatedSprite2D currentSegment, int i)
 	{
-		if (currentSegment == null) throw new ArgumentNullException();
+		//if (currentSegment == null) throw new ArgumentNullException();
 		if (i == _snake.Count - 3 && _snake.Count > 5 || (i > 2 && _snake.Count < 5) || (i == 3 && _snake.Count == 5))
 		{
 			currentSegment = (AnimatedSprite2D)_snake[i];
@@ -392,6 +392,7 @@ public partial class Main : Node
 		tailBase.FlipV = false;
 		tailShaft.FlipV = false;
 		
+		
 		//If all segments are going in a straight line
 		if (tailBaseMovement == tailShaftMovement && tailShaftMovement == tailTipMovement)
 		{
@@ -399,6 +400,7 @@ public partial class Main : Node
 			tailShaft.Frame = 8;
 			if (tailTip != null)
 			{
+				tailTip.FlipV = false;
 				tailTip.Frame = 10;
 			}
 		}
@@ -453,6 +455,7 @@ public partial class Main : Node
 			tailShaft.Frame = 8;
 			if (tailTip != null)
 			{
+				tailTip.FlipV = false;
 				tailTip.Frame = 10;
 			}
 		}
@@ -508,6 +511,7 @@ public partial class Main : Node
 
 			if (tailTip != null)
 			{
+				tailTip.FlipV = false;
 				tailTip.Frame = 10;
 			}
 		}
