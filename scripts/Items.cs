@@ -128,12 +128,28 @@ public partial class Items : Node
 			itemPlacement = new Vector2I(rndm.Next(0, _main.BoardCellSize - 1), rndm.Next(3, _main.BoardCellSize - 1));
 		} while (occupiedPositions. Count < 899 && //TODO: this 899 limit doesn't account for large items either.
 				 (occupiedPositions.Contains(itemPlacement) || //Don't place on an occupied position.
-				  _main.CheckLargeItemHit(itemPlacement) || //Don't place on large items.
+				  _main.CheckLargeItemHit(itemPlacement) || //Don't place on large items. //TODO: Doesn't seem to work.
 				  IsWithinRadius(itemPlacement, _snake.SnakeData[0], 3) || //Don't place too close to snake head.
+				  CheckWithinRadius(itemPlacement, _snake.SnakeData, 1) || //Don't place anywhere near entire body.
 				  !IsWithinRadius(itemPlacement, _snake.SnakeData[^1], 20) //Place within 7 cells of the tail. Temporary rule? I kind of like it.
 				 ));
 
 		return itemPlacement;
+
+		//TODO: Needs a better implementation.
+		bool CheckWithinRadius(Vector2I itemPlacement, List<Vector2I> listCoords, int radius)
+		{
+			bool withinRadius = false;
+			foreach (var spot in listCoords)
+			{
+				if (IsWithinRadius(itemPlacement, spot, radius))
+				{
+					withinRadius = true;
+					return withinRadius;
+				}
+			}
+			return withinRadius;
+		}
 
 		// Helper function to check if a position is within a given radius
 		bool IsWithinRadius(Vector2I position, Vector2I center, int radius)
