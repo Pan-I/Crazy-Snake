@@ -27,7 +27,7 @@ namespace Snake.scripts;
 
 public class Snake
 {
-	private Main _main;
+	private readonly Main _main;
 	internal List<Vector2I> OldData;
 	internal List<Vector2I> SnakeData;
 	private List<Node2D> _oldSnakeNodes;
@@ -117,11 +117,10 @@ public class Snake
 		}
 		SnakeData[0] += _main.MoveDirection;// Update snake's head position data
 		// Update other body segments data
-		AnimatedSprite2D currentSegment;
 		for (int i = 0; i < SnakeData.Count; i++)
 		{
 			// Copy frame data for other body segments
-			currentSegment = null;
+			AnimatedSprite2D currentSegment = null;
 			if (i > 1 && i < SnakeNodes.Count - 1)
 			{
 				currentSegment = (AnimatedSprite2D)SnakeNodes[i];

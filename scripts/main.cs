@@ -28,8 +28,8 @@ namespace Snake.scripts;
 public partial class Main : Node
 {
 	[Export] public PackedScene SnakeSegmentPs {get; set;}
-	public Snake Snake { get; }
-	public Items Items { get; }
+	private Snake Snake { get; }
+	private Items Items { get; }
 
 	//Game Variables
 	internal double Score;
@@ -55,7 +55,7 @@ public partial class Main : Node
 	public Main()
 	{
 		Snake = new Snake(this);
-		Items = new Items(this);
+		Items = new Items(this, Snake);
 	}
 
 	// Called when the node enters the scene tree for the first time.
@@ -114,8 +114,8 @@ public partial class Main : Node
 	}
 
 	#region Game Handling
-	
-	public void NewGame()
+
+	private void NewGame()
 	{
 		GetTree().Paused = false;
 		GetTree().CallGroup("snake", "queue_free");

@@ -21,13 +21,15 @@ The author can be contacted at pan.i.githubcontact@gmail.com
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Godot;
 
 namespace Snake.scripts;
 
 public partial class Items : Node
 {
-	private Main _main;
+	private readonly Main _main;
+	private readonly Snake _snake;
 	internal Node2D WallNode;
 	internal Vector2I EggPosition;
 	internal int Tally;
@@ -51,18 +53,19 @@ public partial class Items : Node
 	internal Node2D PillItemNode;
 	internal Node2D DiscoEggNode;
 
-	public Items(Main main)
+	public Items(Main main, Snake snake)
 	{
 		_main = main;
+		_snake = snake;
 	}
 
-	internal void LoadItems()
-	{
-	}
-
-	internal void SetItemRates()
-	{
-	}
+	// internal void LoadItems()
+	// {
+	// }
+	//
+	// internal void SetItemRates()
+	// {
+	// }
 
 
 	internal void MoveEgg()
@@ -76,8 +79,7 @@ public partial class Items : Node
 		//TODO: possible parameter for introducing larger objects when being placed to avoid placing on top of other items.
 		//Large walls have been spotted spawning on snake segments, and other items (https://github.com/users/Pan-I/projects/6/views/3?pane=issue&itemId=93374486&issue=Pan-I%7CCrazy-Snake%7C9)
 		Random rndm = new Random();
-		HashSet<Vector2I> occupiedPositions = new HashSet<Vector2I>(_main.Snake.SnakeData);
-		occupiedPositions.Add(EggPosition);
+		HashSet<Vector2I> occupiedPositions = new HashSet<Vector2I>(_snake.SnakeData) { EggPosition };
 		occupiedPositions.UnionWith(ItemsData);
 		occupiedPositions.UnionWith(LargeItemsData); //TODO: Needs a way to fill the other cells. Otherwise items may place in non-origin cells of larger items.
 		//
@@ -88,9 +90,12 @@ public partial class Items : Node
 			itemPlacement = new Vector2I(rndm.Next(0, _main.BoardCellSize - 1), rndm.Next(3, _main.BoardCellSize - 1));
 		} while (occupiedPositions. Count < 899 && //TODO: this 899 limit doesn't account for large items either.
 				 (occupiedPositions.Contains(itemPlacement) || //Don't place on an occupied position.
-				  IsWithinRadius(itemPlacement, _main.Snake.SnakeData[0], 3) || //Don't place too close to snake head.
-				  !IsWithinRadius(itemPlacement, _main.Snake.SnakeData[^1], 20) //Place within 7 cells of the tail. Temporary rule? I kind of like it.
+				  IsWithinRadius(itemPlacement, _snake.SnakeData[0], 3) || //Don't place too close to snake head.
+				  !IsWithinRadius(itemPlacement, _snake.SnakeData[^1], 20) //Place within 7 cells of the tail. Temporary rule? I kind of like it.
 				 ));
+
+		return itemPlacement;
+
 		// Helper function to check if a position is within a given radius
 		bool IsWithinRadius(Vector2I position, Vector2I center, int radius)
 		{
@@ -98,8 +103,6 @@ public partial class Items : Node
 			int dy = Math.Abs(position.Y - center.Y);
 			return dx <= radius && dy <= radius;
 		}
-		
-		return itemPlacement;
 	}
 
 	internal void GenerateFromItemLookup()
@@ -145,45 +148,46 @@ public partial class Items : Node
 			
 		{
 			_main.Score += 25;
-			_main.Snake.AddSegment(_main.Snake.OldData[^1]);
+			Debug.Assert(_snake != null, nameof(_snake) + " != null");
+			_snake.AddSegment(_snake.OldData[^1]);
 		}
 		if (item.SceneFilePath == RipeEggNode.SceneFilePath)
 		{
 			_main.Score *= 1.5;
-			_main.Snake.AddSegment(_main.Snake.OldData[^1]);
+			_snake.AddSegment(_snake.OldData[^1]);
 		}
 
 		if (item.SceneFilePath == ShinyEggNode.SceneFilePath)
 		{
 			_main.Score *= 2;
-			_main.Snake.AddSegment(_main.Snake.OldData[^1]);
+			_snake.AddSegment(_snake.OldData[^1]);
 		}
 
 		if (item.SceneFilePath == AlienEggNode.SceneFilePath)
 		{
 			_main.Score *= 5;
-			_main.Snake.AddSegment(_main.Snake.OldData[^1]);
+			_snake.AddSegment(_snake.OldData[^1]);
 		}
 
 		if (item.SceneFilePath == DiscoEggNode.SceneFilePath)
 		{
 			_main.Score *= _main.Score;
-			_main.Snake.AddSegment(_main.Snake.OldData[^1]);
+			_snake.AddSegment(_snake.OldData[^1]);
 		}
 		if (item.SceneFilePath == RottenEggNode.SceneFilePath)
 		{
 			_main.Score -= 75;
-			_main.Snake.AddSegment(_main.Snake.OldData[^1]);
+			_snake.AddSegment(_snake.OldData[^1]);
 		}
 		if(item.SceneFilePath == LavaEggNode.SceneFilePath)
 		{
 			_main.Score /= 2;
-			_main.Snake.AddSegment(_main.Snake.OldData[^1]);
+			_snake.AddSegment(_snake.OldData[^1]);
 		}
 		if (item.SceneFilePath == IceEggNode.SceneFilePath)
 		{
 			_main.Score = Math.Sqrt(Math.Abs(_main.Score));
-			_main.Snake.AddSegment(_main.Snake.OldData[^1]);
+			_snake.AddSegment(_snake.OldData[^1]);
 		}
 		if (item.SceneFilePath == MushroomNode.SceneFilePath)
 		{
