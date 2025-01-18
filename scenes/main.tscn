@@ -1,8 +1,8 @@
 [gd_scene load_steps=12 format=3 uid="uid://dwuicj4fifd38"]
 
 [ext_resource type="Script" path="res://scripts/Main.cs" id="1_oifwq"]
-[ext_resource type="PackedScene" uid="uid://srvuytqmi2cm" path="res://scenes/snake_segments.tscn" id="2_0hqrm"]
 [ext_resource type="Texture2D" uid="uid://cmbdb2cxsxt1a" path="res://assets/sprites/Grid.png" id="2_a1cr7"]
+[ext_resource type="PackedScene" uid="uid://srvuytqmi2cm" path="res://scenes/snake_segments.tscn" id="2_vh6ou"]
 [ext_resource type="PackedScene" uid="uid://c04wsqka0wuf" path="res://scenes/hud.tscn" id="3_4f2l8"]
 [ext_resource type="Texture2D" uid="uid://c7p74uw1tlqgx" path="res://assets/sprites/Grid 2.png" id="4_ee02f"]
 [ext_resource type="Texture2D" uid="uid://cd27x2ar74f2s" path="res://assets/sprites/Egg.png" id="5_5bxva"]
@@ -33,7 +33,7 @@ animations = [{
 
 [node name="Main" type="Node"]
 script = ExtResource("1_oifwq")
-SnakeSegmentPs = ExtResource("2_0hqrm")
+SnakeSegmentPs = ExtResource("2_vh6ou")
 
 [node name="Background" type="AnimatedSprite2D" parent="."]
 position = Vector2(450, 510)
