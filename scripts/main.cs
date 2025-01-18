@@ -42,10 +42,10 @@ public partial class Main : Node
 	//Snake Variables
 
 	//Movement Variables
-	private Vector2I _upMove = new (0, -1);
-	private Vector2I _downMove = new (0, 1);
-	private Vector2I _leftMove = new (-1, 0);
-	private Vector2I _rightMove = new (1, 0);
+	internal Vector2I UpMove = new (0, -1);
+	internal Vector2I DownMove = new (0, 1);
+	internal Vector2I LeftMove = new (-1, 0);
+	internal Vector2I RightMove = new (1, 0);
 	internal Vector2I MoveDirection;
 	
 	//Egg & Item Variables
@@ -63,51 +63,11 @@ public partial class Main : Node
 	{
 		// The WaitTime is the amount of seconds between each snake movement. .1-.2 is a good regular gameplay speed; .75 is a good debug speed for animations etc.
 		GetNode<Timer>("MoveTimer").WaitTime = 0.2;
-		
-		//TODO: Figure out how to get these to be handled within Items.cs
-		//Items.LoadItems();
-		Items.WallNode = GetNode<Node2D>("ItemManager/Wall");
-		Items.FreshEggNode = GetNode<Node2D>("ItemManager/FreshEgg");
-		Items.RipeEggNode = GetNode<Node2D>("ItemManager/RipeEgg");
-		Items.RottenEggNode = GetNode<Node2D>("ItemManager/RottenEgg");
-		Items.MushroomNode = GetNode<Node2D>("ItemManager/Mushroom");
-		Items.ShinyEggNode = GetNode<Node2D>("ItemManager/ShinyEgg");
-		Items.SkullNode = GetNode<Node2D>("ItemManager/Skull");
-		Items.DewDropNode = GetNode<Node2D>("ItemManager/DewDrop");
-		Items.LavaEggNode = GetNode<Node2D>("ItemManager/LavaEgg");
-		Items.FrogNode = GetNode<Node2D>("ItemManager/Frog");
-		Items.AlienEggNode = GetNode<Node2D>("ItemManager/AlienEgg");
-		Items.IceEggNode = GetNode<Node2D>("ItemManager/IceEgg");
-		Items.PillItemNode = GetNode<Node2D>("ItemManager/Pill");
-		Items.DiscoEggNode = GetNode<Node2D>("ItemManager/DiscoEgg");
-		Items.LargeWallNode = GetNode<Node2D>("ItemManager/LargeWall");
-		//Items.SetItemRates();
-		Items.ItemRates = new Dictionary<int, List<Node2D>>
-		{
-			{ 1, new List<Node2D> { Items.WallNode, Items.FreshEggNode } },
-			{ 2, new List<Node2D> { Items.RipeEggNode } },
-			{ 3, new List<Node2D> { Items.RottenEggNode } },
-			{ 4, new List<Node2D> { Items.MushroomNode } },
-			{ 5, new List<Node2D> { Items.ShinyEggNode } },
-			{ 6, new List<Node2D> { Items.SkullNode } },
-			{ 7, new List<Node2D> { Items.DewDropNode } },
-			{ 8, new List<Node2D> { Items.LavaEggNode } },
-			{ 10, new List<Node2D> { Items.FrogNode } },
-			{ 12, new List<Node2D> { Items.LargeWallNode } },
-			{ 13, new List<Node2D> { Items.AlienEggNode } },
-			{ 21, new List<Node2D> { Items.IceEggNode } },
-			{ 22, new List<Node2D> { Items.PillItemNode } },
-			{ 34, new List<Node2D> { Items.DiscoEggNode } }
-		};
-		
-		// Map input actions to movement directions and settings
-		Snake.HeadDirection = new Dictionary<string, (Vector2 offset, float rotation, bool flipV, bool flipH, Vector2 direction)>
-		{
-			{ "move_down",  (new Vector2(15, -15), 1.5708f, false, false, _downMove) },
-			{ "move_up",    (new Vector2(-15, 15), 4.7183f, false, false, _upMove) },
-			{ "move_left",  (new Vector2(-15, -15), 3.1416f, true, false, _leftMove) },
-			{ "move_right", (new Vector2(15, 15), 0f, false, false, _rightMove) }
-		};
+
+		Items.LoadItems();
+		Items.SetItemRates();
+
+		Snake.MapDirections();
 		
 		_pause = false;
 		NewGame();
@@ -134,7 +94,7 @@ public partial class Main : Node
 		Items.LargeItemsData = new List<Vector2I>();
 		GetNode<CanvasLayer>("GameOverMenu").Visible = false;
 		UpdateHudScore();
-		MoveDirection = _upMove;
+		MoveDirection = UpMove;
 		Snake.CanMove = true;
 		Snake.GenerateSnake();
 		Items.MoveEgg();
@@ -260,10 +220,8 @@ public partial class Main : Node
 				{
 					return;
 				}
-				else
-				{
-					EndGame();
-				}
+				
+				EndGame();
 			}
 		}
 	}

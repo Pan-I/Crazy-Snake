@@ -20,6 +20,7 @@ The author can be contacted at pan.i.githubcontact@gmail.com
 */
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Godot;
 
@@ -32,7 +33,7 @@ public class Snake
 	internal List<Vector2I> SnakeData;
 	private List<Node2D> _oldSnakeNodes;
 	internal List<Node2D> SnakeNodes;
-	internal Dictionary<string, (Vector2 offset, float rotation, bool flipV, bool flipH, Vector2 direction)> HeadDirection;
+	private Dictionary<string, (Vector2 offset, float rotation, bool flipV, bool flipH, Vector2 direction)> _headDirection;
 	private List<string> _snakeMoveData;
 	private List<string> _oldSnakeMoveData;
 	private readonly Vector2I _startPosition = new (14, 16);
@@ -64,7 +65,7 @@ public class Snake
 		SnakeData.Add(position);
 		_snakeMoveData.Add("");
 		var snakeSegment = _main.SnakeSegmentPs.Instantiate<AnimatedSprite2D>();
-		snakeSegment.Position = (position * _main.CellPixelSize) + new Vector2I(0, _main.CellPixelSize);
+		snakeSegment.Position = position * _main.CellPixelSize + new Vector2I(0, _main.CellPixelSize);
 		switch (SnakeNodes.Count)
 		{
 			case 0:
@@ -85,7 +86,7 @@ public class Snake
 	internal void KeyPressSnakeDirection()
 	{
 		if (!CanMove) return;
-		foreach (var action in HeadDirection)
+		foreach (var action in _headDirection)
 		{
 			if (Input.IsActionPressed(action.Key) && _main.MoveDirection != -action.Value.direction)
 			{
@@ -120,7 +121,7 @@ public class Snake
 		for (int i = 0; i < SnakeData.Count; i++)
 		{
 			// Copy frame data for other body segments
-			AnimatedSprite2D currentSegment = null;
+			AnimatedSprite2D currentSegment;
 			if (i > 1 && i < SnakeNodes.Count - 1)
 			{
 				currentSegment = (AnimatedSprite2D)SnakeNodes[i];
@@ -139,16 +140,16 @@ public class Snake
 				_snakeMoveData[i] = _oldSnakeMoveData[i - 1];
 			}
 			HandleTailSegments(i);
-			if ((SnakeNodes.Count > 4 && i > 4))
+			if (SnakeNodes.Count > 4 && i > 4)
 			{
-				BendTail(i);
+				BendTail();
 			}
-			if ((SnakeNodes.Count == 5 && i > 3))
+			if (SnakeNodes.Count == 5 && i > 3)
 			{
-				BendTail(i, false);
+				BendTail(false);
 			}
 			// Update the position of the segment sprite
-			SnakeNodes[i].Position = (SnakeData[i] * _main.CellPixelSize) + new Vector2I(0, _main.CellPixelSize);
+			SnakeNodes[i].Position = SnakeData[i] * _main.CellPixelSize + new Vector2I(0, _main.CellPixelSize);
 			// Handle new neck bending for the second segment
 			if (i == 2)
 			{
@@ -165,7 +166,7 @@ public class Snake
 			currentSegment = (AnimatedSprite2D)SnakeNodes[i];
 			currentSegment.Frame = 6;
 			var currentDirection = _snakeMoveData[i];
-			foreach (var action in HeadDirection)
+			foreach (var action in _headDirection)
 			{
 				if (currentDirection == action.Key)
 				{
@@ -181,7 +182,7 @@ public class Snake
 			currentSegment = (AnimatedSprite2D)SnakeNodes[i];
 			currentSegment.Frame = 8;
 			var currentDirection = _snakeMoveData[i];
-			foreach (var action in HeadDirection)
+			foreach (var action in _headDirection)
 			{
 				if (currentDirection == action.Key)
 				{
@@ -197,7 +198,7 @@ public class Snake
 			currentSegment = (AnimatedSprite2D)SnakeNodes[i];
 			currentSegment.Frame = 10;
 			var currentDirection = _snakeMoveData[i];
-			foreach (var action in HeadDirection)
+			foreach (var action in _headDirection)
 			{
 				if (currentDirection == action.Key)
 				{
@@ -210,7 +211,7 @@ public class Snake
 		}
 	}
 
-	private void BendTail(int i, bool fullTail = true)
+	private void BendTail(bool fullTail = true)
 	{
 		
 		AnimatedSprite2D tailBase = fullTail ? (AnimatedSprite2D)SnakeNodes[^3] : (AnimatedSprite2D)SnakeNodes[^2];
@@ -295,6 +296,7 @@ public class Snake
 				"move_down" => tailTipMovement is "move_left",
 				_ => tailShaft.FlipV
 			};
+			Debug.Assert(tailTip != null, nameof(tailTip) + " != null");
 			tailTip.Frame = 10;
 		}
 	}
@@ -344,5 +346,17 @@ public class Snake
 				neck.Frame = headPosition.X == neckPosition.X ? 2 : 4;
 			}
 		}
+	}
+
+	public void MapDirections()
+	{
+		// Map input actions to movement directions and settings
+		_headDirection = new Dictionary<string, (Vector2 offset, float rotation, bool flipV, bool flipH, Vector2 direction)>
+		{
+			{ "move_down",  (new Vector2(15, -15), 1.5708f, false, false, _main.DownMove) },
+			{ "move_up",    (new Vector2(-15, 15), 4.7183f, false, false, _main.UpMove) },
+			{ "move_left",  (new Vector2(-15, -15), 3.1416f, true, false, _main.LeftMove) },
+			{ "move_right", (new Vector2(15, 15), 0f, false, false, _main.RightMove) }
+		};
 	}
 }
