@@ -241,6 +241,10 @@ public partial class Main : Node
 			{
 				BendTail(i);
 			}
+			if ((_snake.Count == 5 && i > 3))
+			{
+				BendTail(i, false);
+			}
 			// Update the position of the segment sprite
 			_snake[i].Position = (_snakeData[i] * _cellPixelSize) + new Vector2I(0, _cellPixelSize);
 			// Handle new neck bending for the second segment
@@ -324,6 +328,7 @@ public partial class Main : Node
 	}
 	private void HandleTailSegments(AnimatedSprite2D currentSegment, int i)
 	{
+		if (currentSegment == null) throw new ArgumentNullException();
 		if (i == _snake.Count - 3 && _snake.Count > 5 || (i > 2 && _snake.Count < 5) || (i == 3 && _snake.Count == 5))
 		{
 			currentSegment = (AnimatedSprite2D)_snake[i];
@@ -374,15 +379,15 @@ public partial class Main : Node
 		}
 	}
 	
-	private void BendTail(int i)
+	private void BendTail(int i, bool fullTail = true)
 	{
-		var valid = false;
-		AnimatedSprite2D tailBase = (AnimatedSprite2D)_snake[^3];
-		AnimatedSprite2D tailShaft = (AnimatedSprite2D)_snake[^2];
-		AnimatedSprite2D tailTip = (AnimatedSprite2D)_snake[^1];
-		string tailBaseMovement = _snakeMoveData[^3];
-		string tailShaftMovement = _snakeMoveData[^2];
-		string tailTipMovement = _snakeMoveData[^1];
+		
+		AnimatedSprite2D tailBase = fullTail ? (AnimatedSprite2D)_snake[^3] : (AnimatedSprite2D)_snake[^2];
+		AnimatedSprite2D tailShaft = fullTail ? (AnimatedSprite2D)_snake[^2] : (AnimatedSprite2D)_snake[^1];
+		AnimatedSprite2D tailTip = fullTail ? (AnimatedSprite2D)_snake[^1] : null;
+		string tailBaseMovement = fullTail ? _snakeMoveData[^3] : _snakeMoveData[^2];
+		string tailShaftMovement = fullTail ? _snakeMoveData[^2] : _snakeMoveData[^1];
+		string tailTipMovement = fullTail ? _snakeMoveData[^1] : null;
 		
 		tailBase.FlipV = false;
 		tailShaft.FlipV = false;
@@ -392,11 +397,13 @@ public partial class Main : Node
 		{
 			tailBase.Frame = 6;
 			tailShaft.Frame = 8;
-			tailTip.Frame = 10;
-			
+			if (tailTip != null)
+			{
+				tailTip.Frame = 10;
+			}
 		}
 		//If the base segment is the only turning segment
-		if (tailBaseMovement != tailShaftMovement && tailShaftMovement == tailTipMovement)
+		if (tailBaseMovement != tailShaftMovement && (tailShaftMovement == tailTipMovement || tailTipMovement == null))
 		{
 			tailBase.Frame = 7;
 			if (tailBaseMovement is "move_right")
@@ -444,10 +451,13 @@ public partial class Main : Node
 				}
 			}
 			tailShaft.Frame = 8;
-			tailTip.Frame = 10;
+			if (tailTip != null)
+			{
+				tailTip.Frame = 10;
+			}
 		}
 		//if the shaft is the only turning segment
-		if (tailBaseMovement == tailShaftMovement && tailShaftMovement != tailTipMovement)
+		if (tailTipMovement != null && tailBaseMovement == tailShaftMovement && tailShaftMovement != tailTipMovement)
 		{
 			tailBase.Frame = 6;
 			tailShaft.Frame = 9;
@@ -495,10 +505,14 @@ public partial class Main : Node
 					tailShaft.FlipV = false;
 				}
 			}
-			tailTip.Frame = 10;
+
+			if (tailTip != null)
+			{
+				tailTip.Frame = 10;
+			}
 		}
 		//if both segments are turning
-		if (tailBaseMovement != tailShaftMovement && tailShaftMovement != tailTipMovement)
+		if (tailTipMovement != null && tailBaseMovement != tailShaftMovement && tailShaftMovement != tailTipMovement)
 		{
 			tailBase.Frame = 7;
 			if (tailBaseMovement is "move_right")
