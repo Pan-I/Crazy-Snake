@@ -1,4 +1,4 @@
-#  🐍🎮 Crazy Snake 👾🪩 - v0.2.2.1
+#  🐍🎮 Crazy Snake 👾🪩 - v0.2.2.2
 
 
 <img src="https://raw.githubusercontent.com/Pan-I/Crazy-Snake/refs/heads/main/readme_links/Banner%20Image.png" alt="broken link of game screenshot 1" width="900"/>
