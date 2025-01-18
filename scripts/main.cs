@@ -87,7 +87,7 @@ public partial class Main : Node
 	public override void _Ready()
 	{
 		// The WaitTime is the amount of seconds between each snake movement. .1-.2 is a good regular gameplay speed; .75 is a good debug speed for animations etc.
-		GetNode<Timer>("MoveTimer").WaitTime = 0.12;
+		GetNode<Timer>("MoveTimer").WaitTime = 0.2;
 		
 		_wallNode = GetNode<Node2D>("ItemManager/Wall");
 		_freshEggNode = GetNode<Node2D>("ItemManager/FreshEgg");
@@ -197,12 +197,22 @@ public partial class Main : Node
 		}
 		if (!_pause)
 		{
-			MoveSnake();
+			KeyPressSnakeDirection();
 		}
 	}
 	
 		
 	private void _on_move_timer_timeout()
+	{
+		UpdateSnake();
+		CheckOutOfBound();
+		CheckSelfEaten();
+		CheckEggEaten();
+		CheckItemHit();
+		CheckLargeItemHit();
+	}
+
+	private void UpdateSnake()
 	{
 		_canMove = true;
 		_oldData = _snakeData.ToList();
@@ -253,16 +263,9 @@ public partial class Main : Node
 				BendNeckSegment();
 			}
 		}
-		
-		CheckOutOfBound();
-		CheckSelfEaten();
-		CheckEggEaten();
-		CheckItemHit();
-		CheckLargeItemHit();
 	}
-	
-	#endregion Game Handling
 
+	#endregion Game Handling
 	
 	#region Snake Methods
 	
@@ -301,7 +304,7 @@ public partial class Main : Node
 		_snake.Add(snakeSegment);
 		_oldSnake.Add(snakeSegment);
 	}
-	private void MoveSnake()
+	private void KeyPressSnakeDirection()
 	{
 		if (!_canMove) return;
 		foreach (var action in _headDirection)
@@ -408,50 +411,14 @@ public partial class Main : Node
 		if (tailBaseMovement != tailShaftMovement && (tailShaftMovement == tailTipMovement || tailTipMovement == null))
 		{
 			tailBase.Frame = 7;
-			if (tailBaseMovement is "move_right")
+			tailBase.FlipV = tailBaseMovement switch
 			{
-				if (tailShaftMovement is "move_up")
-				{
-					tailBase.FlipV = true;
-				}
-				else
-				{
-					tailBase.FlipV = false;
-				}
-			}
-			if (tailBaseMovement is "move_up")
-			{
-				if (tailShaftMovement is "move_left")
-				{
-					tailBase.FlipV = true;
-				}
-				else
-				{
-					tailBase.FlipV = false;
-				}
-			}
-			if (tailBaseMovement is "move_left")
-			{
-				if (tailShaftMovement is "move_down")
-				{
-					tailBase.FlipV = true;
-				}
-				else
-				{
-					tailBase.FlipV = false;
-				}
-			}
-			if (tailBaseMovement is "move_down")
-			{
-				if (tailShaftMovement is "move_right")
-				{
-					tailBase.FlipV = true;
-				}
-				else
-				{
-					tailBase.FlipV = false;
-				}
-			}
+				"move_right" => tailShaftMovement is "move_up",
+				"move_up" => tailShaftMovement is "move_left",
+				"move_left" => tailShaftMovement is "move_down",
+				"move_down" => tailShaftMovement is "move_right",
+				_ => tailBase.FlipV
+			};
 			tailShaft.Frame = 8;
 			if (tailTip != null)
 			{
@@ -464,50 +431,14 @@ public partial class Main : Node
 		{
 			tailBase.Frame = 6;
 			tailShaft.Frame = 9;
-			if (tailShaftMovement is "move_right")
+			tailShaft.FlipV = tailShaftMovement switch
 			{
-				if (tailTipMovement is "move_down")
-				{
-					tailShaft.FlipV = true;
-				}
-				else
-				{
-					tailShaft.FlipV = false;
-				}
-			}
-			if (tailShaftMovement is "move_up")
-			{
-				if (tailTipMovement is "move_right")
-				{
-					tailShaft.FlipV = true;
-				}
-				else
-				{
-					tailShaft.FlipV = false;
-				}
-			}
-			if (tailShaftMovement is "move_left")
-			{
-				if (tailTipMovement is "move_up")
-				{
-					tailShaft.FlipV = true;
-				}
-				else
-				{
-					tailShaft.FlipV = false;
-				}
-			}
-			if (tailShaftMovement is "move_down")
-			{
-				if (tailTipMovement is "move_left")
-				{
-					tailShaft.FlipV = true;
-				}
-				else
-				{
-					tailShaft.FlipV = false;
-				}
-			}
+				"move_right" => tailTipMovement is "move_down",
+				"move_up" => tailTipMovement is "move_right",
+				"move_left" => tailTipMovement is "move_up",
+				"move_down" => tailTipMovement is "move_left",
+				_ => tailShaft.FlipV
+			};
 
 			if (tailTip != null)
 			{
@@ -519,95 +450,23 @@ public partial class Main : Node
 		if (tailTipMovement != null && tailBaseMovement != tailShaftMovement && tailShaftMovement != tailTipMovement)
 		{
 			tailBase.Frame = 7;
-			if (tailBaseMovement is "move_right")
+			tailBase.FlipV = tailBaseMovement switch
 			{
-				if (tailShaftMovement is "move_up")
-				{
-					tailBase.FlipV = true;
-				}
-				else
-				{
-					tailBase.FlipV = false;
-				}
-			}
-			if (tailBaseMovement is "move_up")
-			{
-				if (tailShaftMovement is "move_left")
-				{
-					tailBase.FlipV = true;
-				}
-				else
-				{
-					tailBase.FlipV = false;
-				}
-			}
-			if (tailBaseMovement is "move_left")
-			{
-				if (tailShaftMovement is "move_down")
-				{
-					tailBase.FlipV = true;
-				}
-				else
-				{
-					tailBase.FlipV = false;
-				}
-			}
-			if (tailBaseMovement is "move_down")
-			{
-				if (tailShaftMovement is "move_right")
-				{
-					tailBase.FlipV = true;
-				}
-				else
-				{
-					tailBase.FlipV = false;
-				}
-			}
+				"move_right" => tailShaftMovement is "move_up",
+				"move_up" => tailShaftMovement is "move_left",
+				"move_left" => tailShaftMovement is "move_down",
+				"move_down" => tailShaftMovement is "move_right",
+				_ => tailBase.FlipV
+			};
 			tailShaft.Frame = 9;
-			if (tailShaftMovement is "move_right")
+			tailShaft.FlipV = tailShaftMovement switch
 			{
-				if (tailTipMovement is "move_down")
-				{
-					tailShaft.FlipV = true;
-				}
-				else
-				{
-					tailShaft.FlipV = false;
-				}
-			}
-			if (tailShaftMovement is "move_up")
-			{
-				if (tailTipMovement is "move_right")
-				{
-					tailShaft.FlipV = true;
-				}
-				else
-				{
-					tailShaft.FlipV = false;
-				}
-			}
-			if (tailShaftMovement is "move_left")
-			{
-				if (tailTipMovement is "move_up")
-				{
-					tailShaft.FlipV = true;
-				}
-				else
-				{
-					tailShaft.FlipV = false;
-				}
-			}
-			if (tailShaftMovement is "move_down")
-			{
-				if (tailTipMovement is "move_left")
-				{
-					tailShaft.FlipV = true;
-				}
-				else
-				{
-					tailShaft.FlipV = false;
-				}
-			}
+				"move_right" => tailTipMovement is "move_down",
+				"move_up" => tailTipMovement is "move_right",
+				"move_left" => tailTipMovement is "move_up",
+				"move_down" => tailTipMovement is "move_left",
+				_ => tailShaft.FlipV
+			};
 			tailTip.Frame = 10;
 		}
 	}
@@ -803,25 +662,23 @@ public partial class Main : Node
 			int result;
 			do { result = rnd.Next(-1, 7); } while (result % 2 == 0); //results can only be odd
 			
-			if (result == -1)
+			switch (result)
 			{
-				_score = -9999;
-			}
-			else if (result == 1)
-			{
-				_score -= -9999;
-			}
-			else if (result == 3)
-			{ 
-				_score = 0;
-			}
-			else if (result == 5)
-			{ 
-				_score += 9999;	
-			}
-			else
-			{
-				_score = 9999;
+				case -1:
+					_score = -9999;
+					break;
+				case 1:
+					_score -= -9999;
+					break;
+				case 3:
+					_score = 0;
+					break;
+				case 5:
+					_score += 9999;
+					break;
+				default:
+					_score = 9999;
+					break;
 			}
 		}
 			
