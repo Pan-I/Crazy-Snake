@@ -55,7 +55,9 @@ What's coming in the next major update (v0.3), after v0.2 is finalized:
 ---
 ## 🔨 Code Highlights 🔍
 
-Most of the project's code is in [`Main.cs`](https://github.com/Pan-I/Crazy-Snake/blob/main/scripts/main.cs)
+- High-level game play beats are handled in [`Main.cs`](https://github.com/Pan-I/Crazy-Snake/blob/main/scripts/main.cs)
+- Item rarity, spawning, and rules are handled in [`Items.cs`](https://github.com/Pan-I/Crazy-Snake/blob/main/scripts/Items.cs)
+- Snake movement, growth, and animations are handled in [`Snake.cs`](https://github.com/Pan-I/Crazy-Snake/blob/main/scripts/Snake.cs)
 
 ---
 ## 🏃 Getting Started 🚀
