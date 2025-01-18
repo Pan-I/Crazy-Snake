@@ -124,9 +124,11 @@ public partial class Items : Node
 		Vector2I itemPlacement;
 		do
 		{
+			//generate a new coordinate spot
 			itemPlacement = new Vector2I(rndm.Next(0, _main.BoardCellSize - 1), rndm.Next(3, _main.BoardCellSize - 1));
 		} while (occupiedPositions. Count < 899 && //TODO: this 899 limit doesn't account for large items either.
 				 (occupiedPositions.Contains(itemPlacement) || //Don't place on an occupied position.
+				  _main.CheckLargeItemHit(itemPlacement) || //Don't place on large items.
 				  IsWithinRadius(itemPlacement, _snake.SnakeData[0], 3) || //Don't place too close to snake head.
 				  !IsWithinRadius(itemPlacement, _snake.SnakeData[^1], 20) //Place within 7 cells of the tail. Temporary rule? I kind of like it.
 				 ));

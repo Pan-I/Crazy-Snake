@@ -159,7 +159,7 @@ public partial class Main : Node
 		CheckSelfEaten();
 		CheckEggEaten();
 		CheckItemHit();
-		CheckLargeItemHit();
+		CheckLargeItemHit(Snake.SnakeData[0]);
 	}
 
 	#endregion Game Handling
@@ -203,19 +203,22 @@ public partial class Main : Node
 		}
 	}
 	
-	private void CheckLargeItemHit()
+	internal bool CheckLargeItemHit(Vector2I position)
 	{
+		bool hit = false;
 		for (int i = 0; i < Items.LargeItemsData.Count; i++)
 		{
 			Vector2I q2 = new Vector2I(x: Items.LargeItemsData[i].X, y: Items.LargeItemsData[i].Y + 1);
 			Vector2I q3 = new Vector2I(x: Items.LargeItemsData[i].X + 1, y: Items.LargeItemsData[i].Y + 1);
 			Vector2I q4 = new Vector2I(x: Items.LargeItemsData[i].X + 1, y: Items.LargeItemsData[i].Y);
 			
-			if (Snake.SnakeData[0] == Items.LargeItemsData[i] || Snake.SnakeData[0] == q2 || Snake.SnakeData[0] == q3 || Snake.SnakeData[0] == q4 )
+			if (position == Items.LargeItemsData[i] || position == q2 || position == q3 || position == q4 )
 			{
-				EndGame();
+				hit = true;
 			}
 		}
+
+		return hit;
 	}
 
 	private void CheckSelfEaten()
