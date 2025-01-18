@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://dl0l2obriypdb"]
 
-[ext_resource type="Texture2D" uid="uid://evr3vdmk55dc" path="res://assets/sprites/Lava Egg.png" id="1_m7wv4"]
+[ext_resource type="Texture2D" uid="uid://bly0qsgkm3uvl" path="res://assets/sprites/Lava Egg.png" id="1_m7wv4"]
 
 [node name="LavaEgg" type="Sprite2D"]
 texture = ExtResource("1_m7wv4")
