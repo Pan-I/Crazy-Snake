@@ -36,6 +36,7 @@ public partial class Items : Node
 	private Dictionary<int, List<Node2D>> _itemRates;
 	internal List<Node2D> ItemNodes;
 	internal List<Vector2I> ItemsData;
+	internal List<Node2D> LargeItemNodes;
 	internal List<Vector2I> LargeItemsData;
 	private Vector2I _newItemPosition;
 	private Node2D _freshEggNode;
@@ -162,13 +163,14 @@ public partial class Items : Node
 		_newItemPosition = RandomPlacement();
 		newItem.Position = _newItemPosition * _main.CellPixelSize + new Vector2I(0, _main.CellPixelSize);
 		_main.AddChild(newItem);
-		ItemNodes.Add(newItem);
 		if (newItem.SceneFilePath == _largeWallNode.SceneFilePath)
 		{
+			LargeItemNodes.Add(newItem);
 			LargeItemsData.Add(_newItemPosition);
 		}
 		else
 		{
+			ItemNodes.Add(newItem);
 			ItemsData.Add(_newItemPosition);
 		}
 	}

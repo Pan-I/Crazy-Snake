@@ -88,9 +88,17 @@ public partial class Main : Node
 				node.QueueFree();
 			}
 		}
+		if (Items.LargeItemNodes != null)
+		{
+			foreach (Node2D node in Items.LargeItemNodes)
+			{
+				node.QueueFree();
+			}
+		}
 
 		Items.ItemNodes = new List<Node2D>();
 		Items.ItemsData = new List<Vector2I>();
+		Items.LargeItemNodes = new List<Node2D>();
 		Items.LargeItemsData = new List<Vector2I>();
 		GetNode<CanvasLayer>("GameOverMenu").Visible = false;
 		UpdateHudScore();
