@@ -5,7 +5,7 @@
 
 
 ##### ReadMe Table of Contents
-- [Introduction](https://github.com/Pan-I/Crazy-Snake?tab=readme-ov-file#-introduction-)
+- [Introduction & Updates](https://github.com/Pan-I/Crazy-Snake?tab=readme-ov-file#-introduction-)
 - [Features](https://github.com/Pan-I/Crazy-Snake?tab=readme-ov-file#-features-)
 - [Code Highlights](https://github.com/Pan-I/Crazy-Snake?tab=readme-ov-file#-code-highlights-)
 - [Getting Started](https://github.com/Pan-I/Crazy-Snake?tab=readme-ov-file#-getting-started-)
@@ -18,10 +18,10 @@
 ---
 ## 🎉 Introduction & Update News 📣
 
-A remake of Snake - with some twists - as a Godot project. Written entirely in C#. Game includes a long list of items that have a wide range of effects on the game and game play, as well as a complex and high-scoring point system.
+A remake of Snake, with some twists, as a Godot project. Written entirely in C#. Game includes a long list of items that have a wide range of effects on the game and game play, as well as a complex and high-scoring point system.
 
 #### Current Major Update Set (*'Minor' Semantic*)
-The current version (v0.2.x) introduces a rough 'animation' for the snake including face, bending neck, and winding tail; also a list of items that impact scoring and gameplay including:
+The current version (v0.2.x) introduces a rough 'animation' for the snake including face, bending body, and winding tail; also a list of items that impact scoring and gameplay including:
 - Game ending walls
 - High scoring eggs
 - Negative scoring eggs
@@ -100,7 +100,7 @@ Contributing information found here: [CONTRIBUTING.md](https://github.com/Pan-I/
 ---
 ## 📍Attributions 👥
 
-The project is heavily inspired by the following video: [Beginner Godot Tutorial - Make a Snake Game in 10 Minutes!](https://www.youtube.com/watch?v=DlRP-UBR-2A)
+The project is initially inspired by, and was made v0.1 by the following video: [Beginner Godot Tutorial - Make a Snake Game in 10 Minutes!](https://www.youtube.com/watch?v=DlRP-UBR-2A)
 
 The credits for the audio used, are in [**ATTRIBUTIONS.md**](https://github.com/Pan-I/Crazy-Snake/tree/main/readme_links/ATTRIBUTIONS.md)
 

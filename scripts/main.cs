@@ -34,23 +34,18 @@ public partial class Main : Node
 	//Game Variables
 	internal double Score;
 	private bool _gameStarted;
+	private bool _pause;
 	
 	//Grid Variables
 	internal int BoardCellSize = 30;
 	internal int CellPixelSize = 30;
 	
-	//Snake Variables
-
 	//Movement Variables
 	internal Vector2I UpMove = new (0, -1);
 	internal Vector2I DownMove = new (0, 1);
 	internal Vector2I LeftMove = new (-1, 0);
 	internal Vector2I RightMove = new (1, 0);
 	internal Vector2I MoveDirection;
-	
-	//Egg & Item Variables
-
-	private bool _pause;
 
 	public Main()
 	{
@@ -62,14 +57,10 @@ public partial class Main : Node
 	public override void _Ready()
 	{
 		// The WaitTime is the amount of seconds between each snake movement. .1-.2 is a good regular gameplay speed; .75 is a good debug speed for animations etc.
-		GetNode<Timer>("MoveTimer").WaitTime = 0.2;
-
+		GetNode<Timer>("MoveTimer").WaitTime = 0.333333333;
 		Items.LoadItems();
 		Items.SetItemRates();
-
 		Snake.MapDirections();
-		
-		_pause = false;
 		NewGame();
 	}
 

@@ -247,15 +247,20 @@ public partial class Items : Node
 		}
 		if (item.SceneFilePath == _mushroomNode.SceneFilePath)
 		{
-			_main.Score = Math.Pow(Math.Abs(_main.Score), 1.05);
+			_main.Score = (_main.Score < 0) ? (-1) : Math.Pow(Math.Abs(_main.Score), 1.05);
 		}
 		if (item.SceneFilePath == _dewDropNode.SceneFilePath)
 		{
+			
 			_main.Score = Math.Abs(_main.Score);
+		}
+		if (item.SceneFilePath == _frogNode.SceneFilePath)
+		{
+			_main.Score = (_main.Score < 0) ? (Math.Abs(_main.Score) - Math.Pow(Math.Abs(_main.Score), 1.15)): Math.Pow(Math.Abs(_main.Score), 1.15);
 		}
 		if (item.SceneFilePath == _pillItemNode.SceneFilePath)
 		{
-			_main.Score = Math.Pow(Math.Abs(_main.Score), 1.5);
+			_main.Score = (_main.Score < 0) ? (0 - Math.Pow(Math.Abs(_main.Score), 1.5)) : Math.Pow(Math.Abs(_main.Score), 1.5);
 		}
 		if (item.SceneFilePath == _skullNode.SceneFilePath)
 		{
