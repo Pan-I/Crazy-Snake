@@ -110,6 +110,7 @@ public partial class Main : Node
 
 	internal void EndGame()
 	{
+		Snake.DeadSnake();
 		GetTree().Paused = true;
 		_gameStarted = false;
 		GetNode<Timer>("MoveTimer").Stop();
@@ -148,7 +149,14 @@ public partial class Main : Node
 		Snake.UpdateSnake();
 		CheckOutOfBound();
 		CheckSelfEaten();
-		CheckEggEaten();
+		bool eggEaten =  CheckEggEaten();
+		if (eggEaten)
+		{
+			if (1 + Snake.SnakeData.Count + Items.ItemsData.Count + (Items.LargeItemsData.Count*4) == BoardCellSize)
+			{
+				EndGame(); // TODO: this doesn't account for if there are edible items left. Small walls might need separating into their own group.
+			}
+		}
 		CheckItemHit();
 		CheckLargeItemHit(Snake.SnakeData[0]);
 	}
@@ -163,17 +171,16 @@ public partial class Main : Node
 		GetNode<CanvasLayer>("Hud").GetNode<Label>("ScoreLabel").Text = $"Score: {Score} ";
 	}
 	
-	private void CheckEggEaten()
+	private bool CheckEggEaten()
 	{
-		if (Items.EggPosition == Snake.SnakeData[0])
-		{
-			Score += 5;
-			Items.Tally++;
-			UpdateHudScore();
-			Snake.AddSegment(Snake.OldData[^1]);
-			Items.MoveEgg();
-			Items.GenerateFromItemLookup();
-		}
+		if (Items.EggPosition != Snake.SnakeData[0]) return false;
+		Score += 5;
+		Items.Tally++;
+		UpdateHudScore();
+		Snake.AddSegment(Snake.OldData[^1]);
+		Items.MoveEgg();
+		Items.GenerateFromItemLookup();
+		return true;
 	}
 
 	private void CheckItemHit()
@@ -195,6 +202,7 @@ public partial class Main : Node
 	}
 	
 	internal bool CheckLargeItemHit(Vector2I position)
+	
 	{
 		bool hit = false;
 		for (int i = 0; i < Items.LargeItemsData.Count; i++)

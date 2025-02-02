@@ -107,36 +107,45 @@ public partial class Items : Node
 
 	internal void MoveEgg()
 	{
-		EggPosition = RandomPlacement();
+		do
+		{
+			EggPosition = RandomPlacement();
+		}
+		while (CheckWallTrap());
 		_main.GetNode<Node2D>("Egg").Position = EggPosition * _main.CellPixelSize + new Vector2I(0, _main.CellPixelSize);
+	}
+
+	private bool CheckWallTrap()
+	{
+		//TODO: Surrounding wall check... seems to need its own class, unless I want to loop through ever item and check the scene location, which seems very impractical.
+		return EggPosition == (Vector2I.Zero);
 	}
 
 	private Vector2I RandomPlacement()
 	{
-		//TODO: possible parameter for introducing larger objects when being placed to avoid placing on top of other items.
+		//TODO: possible parameter for introducing larger objects when being placed to avoid placing on top of other items. Or does the large item hit in main cover this?
 		//Large walls have been spotted spawning on snake segments, and other items (https://github.com/users/Pan-I/projects/6/views/3?pane=issue&itemId=93374486&issue=Pan-I%7CCrazy-Snake%7C9)
 		Random rndm = new Random();
 		HashSet<Vector2I> occupiedPositions = new HashSet<Vector2I>(_snake.SnakeData) { EggPosition };
 		occupiedPositions.UnionWith(ItemsData);
-		occupiedPositions.UnionWith(LargeItemsData); //TODO: Needs a way to fill the other cells. Otherwise items may place in non-origin cells of larger items.
-		//
+		var occupiedPositionsCount = occupiedPositions.Count + (LargeItemNodes.Count * 4);
+		occupiedPositions.UnionWith(LargeItemsData);
 		
 		Vector2I itemPlacement;
 		do
 		{
 			//generate a new coordinate spot
 			itemPlacement = new Vector2I(rndm.Next(0, _main.BoardCellSize - 1), rndm.Next(3, _main.BoardCellSize - 1));
-		} while (occupiedPositions. Count < 899 && //TODO: this 899 limit doesn't account for large items either.
-				 (occupiedPositions.Contains(itemPlacement) || //Don't place on an occupied position.
-				  _main.CheckLargeItemHit(itemPlacement) || //Don't place on large items. //TODO: Doesn't seem to work.
+		} while ((occupiedPositions.Contains(itemPlacement) || //Don't place on an occupied position.
+				  _main.CheckLargeItemHit(itemPlacement) || //Don't place on large items. //TODO: Doesn't seem to work. Observed an item spawning under a large wall after this was implemented.
 				  IsWithinRadius(itemPlacement, _snake.SnakeData[0], 3) || //Don't place too close to snake head.
 				  CheckWithinRadius(itemPlacement, _snake.SnakeData, 1) || //Don't place anywhere near entire body.
-				  !IsWithinRadius(itemPlacement, _snake.SnakeData[^1], 20) //Place within 7 cells of the tail. Temporary rule? I kind of like it.
+				  !IsWithinRadius(itemPlacement, _snake.SnakeData[^1], 20) //Place within 7 cells of the tail. Temporary rule? I kind of like it. //TODO: decide.
 				 ));
 
 		return itemPlacement;
 
-		//TODO: Needs a better implementation.
+		//TODO: Needs a better implementation. Why? Don't remember what is wrong with this.
 		bool CheckWithinRadius(Vector2I itemPlacement, List<Vector2I> listCoords, int radius)
 		{
 			bool withinRadius = false;
@@ -158,6 +167,11 @@ public partial class Items : Node
 			int dy = Math.Abs(position.Y - center.Y);
 			return dx <= radius && dy <= radius;
 		}
+	}
+
+	private void ReplaceItem()
+	{
+		//do nothing;
 	}
 
 	internal void GenerateFromItemLookup()
