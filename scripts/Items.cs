@@ -30,14 +30,16 @@ public partial class Items : Node
 {
 	private readonly Main _main;
 	private readonly Snake _snake;
-	internal Node2D WallNode;
+	private Node2D WallNode;
 	internal Vector2I EggPosition;
 	internal int Tally;
 	private Dictionary<int, List<Node2D>> _itemRates;
 	internal List<Node2D> ItemNodes;
 	internal List<Vector2I> ItemsData;
-	internal List<Node2D> LargeItemNodes;
-	internal List<Vector2I> LargeItemsData;
+	internal List<Node2D> WallNodes;
+	internal List<Vector2I> WallsData;
+	internal List<Node2D> LargeWallNodes;
+	internal List<Vector2I> LargeWallsData;
 	private Vector2I _newItemPosition;
 	private Node2D _freshEggNode;
 	private Node2D _ripeEggNode;
@@ -107,18 +109,24 @@ public partial class Items : Node
 
 	internal void MoveEgg()
 	{
-		do
-		{
-			EggPosition = RandomPlacement();
-		}
-		while (CheckWallTrap());
+		do { EggPosition = RandomPlacement(); }
+		while ( CheckWallTrap() );
 		_main.GetNode<Node2D>("Egg").Position = EggPosition * _main.CellPixelSize + new Vector2I(0, _main.CellPixelSize);
 	}
 
 	private bool CheckWallTrap()
 	{
-		//TODO: Surrounding wall check... seems to need its own class, unless I want to loop through ever item and check the scene location, which seems very impractical.
-		return EggPosition == (Vector2I.Zero);
+		//TODO:Doesn't account for large walls... technically it should, but I wonder if its necessary or worth it.
+		var eggPosNord = new Vector2I(EggPosition.X, EggPosition.Y - 1);
+		var eggPosEas = new Vector2I(EggPosition.X + 1, EggPosition.Y);
+		var eggPosSud = new Vector2I(EggPosition.X, EggPosition.Y + 1);
+		var eggPosWes = new Vector2I(EggPosition.X - 1, EggPosition.Y);
+		if (WallsData.Contains(eggPosNord) && WallsData.Contains(eggPosEas) && WallsData.Contains(eggPosSud) &&
+		    WallsData.Contains(eggPosWes))
+		{
+			return true;
+		}
+		return false;
 	}
 
 	private Vector2I RandomPlacement()
@@ -128,13 +136,20 @@ public partial class Items : Node
 		Random rndm = new Random();
 		HashSet<Vector2I> occupiedPositions = new HashSet<Vector2I>(_snake.SnakeData) { EggPosition };
 		occupiedPositions.UnionWith(ItemsData);
-		var occupiedPositionsCount = occupiedPositions.Count + (LargeItemNodes.Count * 4);
-		occupiedPositions.UnionWith(LargeItemsData);
+		occupiedPositions.UnionWith(WallsData);
+		occupiedPositions.UnionWith(LargeWallsData);
+
+		int tryCounter = 0;
 		
 		Vector2I itemPlacement;
 		do
 		{
 			//generate a new coordinate spot
+			tryCounter++;
+			if (tryCounter == 90000) //if there have been this many attempts to place the item, something is wrong.
+			{
+				_main.EndGame(); //TODO: for REVIEW place a stopping here and see if this can be easily triggered on a long-lasting game. 
+			}
 			itemPlacement = new Vector2I(rndm.Next(0, _main.BoardCellSize - 1), rndm.Next(3, _main.BoardCellSize - 1));
 		} while ((occupiedPositions.Contains(itemPlacement) || //Don't place on an occupied position.
 				  _main.CheckLargeItemHit(itemPlacement) || //Don't place on large items. //TODO: Doesn't seem to work. Observed an item spawning under a large wall after this was implemented.
@@ -145,7 +160,7 @@ public partial class Items : Node
 
 		return itemPlacement;
 
-		//TODO: Needs a better implementation. Why? Don't remember what is wrong with this.
+		//TODO: Needs a better implementation. (*Why? Don't remember what is wrong with this.*)
 		bool CheckWithinRadius(Vector2I itemPlacement, List<Vector2I> listCoords, int radius)
 		{
 			bool withinRadius = false;
@@ -195,10 +210,15 @@ public partial class Items : Node
 		_newItemPosition = RandomPlacement();
 		newItem.Position = _newItemPosition * _main.CellPixelSize + new Vector2I(0, _main.CellPixelSize);
 		_main.AddChild(newItem);
+		if (newItem.SceneFilePath == WallNode.SceneFilePath)
+		{
+			WallNodes.Add(newItem);
+			WallsData.Add(_newItemPosition);
+		}
 		if (newItem.SceneFilePath == _largeWallNode.SceneFilePath)
 		{
-			LargeItemNodes.Add(newItem);
-			LargeItemsData.Add(_newItemPosition);
+			LargeWallNodes.Add(newItem);
+			LargeWallsData.Add(_newItemPosition);
 		}
 		else
 		{
@@ -265,7 +285,6 @@ public partial class Items : Node
 		}
 		if (item.SceneFilePath == _dewDropNode.SceneFilePath)
 		{
-			
 			_main.Score = Math.Abs(_main.Score);
 		}
 		if (item.SceneFilePath == _frogNode.SceneFilePath)

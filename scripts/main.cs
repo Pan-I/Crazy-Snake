@@ -79,9 +79,16 @@ public partial class Main : Node
 				node.QueueFree();
 			}
 		}
-		if (Items.LargeItemNodes != null)
+		if (Items.WallNodes != null)
 		{
-			foreach (Node2D node in Items.LargeItemNodes)
+			foreach (Node2D node in Items.WallNodes)
+			{
+				node.QueueFree();
+			}
+		}
+		if (Items.LargeWallNodes != null)
+		{
+			foreach (Node2D node in Items.LargeWallNodes)
 			{
 				node.QueueFree();
 			}
@@ -89,8 +96,10 @@ public partial class Main : Node
 
 		Items.ItemNodes = new List<Node2D>();
 		Items.ItemsData = new List<Vector2I>();
-		Items.LargeItemNodes = new List<Node2D>();
-		Items.LargeItemsData = new List<Vector2I>();
+		Items.WallNodes = new List<Node2D>();
+		Items.WallsData = new List<Vector2I>();
+		Items.LargeWallNodes = new List<Node2D>();
+		Items.LargeWallsData = new List<Vector2I>();
 		GetNode<CanvasLayer>("GameOverMenu").Visible = false;
 		UpdateHudScore();
 		MoveDirection = UpMove;
@@ -150,15 +159,20 @@ public partial class Main : Node
 		CheckOutOfBound();
 		CheckSelfEaten();
 		bool eggEaten =  CheckEggEaten();
-		if (eggEaten)
-		{
-			if (1 + Snake.SnakeData.Count + Items.ItemsData.Count + (Items.LargeItemsData.Count*4) == BoardCellSize)
-			{
-				EndGame(); // TODO: this doesn't account for if there are edible items left. Small walls might need separating into their own group.
-			}
-		}
+		CheckFullBoard(eggEaten);
 		CheckItemHit();
 		CheckLargeItemHit(Snake.SnakeData[0]);
+	}
+
+	private void CheckFullBoard(bool eggEaten)
+	{
+		if (eggEaten)
+		{
+			if (1 + Snake.SnakeData.Count + Items.WallsData.Count + (Items.LargeWallsData.Count*4) == BoardCellSize)
+			{
+				EndGame();
+			}
+		}
 	}
 
 	#endregion Game Handling
@@ -191,12 +205,9 @@ public partial class Main : Node
 			{
 				Items.ItemResult(Items.ItemNodes[i]);
 				UpdateHudScore();
-				if (Items.ItemNodes[i].SceneFilePath != Items.WallNode.SceneFilePath)
-				{
-					Items.ItemNodes[i].QueueFree();
-					Items.ItemsData.RemoveAt(i);
-					Items.ItemNodes.RemoveAt(i);
-				}
+				Items.ItemNodes[i].QueueFree();
+				Items.ItemsData.RemoveAt(i);
+				Items.ItemNodes.RemoveAt(i);
 			}
 		}
 	}
@@ -205,13 +216,13 @@ public partial class Main : Node
 	
 	{
 		bool hit = false;
-		for (int i = 0; i < Items.LargeItemsData.Count; i++)
+		for (int i = 0; i < Items.LargeWallsData.Count; i++)
 		{
-			Vector2I q2 = new Vector2I(x: Items.LargeItemsData[i].X, y: Items.LargeItemsData[i].Y + 1);
-			Vector2I q3 = new Vector2I(x: Items.LargeItemsData[i].X + 1, y: Items.LargeItemsData[i].Y + 1);
-			Vector2I q4 = new Vector2I(x: Items.LargeItemsData[i].X + 1, y: Items.LargeItemsData[i].Y);
+			Vector2I q2 = new Vector2I(x: Items.LargeWallsData[i].X, y: Items.LargeWallsData[i].Y + 1);
+			Vector2I q3 = new Vector2I(x: Items.LargeWallsData[i].X + 1, y: Items.LargeWallsData[i].Y + 1);
+			Vector2I q4 = new Vector2I(x: Items.LargeWallsData[i].X + 1, y: Items.LargeWallsData[i].Y);
 			
-			if (position == Items.LargeItemsData[i] || position == q2 || position == q3 || position == q4 )
+			if (position == Items.LargeWallsData[i] || position == q2 || position == q3 || position == q4 )
 			{
 				hit = true;
 			}
