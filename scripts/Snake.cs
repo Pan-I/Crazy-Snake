@@ -348,6 +348,18 @@ public class Snake
 		}
 	}
 
+	public void DeadSnake()
+	{
+		var test1 = (AnimatedSprite2D)SnakeNodes[0];
+
+	var test2 = (AnimatedSprite2D)SnakeNodes[1];
+		test2.Rotation = test1.Rotation;
+		test2.Offset = test1.Offset;
+		test2.FlipH = test1.FlipH;
+		test2.FlipV = test1.FlipV;
+		test2.Frame = 11;
+	}
+
 	public void MapDirections()
 	{
 		// Map input actions to movement directions and settings

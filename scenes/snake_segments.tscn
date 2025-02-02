@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://srvuytqmi2cm"]
+[gd_scene load_steps=14 format=3 uid="uid://srvuytqmi2cm"]
 
 [ext_resource type="Texture2D" uid="uid://e31hhgass1xd" path="res://assets/sprites/Body.png" id="1_88t40"]
 [ext_resource type="Texture2D" uid="uid://bj3x547aeshji" path="res://assets/sprites/Head.png" id="2_63hyv"]
@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://5qr2hp5bmfd0" path="res://assets/sprites/TailBaseCurve.png" id="8_mo0vn"]
 [ext_resource type="Texture2D" uid="uid://bki60axekleyn" path="res://assets/sprites/TailShaftCurve.png" id="9_1q1wg"]
 [ext_resource type="Texture2D" uid="uid://bpnyeonhv43e4" path="res://assets/sprites/TailTip.png" id="10_trsnm"]
+[ext_resource type="Texture2D" uid="uid://c0p03c1dj4qk2" path="res://assets/sprites/DeadHead.png" id="12_5squ0"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_tfhym"]
 animations = [{
@@ -47,6 +48,9 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": ExtResource("10_trsnm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_5squ0")
 }],
 "loop": true,
 "name": &"default",

@@ -30,14 +30,16 @@ public partial class Items : Node
 {
 	private readonly Main _main;
 	private readonly Snake _snake;
-	internal Node2D WallNode;
+	private Node2D WallNode;
 	internal Vector2I EggPosition;
 	internal int Tally;
 	private Dictionary<int, List<Node2D>> _itemRates;
 	internal List<Node2D> ItemNodes;
 	internal List<Vector2I> ItemsData;
-	internal List<Node2D> LargeItemNodes;
-	internal List<Vector2I> LargeItemsData;
+	internal List<Node2D> WallNodes;
+	internal List<Vector2I> WallsData;
+	internal List<Node2D> LargeWallNodes;
+	internal List<Vector2I> LargeWallsData;
 	private Vector2I _newItemPosition;
 	private Node2D _freshEggNode;
 	private Node2D _ripeEggNode;
@@ -107,36 +109,58 @@ public partial class Items : Node
 
 	internal void MoveEgg()
 	{
-		EggPosition = RandomPlacement();
+		do { EggPosition = RandomPlacement(); }
+		while ( CheckWallTrap() );
 		_main.GetNode<Node2D>("Egg").Position = EggPosition * _main.CellPixelSize + new Vector2I(0, _main.CellPixelSize);
+	}
+
+	private bool CheckWallTrap()
+	{
+		//TODO:Doesn't account for large walls... technically it should, but I wonder if its necessary or worth it.
+		var eggPosNord = new Vector2I(EggPosition.X, EggPosition.Y - 1);
+		var eggPosEas = new Vector2I(EggPosition.X + 1, EggPosition.Y);
+		var eggPosSud = new Vector2I(EggPosition.X, EggPosition.Y + 1);
+		var eggPosWes = new Vector2I(EggPosition.X - 1, EggPosition.Y);
+		if (WallsData.Contains(eggPosNord) && WallsData.Contains(eggPosEas) && WallsData.Contains(eggPosSud) &&
+		    WallsData.Contains(eggPosWes))
+		{
+			return true;
+		}
+		return false;
 	}
 
 	private Vector2I RandomPlacement()
 	{
-		//TODO: possible parameter for introducing larger objects when being placed to avoid placing on top of other items.
+		//TODO: possible parameter for introducing larger objects when being placed to avoid placing on top of other items. Or does the large item hit in main cover this?
 		//Large walls have been spotted spawning on snake segments, and other items (https://github.com/users/Pan-I/projects/6/views/3?pane=issue&itemId=93374486&issue=Pan-I%7CCrazy-Snake%7C9)
 		Random rndm = new Random();
 		HashSet<Vector2I> occupiedPositions = new HashSet<Vector2I>(_snake.SnakeData) { EggPosition };
 		occupiedPositions.UnionWith(ItemsData);
-		occupiedPositions.UnionWith(LargeItemsData); //TODO: Needs a way to fill the other cells. Otherwise items may place in non-origin cells of larger items.
-		//
+		occupiedPositions.UnionWith(WallsData);
+		occupiedPositions.UnionWith(LargeWallsData);
+
+		int tryCounter = 0;
 		
 		Vector2I itemPlacement;
 		do
 		{
 			//generate a new coordinate spot
+			tryCounter++;
+			if (tryCounter == 90000) //if there have been this many attempts to place the item, something is wrong.
+			{
+				_main.EndGame(); //TODO: for REVIEW place a stopping here and see if this can be easily triggered on a long-lasting game. 
+			}
 			itemPlacement = new Vector2I(rndm.Next(0, _main.BoardCellSize - 1), rndm.Next(3, _main.BoardCellSize - 1));
-		} while (occupiedPositions. Count < 899 && //TODO: this 899 limit doesn't account for large items either.
-				 (occupiedPositions.Contains(itemPlacement) || //Don't place on an occupied position.
-				  _main.CheckLargeItemHit(itemPlacement) || //Don't place on large items. //TODO: Doesn't seem to work.
+		} while ((occupiedPositions.Contains(itemPlacement) || //Don't place on an occupied position.
+				  _main.CheckLargeItemHit(itemPlacement) || //Don't place on large items. //TODO: Doesn't seem to work. Observed an item spawning under a large wall after this was implemented.
 				  IsWithinRadius(itemPlacement, _snake.SnakeData[0], 3) || //Don't place too close to snake head.
 				  CheckWithinRadius(itemPlacement, _snake.SnakeData, 1) || //Don't place anywhere near entire body.
-				  !IsWithinRadius(itemPlacement, _snake.SnakeData[^1], 20) //Place within 7 cells of the tail. Temporary rule? I kind of like it.
+				  !IsWithinRadius(itemPlacement, _snake.SnakeData[^1], 20) //Place within 7 cells of the tail. Temporary rule? I kind of like it. //TODO: decide.
 				 ));
 
 		return itemPlacement;
 
-		//TODO: Needs a better implementation.
+		//TODO: Needs a better implementation. (*Why? Don't remember what is wrong with this.*)
 		bool CheckWithinRadius(Vector2I itemPlacement, List<Vector2I> listCoords, int radius)
 		{
 			bool withinRadius = false;
@@ -160,6 +184,11 @@ public partial class Items : Node
 		}
 	}
 
+	private void ReplaceItem()
+	{
+		//do nothing;
+	}
+
 	internal void GenerateFromItemLookup()
 	{
 		foreach (var rule in _itemRates)
@@ -181,10 +210,15 @@ public partial class Items : Node
 		_newItemPosition = RandomPlacement();
 		newItem.Position = _newItemPosition * _main.CellPixelSize + new Vector2I(0, _main.CellPixelSize);
 		_main.AddChild(newItem);
+		if (newItem.SceneFilePath == WallNode.SceneFilePath)
+		{
+			WallNodes.Add(newItem);
+			WallsData.Add(_newItemPosition);
+		}
 		if (newItem.SceneFilePath == _largeWallNode.SceneFilePath)
 		{
-			LargeItemNodes.Add(newItem);
-			LargeItemsData.Add(_newItemPosition);
+			LargeWallNodes.Add(newItem);
+			LargeWallsData.Add(_newItemPosition);
 		}
 		else
 		{
@@ -247,15 +281,19 @@ public partial class Items : Node
 		}
 		if (item.SceneFilePath == _mushroomNode.SceneFilePath)
 		{
-			_main.Score = Math.Pow(Math.Abs(_main.Score), 1.05);
+			_main.Score = (_main.Score < 0) ? (-1) : Math.Pow(Math.Abs(_main.Score), 1.05);
 		}
 		if (item.SceneFilePath == _dewDropNode.SceneFilePath)
 		{
 			_main.Score = Math.Abs(_main.Score);
 		}
+		if (item.SceneFilePath == _frogNode.SceneFilePath)
+		{
+			_main.Score = (_main.Score < 0) ? (Math.Abs(_main.Score) - Math.Pow(Math.Abs(_main.Score), 1.15)): Math.Pow(Math.Abs(_main.Score), 1.15);
+		}
 		if (item.SceneFilePath == _pillItemNode.SceneFilePath)
 		{
-			_main.Score = Math.Pow(Math.Abs(_main.Score), 1.5);
+			_main.Score = (_main.Score < 0) ? (0 - Math.Pow(Math.Abs(_main.Score), 1.5)) : Math.Pow(Math.Abs(_main.Score), 1.5);
 		}
 		if (item.SceneFilePath == _skullNode.SceneFilePath)
 		{
