@@ -122,7 +122,7 @@ public partial class Items : Node
 		var eggPosSud = new Vector2I(EggPosition.X, EggPosition.Y + 1);
 		var eggPosWes = new Vector2I(EggPosition.X - 1, EggPosition.Y);
 		if (WallsData.Contains(eggPosNord) && WallsData.Contains(eggPosEas) && WallsData.Contains(eggPosSud) &&
-		    WallsData.Contains(eggPosWes))
+			WallsData.Contains(eggPosWes))
 		{
 			return true;
 		}
