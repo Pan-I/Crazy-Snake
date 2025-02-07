@@ -34,7 +34,7 @@ public partial class Main : Node
 	//Game Variables
 	internal double Score;
 	private bool _gameStarted;
-	private bool _pause;
+	private bool _pause = false;
 	
 	//Grid Variables
 	internal int BoardCellSize = 30;
@@ -57,7 +57,7 @@ public partial class Main : Node
 	public override void _Ready()
 	{
 		// The WaitTime is the amount of seconds between each snake movement. .1-.2 is a good regular gameplay speed; .75 is a good debug speed for animations etc.
-		GetNode<Timer>("MoveTimer").WaitTime = 0.333333333;
+		GetNode<Timer>("MoveTimer").WaitTime = 0.25;
 		Items.LoadItems();
 		Items.SetItemRates();
 		Snake.MapDirections();
@@ -133,23 +133,23 @@ public partial class Main : Node
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		if (Input.IsActionPressed("pause"))
+		if (Input.IsActionJustPressed("pause"))
 		{
-			if (!_pause)
-			{
-				GetNode<Timer>("MoveTimer").Stop();
-				_pause = true;
-			}
-			else
-			{
-				GetNode<Timer>("MoveTimer").Start();
-				_pause = false;
-			}
+				if (!_pause)
+				{
+					GetNode<Timer>("MoveTimer").Stop();
+					_pause = true;
+				}
+				else if (_pause)
+				{
+					GetNode<Timer>("MoveTimer").Start();
+					_pause = false;
+				}
 		}
 		if (!_pause)
 		{
 			Snake.KeyPressSnakeDirection();
-		}
+		} 
 	}
 	
 		
