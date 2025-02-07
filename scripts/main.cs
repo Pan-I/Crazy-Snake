@@ -34,23 +34,18 @@ public partial class Main : Node
 	//Game Variables
 	internal double Score;
 	private bool _gameStarted;
+	private bool _pause = false;
 	
 	//Grid Variables
 	internal int BoardCellSize = 30;
 	internal int CellPixelSize = 30;
 	
-	//Snake Variables
-
 	//Movement Variables
 	internal Vector2I UpMove = new (0, -1);
 	internal Vector2I DownMove = new (0, 1);
 	internal Vector2I LeftMove = new (-1, 0);
 	internal Vector2I RightMove = new (1, 0);
 	internal Vector2I MoveDirection;
-	
-	//Egg & Item Variables
-
-	private bool _pause;
 
 	public Main()
 	{
@@ -62,14 +57,10 @@ public partial class Main : Node
 	public override void _Ready()
 	{
 		// The WaitTime is the amount of seconds between each snake movement. .1-.2 is a good regular gameplay speed; .75 is a good debug speed for animations etc.
-		GetNode<Timer>("MoveTimer").WaitTime = 0.2;
-
+		GetNode<Timer>("MoveTimer").WaitTime = 0.25;
 		Items.LoadItems();
 		Items.SetItemRates();
-
 		Snake.MapDirections();
-		
-		_pause = false;
 		NewGame();
 	}
 
@@ -88,9 +79,16 @@ public partial class Main : Node
 				node.QueueFree();
 			}
 		}
-		if (Items.LargeItemNodes != null)
+		if (Items.WallNodes != null)
 		{
-			foreach (Node2D node in Items.LargeItemNodes)
+			foreach (Node2D node in Items.WallNodes)
+			{
+				node.QueueFree();
+			}
+		}
+		if (Items.LargeWallNodes != null)
+		{
+			foreach (Node2D node in Items.LargeWallNodes)
 			{
 				node.QueueFree();
 			}
@@ -98,8 +96,10 @@ public partial class Main : Node
 
 		Items.ItemNodes = new List<Node2D>();
 		Items.ItemsData = new List<Vector2I>();
-		Items.LargeItemNodes = new List<Node2D>();
-		Items.LargeItemsData = new List<Vector2I>();
+		Items.WallNodes = new List<Node2D>();
+		Items.WallsData = new List<Vector2I>();
+		Items.LargeWallNodes = new List<Node2D>();
+		Items.LargeWallsData = new List<Vector2I>();
 		GetNode<CanvasLayer>("GameOverMenu").Visible = false;
 		UpdateHudScore();
 		MoveDirection = UpMove;
@@ -119,6 +119,7 @@ public partial class Main : Node
 
 	internal void EndGame()
 	{
+		Snake.DeadSnake();
 		GetTree().Paused = true;
 		_gameStarted = false;
 		GetNode<Timer>("MoveTimer").Stop();
@@ -132,23 +133,23 @@ public partial class Main : Node
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		if (Input.IsActionPressed("pause"))
+		if (Input.IsActionJustPressed("pause"))
 		{
-			if (!_pause)
-			{
-				GetNode<Timer>("MoveTimer").Stop();
-				_pause = true;
-			}
-			else
-			{
-				GetNode<Timer>("MoveTimer").Start();
-				_pause = false;
-			}
+				if (!_pause)
+				{
+					GetNode<Timer>("MoveTimer").Stop();
+					_pause = true;
+				}
+				else if (_pause)
+				{
+					GetNode<Timer>("MoveTimer").Start();
+					_pause = false;
+				}
 		}
 		if (!_pause)
 		{
 			Snake.KeyPressSnakeDirection();
-		}
+		} 
 	}
 	
 		
@@ -157,9 +158,21 @@ public partial class Main : Node
 		Snake.UpdateSnake();
 		CheckOutOfBound();
 		CheckSelfEaten();
-		CheckEggEaten();
+		bool eggEaten =  CheckEggEaten();
+		CheckFullBoard(eggEaten);
 		CheckItemHit();
 		CheckLargeItemHit(Snake.SnakeData[0]);
+	}
+
+	private void CheckFullBoard(bool eggEaten)
+	{
+		if (eggEaten)
+		{
+			if (1 + Snake.SnakeData.Count + Items.WallsData.Count + (Items.LargeWallsData.Count*4) == BoardCellSize)
+			{
+				EndGame();
+			}
+		}
 	}
 
 	#endregion Game Handling
@@ -172,17 +185,16 @@ public partial class Main : Node
 		GetNode<CanvasLayer>("Hud").GetNode<Label>("ScoreLabel").Text = $"Score: {Score} ";
 	}
 	
-	private void CheckEggEaten()
+	private bool CheckEggEaten()
 	{
-		if (Items.EggPosition == Snake.SnakeData[0])
-		{
-			Score += 5;
-			Items.Tally++;
-			UpdateHudScore();
-			Snake.AddSegment(Snake.OldData[^1]);
-			Items.MoveEgg();
-			Items.GenerateFromItemLookup();
-		}
+		if (Items.EggPosition != Snake.SnakeData[0]) return false;
+		Score += 5;
+		Items.Tally++;
+		UpdateHudScore();
+		Snake.AddSegment(Snake.OldData[^1]);
+		Items.MoveEgg();
+		Items.GenerateFromItemLookup();
+		return true;
 	}
 
 	private void CheckItemHit()
@@ -193,26 +205,24 @@ public partial class Main : Node
 			{
 				Items.ItemResult(Items.ItemNodes[i]);
 				UpdateHudScore();
-				if (Items.ItemNodes[i].SceneFilePath != Items.WallNode.SceneFilePath)
-				{
-					Items.ItemNodes[i].QueueFree();
-					Items.ItemsData.RemoveAt(i);
-					Items.ItemNodes.RemoveAt(i);
-				}
+				Items.ItemNodes[i].QueueFree();
+				Items.ItemsData.RemoveAt(i);
+				Items.ItemNodes.RemoveAt(i);
 			}
 		}
 	}
 	
 	internal bool CheckLargeItemHit(Vector2I position)
+	
 	{
 		bool hit = false;
-		for (int i = 0; i < Items.LargeItemsData.Count; i++)
+		for (int i = 0; i < Items.LargeWallsData.Count; i++)
 		{
-			Vector2I q2 = new Vector2I(x: Items.LargeItemsData[i].X, y: Items.LargeItemsData[i].Y + 1);
-			Vector2I q3 = new Vector2I(x: Items.LargeItemsData[i].X + 1, y: Items.LargeItemsData[i].Y + 1);
-			Vector2I q4 = new Vector2I(x: Items.LargeItemsData[i].X + 1, y: Items.LargeItemsData[i].Y);
+			Vector2I q2 = new Vector2I(x: Items.LargeWallsData[i].X, y: Items.LargeWallsData[i].Y + 1);
+			Vector2I q3 = new Vector2I(x: Items.LargeWallsData[i].X + 1, y: Items.LargeWallsData[i].Y + 1);
+			Vector2I q4 = new Vector2I(x: Items.LargeWallsData[i].X + 1, y: Items.LargeWallsData[i].Y);
 			
-			if (position == Items.LargeItemsData[i] || position == q2 || position == q3 || position == q4 )
+			if (position == Items.LargeWallsData[i] || position == q2 || position == q3 || position == q4 )
 			{
 				hit = true;
 			}

@@ -1,11 +1,11 @@
-#  🐍🎮 Crazy Snake 👾🪩 - v0.2.2.3
+#  🐍🎮 Crazy Snake 👾🪩 - v0.2.3.0
 
 
 <img src="https://raw.githubusercontent.com/Pan-I/Crazy-Snake/refs/heads/main/readme_links/Banner%20Image.png" alt="broken link of game screenshot 1" width="900"/>
 
 
 ##### ReadMe Table of Contents
-- [Introduction](https://github.com/Pan-I/Crazy-Snake?tab=readme-ov-file#-introduction-)
+- [Introduction & Updates](https://github.com/Pan-I/Crazy-Snake?tab=readme-ov-file#-introduction-)
 - [Features](https://github.com/Pan-I/Crazy-Snake?tab=readme-ov-file#-features-)
 - [Code Highlights](https://github.com/Pan-I/Crazy-Snake?tab=readme-ov-file#-code-highlights-)
 - [Getting Started](https://github.com/Pan-I/Crazy-Snake?tab=readme-ov-file#-getting-started-)
@@ -18,10 +18,10 @@
 ---
 ## 🎉 Introduction & Update News 📣
 
-A remake of Snake - with some twists - as a Godot project. Written entirely in C#. Game includes a long list of items that have a wide range of effects on the game and game play, as well as a complex and high-scoring point system.
+A remake of Snake, with some twists, as a Godot project. Written entirely in C#. Game includes a long list of items that have a wide range of effects on the game and game play, as well as a complex and high-scoring point system.
 
 #### Current Major Update Set (*'Minor' Semantic*)
-The current version (v0.2.x) introduces a rough 'animation' for the snake including face, bending neck, and winding tail; also a list of items that impact scoring and gameplay including:
+The current version (v0.2.x) introduces a rough 'animation' for the snake including face, bending body, and winding tail, as well as a death frame for the head; also a list of items that impact scoring and gameplay including:
 - Game ending walls
 - High scoring eggs
 - Negative scoring eggs
@@ -30,7 +30,7 @@ The current version (v0.2.x) introduces a rough 'animation' for the snake includ
 |                                                                *Where v0.2.x is now*                                                                |
 | :-------------------------------------------------------------------------------------------------------------------------------------------------: |
 | <img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.2.2.3%20Gameplay.gif" alt="broken link of game screenshot 2" width="450"/> |
-|                 *Where v0.2.x is now* [(link)](https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.2.2.3%20Gameplay.gif)                 |
+|                 *Where v0.2.x is now* [(link)](https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.2.3.0%20Gameplay.gif)                 |
 
 |                                                              *Where v0.2 started*                                                               |
 | :---------------------------------------------------------------------------------------------------------------------------------------------: |
@@ -100,7 +100,7 @@ Contributing information found here: [CONTRIBUTING.md](https://github.com/Pan-I/
 ---
 ## 📍Attributions 👥
 
-The project is heavily inspired by the following video: [Beginner Godot Tutorial - Make a Snake Game in 10 Minutes!](https://www.youtube.com/watch?v=DlRP-UBR-2A)
+The project is initially inspired by, and was made v0.1 by the following video: [Beginner Godot Tutorial - Make a Snake Game in 10 Minutes!](https://www.youtube.com/watch?v=DlRP-UBR-2A)
 
 The credits for the audio used, are in [**ATTRIBUTIONS.md**](https://github.com/Pan-I/Crazy-Snake/tree/main/readme_links/ATTRIBUTIONS.md)
 
