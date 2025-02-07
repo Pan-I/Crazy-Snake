@@ -21,7 +21,7 @@
 A remake of Snake, with some twists, as a Godot project. Written entirely in C#. Game includes a long list of items that have a wide range of effects on the game and game play, as well as a complex and high-scoring point system.
 
 #### Current Major Update Set (*'Minor' Semantic*)
-The current version (v0.2.x) introduces a rough 'animation' for the snake including face, bending body, and winding tail; also a list of items that impact scoring and gameplay including:
+The current version (v0.2.x) introduces a rough 'animation' for the snake including face, bending body, and winding tail, as well as a death frame for the head; also a list of items that impact scoring and gameplay including:
 - Game ending walls
 - High scoring eggs
 - Negative scoring eggs
