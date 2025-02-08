@@ -56,8 +56,10 @@ public partial class Main : Node
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		// The WaitTime is the amount of seconds between each snake movement. .1-.2 is a good regular gameplay speed; .75 is a good debug speed for animations etc.
-		GetNode<Timer>("MoveTimer").WaitTime = 0.25;
+		// The WaitTime is the amount of seconds between each snake movement.
+		// .1-.2 is a good regular gameplay #speed; .75 is a good debug speed for animations etc.
+		GetNode<Timer>("MoveTimer").WaitTime = 0.1;
+		
 		Items.LoadItems();
 		Items.SetItemRates();
 		Snake.MapDirections();
@@ -71,41 +73,12 @@ public partial class Main : Node
 		GetTree().Paused = false;
 		GetTree().CallGroup("snake", "queue_free");
 		Score = 0;
-		Items.Tally = 0;
-		if (Items.ItemNodes != null)
-		{
-			foreach (Node2D node in Items.ItemNodes)
-			{
-				node.QueueFree();
-			}
-		}
-		if (Items.WallNodes != null)
-		{
-			foreach (Node2D node in Items.WallNodes)
-			{
-				node.QueueFree();
-			}
-		}
-		if (Items.LargeWallNodes != null)
-		{
-			foreach (Node2D node in Items.LargeWallNodes)
-			{
-				node.QueueFree();
-			}
-		}
-
-		Items.ItemNodes = new List<Node2D>();
-		Items.ItemsData = new List<Vector2I>();
-		Items.WallNodes = new List<Node2D>();
-		Items.WallsData = new List<Vector2I>();
-		Items.LargeWallNodes = new List<Node2D>();
-		Items.LargeWallsData = new List<Vector2I>();
 		GetNode<CanvasLayer>("GameOverMenu").Visible = false;
 		UpdateHudScore();
 		MoveDirection = UpMove;
 		Snake.CanMove = true;
 		Snake.GenerateSnake();
-		Items.MoveEgg();
+		Items.Reset();
 	}
 
 	internal void StartGame()
@@ -187,13 +160,14 @@ public partial class Main : Node
 	
 	private bool CheckEggEaten()
 	{
-		if (Items.EggPosition != Snake.SnakeData[0]) return false;
-		Score += 5;
-		Items.Tally++;
-		UpdateHudScore();
+		if (Items.EggPosition != Snake.SnakeData[0]) 
+			return false;
+		
+		Items.EggEaten();
 		Snake.AddSegment(Snake.OldData[^1]);
-		Items.MoveEgg();
-		Items.GenerateFromItemLookup();
+		Score += 5;
+		UpdateHudScore();
+
 		return true;
 	}
 
@@ -203,11 +177,8 @@ public partial class Main : Node
 		{
 			if (Snake.SnakeData[0] == Items.ItemsData[i])
 			{
-				Items.ItemResult(Items.ItemNodes[i]);
+				Items.ItemResult(Items.ItemNodes[i], i);
 				UpdateHudScore();
-				Items.ItemNodes[i].QueueFree();
-				Items.ItemsData.RemoveAt(i);
-				Items.ItemNodes.RemoveAt(i);
 			}
 		}
 	}
