@@ -1,22 +1,87 @@
-[gd_scene load_steps=2 format=3 uid="uid://c04wsqka0wuf"]
+[gd_scene load_steps=4 format=3 uid="uid://c04wsqka0wuf"]
+
+[ext_resource type="PackedScene" uid="uid://srvuytqmi2cm" path="res://scenes/snake_segments.tscn" id="1_uxavj"]
+[ext_resource type="PackedScene" uid="uid://crx46ynm1y1wq" path="res://scenes/combo_meter.tscn" id="2_5njtd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d5do4"]
-bg_color = Color(0.215686, 0.490196, 0.831373, 1)
+bg_color = Color(0.447059, 0.415686, 0.776471, 1)
 
 [node name="Hud" type="CanvasLayer"]
 
+[node name="LeftPanel" type="Panel" parent="."]
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 30.0
+grow_vertical = 2
+size_flags_horizontal = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_d5do4")
+metadata/_edit_use_anchors_ = true
+
+[node name="RightPanel" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 930.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 8
+theme_override_styles/panel = SubResource("StyleBoxFlat_d5do4")
+
 [node name="ScorePanel" type="Panel" parent="."]
-offset_right = 900.0
-offset_bottom = 60.0
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 90.0
+grow_horizontal = 2
 size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_d5do4")
 
-[node name="ScoreLabel" type="Label" parent="."]
-anchors_preset = 10
+[node name="ScoreLabel" type="Label" parent="ScorePanel"]
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
-offset_bottom = 58.0
+anchor_bottom = 1.0
+offset_left = 54.0
+offset_right = -579.0
 grow_horizontal = 2
+grow_vertical = 2
 theme_override_font_sizes/font_size = 32
 text = "Score: 0"
-horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="SnakeSegments" parent="ScorePanel" instance=ExtResource("1_uxavj")]
+position = Vector2(660, 15)
+scale = Vector2(2, 2)
+frame = 11
+speed_scale = 0.0
+
+[node name="ComboPanel" type="Panel" parent="."]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -90.0
+offset_bottom = 30.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_d5do4")
+
+[node name="ComboLabel" type="Label" parent="ComboPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 58.0
+offset_right = -410.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 32
+text = "Combo: Eggs * Special"
+vertical_alignment = 1
+
+[node name="ComboMeter" parent="ComboPanel" instance=ExtResource("2_5njtd")]
+layout_mode = 1
+offset_left = 943.0
+offset_top = -3.0
+offset_right = 943.0
+offset_bottom = -3.0

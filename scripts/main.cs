@@ -34,11 +34,19 @@ public partial class Main : Node
 	//Game Variables
 	internal double Score;
 	private bool _gameStarted;
-	private bool _pause = false;
+	private bool _pause;
 	
 	//Grid Variables
-	internal int BoardCellSize = 30;
-	internal int CellPixelSize = 30;
+	internal int BoardCellSize;
+	internal int CellPixelSize;
+	internal Vector2 BoardPosition;
+	internal Vector2 BoardScale;
+	internal float BoardLeft;
+	internal float BoardTop;
+	internal float BoardRight;
+	internal float BoardBottom;
+	
+	
 	
 	//Movement Variables
 	internal Vector2I UpMove = new (0, -1);
@@ -59,12 +67,20 @@ public partial class Main : Node
 		// The WaitTime is the amount of seconds between each snake movement.
 		// .1-.2 is a good regular gameplay #speed; .75 is a good debug speed for animations etc.
 		GetNode<Timer>("MoveTimer").WaitTime = 0.1;
+		BoardPosition = GetNode<AnimatedSprite2D>("Background").Position;
+		BoardScale = GetNode<AnimatedSprite2D>("Background").Scale;
+		BoardCellSize = 30;
+		CellPixelSize = 30;
+		BoardLeft = BoardPosition.X - ((BoardCellSize * CellPixelSize) / 2);
+		BoardRight = BoardPosition.X + ((BoardCellSize * CellPixelSize) / 2);
+		BoardTop = BoardPosition.Y - ((BoardCellSize * CellPixelSize) / 2);
+		BoardBottom = BoardPosition.Y + ((BoardCellSize * CellPixelSize) / 2);
 		
 		Items.LoadItems();
 		Items.SetItemRates();
 		Snake.MapDirections();
 		NewGame();
-	}
+	}  
 
 	#region Game Handling
 
@@ -106,6 +122,10 @@ public partial class Main : Node
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
+		if (Input.IsActionPressed("escape"))
+		{
+			GetTree().Quit();
+		}
 		if (Input.IsActionJustPressed("pause"))
 		{
 				if (!_pause)
@@ -155,7 +175,7 @@ public partial class Main : Node
 	private void UpdateHudScore()
 	{
 		Score = Math.Round(Score, 0);
-		GetNode<CanvasLayer>("Hud").GetNode<Label>("ScoreLabel").Text = $"Score: {Score} ";
+		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ScorePanel").GetNode<Label>("ScoreLabel").Text = $"Score: {Score} ";
 	}
 	
 	private bool CheckEggEaten()
@@ -220,10 +240,16 @@ public partial class Main : Node
 
 	private void CheckOutOfBound()
 	{
-		if (Snake.SnakeData[0].X < 0 || Snake.SnakeData[0].X > BoardCellSize - 1 || Snake.SnakeData[0].Y < 1 || Snake.SnakeData[0].Y > BoardCellSize)
+		//if snake X is < Board X Position || snake X is > Board Size + X Position || snake Y is < Board Y Position || snake Y is > Board Size + Y Position
+		if ((Snake.SnakeData[0].X * CellPixelSize) < BoardLeft || Snake.SnakeData[0].X > BoardCellSize - 1 
+											  || ((Snake.SnakeData[0].Y + 1) * CellPixelSize) < BoardTop || (Snake.SnakeData[0].Y > BoardCellSize))
 		{
 			EndGame();
 		}
+		// if (Snake.SnakeData[0].X < 0 || Snake.SnakeData[0].X > BoardCellSize - 1 || Snake.SnakeData[0].Y < 1 || Snake.SnakeData[0].Y > BoardCellSize)
+		// {
+		// 	EndGame();
+		// }
 	}
 	
 	private void _on_game_over_menu_restart()
