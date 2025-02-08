@@ -1,4 +1,4 @@
-#  🐍🎮 Crazy Snake 👾🪩 - v0.2.3.1
+#  🐍🎮 Crazy Snake 👾🪩 - v0.3.0.0
 
 
 <img src="https://raw.githubusercontent.com/Pan-I/Crazy-Snake/refs/heads/main/readme_links/Banner%20Image.png" alt="broken link of game screenshot 1" width="900"/>
@@ -21,28 +21,22 @@
 A remake of Snake, with some twists, as a Godot project. Written entirely in C#. Game includes a long list of items that have a wide range of effects on the game and game play, as well as a complex and high-scoring point system.
 
 #### Current Major Update Set (*'Minor' Semantic*)
-The current version (v0.2.x) introduces a rough 'animation' for the snake including face, bending body, and winding tail, as well as a death frame for the head; also a list of items that impact scoring and gameplay including:
-- Game ending walls
-- High scoring eggs
-- Negative scoring eggs
-- Complex score modifiers
-
-|                                                                *Where v0.2.x is now*                                                                |
-| :-------------------------------------------------------------------------------------------------------------------------------------------------: |
-| <img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.2.3.0%20Gameplay.gif" alt="broken link of game screenshot 2" width="450"/> |
-|                                                                *Where v0.2.x is now*                                                                |
-
-|                                                              *Where v0.2 started*                                                               |
-| :---------------------------------------------------------------------------------------------------------------------------------------------: |
-| <img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.2%20Gameplay.gif" alt="broken link of game screenshot 3" width="450"/> |
-|                                                              *Where v0.2 started*                                                               |
-
-
-#### Next Major Update Set (*'Minor' Semantic*)
-What's coming in the next major update (v0.3), after v0.2 is finalized:
+The current version (v0.3.x) will focus on the following, with more details to come:
 - GUI overhaul
 - Combo scoring system
 - More TBD
+
+
+|                                                                *Where v0.3.x is now*                                                                |
+| :-------------------------------------------------------------------------------------------------------------------------------------------------: |
+| <img src="" alt="broken link of game screenshot 2" width="450"/> |
+|                 *Where v0.3.x is now*               |
+
+|                                                              *Where v0.3. started*                                                               |
+| :---------------------------------------------------------------------------------------------------------------------------------------------: |
+| <img src="" alt="broken link of game screenshot 3" width="450"/> |
+|                                                              *Where v0.2 started*                                                               |
+
 
 ---
 ## 🌟 Features 🎁
