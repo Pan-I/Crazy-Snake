@@ -30,7 +30,7 @@ public partial class Items : Node
 {
 	private readonly Main _main;
 	private readonly Snake _snake;
-	private Node2D WallNode;
+	internal Node2D WallNode;
 	internal Vector2I EggPosition;
 	internal int Tally;
 	private Dictionary<int, List<Node2D>> _itemRates;
@@ -50,7 +50,7 @@ public partial class Items : Node
 	private Node2D _dewDropNode;
 	private Node2D _lavaEggNode;
 	private Node2D _frogNode;
-	private Node2D _largeWallNode;
+	internal Node2D LargeWallNode;
 	private Node2D _alienEggNode;
 	private Node2D _iceEggNode;
 	private Node2D _pillItemNode;
@@ -82,7 +82,7 @@ public partial class Items : Node
 		_iceEggNode = _main.GetNode<Node2D>("ItemManager/IceEgg");
 		_pillItemNode = _main.GetNode<Node2D>("ItemManager/Pill");
 		_discoEggNode = _main.GetNode<Node2D>("ItemManager/DiscoEgg");
-		_largeWallNode = _main.GetNode<Node2D>("ItemManager/LargeWall");
+		LargeWallNode = _main.GetNode<Node2D>("ItemManager/LargeWall");
 	}
 	
 	internal void SetItemRates()
@@ -98,7 +98,7 @@ public partial class Items : Node
 			{ 7, new List<Node2D> { _dewDropNode } },
 			{ 8, new List<Node2D> { _lavaEggNode } },
 			{ 10, new List<Node2D> { _frogNode } },
-			{ 12, new List<Node2D> { _largeWallNode } },
+			{ 12, new List<Node2D> { LargeWallNode } },
 			{ 13, new List<Node2D> { _alienEggNode } },
 			{ 21, new List<Node2D> { _iceEggNode } },
 			{ 22, new List<Node2D> { _pillItemNode } },
@@ -116,7 +116,7 @@ public partial class Items : Node
 
 	private bool CheckWallTrap()
 	{
-		//TODO:Doesn't account for large walls... technically it should, but I wonder if its necessary or worth it.
+		//TODO:Doesn't account for large walls, or larger perimeter traps... it should, but I wonder if it's necessary or worth it. A certain planned power-up might make it even less so
 		var eggPosNord = new Vector2I(EggPosition.X, EggPosition.Y - 1);
 		var eggPosEas = new Vector2I(EggPosition.X + 1, EggPosition.Y);
 		var eggPosSud = new Vector2I(EggPosition.X, EggPosition.Y + 1);
@@ -131,8 +131,7 @@ public partial class Items : Node
 
 	private Vector2I RandomPlacement()
 	{
-		//TODO: possible parameter for introducing larger objects when being placed to avoid placing on top of other items. Or does the large item hit in main cover this?
-		//Large walls have been spotted spawning on snake segments, and other items (https://github.com/users/Pan-I/projects/6/views/3?pane=issue&itemId=93374486&issue=Pan-I%7CCrazy-Snake%7C9)
+		//TODO: possible parameter for introducing larger objects when being placed to avoid placing on top of other  Or does the large item hit in main cover this?
 		Random rndm = new Random();
 		HashSet<Vector2I> occupiedPositions = new HashSet<Vector2I>(_snake.SnakeData) { EggPosition };
 		occupiedPositions.UnionWith(ItemsData);
@@ -152,10 +151,10 @@ public partial class Items : Node
 			}
 			itemPlacement = new Vector2I(rndm.Next(0, _main.BoardCellSize - 1), rndm.Next(3, _main.BoardCellSize - 1));
 		} while ((occupiedPositions.Contains(itemPlacement) || //Don't place on an occupied position.
-				  _main.CheckLargeItemHit(itemPlacement) || //Don't place on large items. //TODO: Doesn't seem to work. Observed an item spawning under a large wall after this was implemented.
+				  _main.CheckLargeItemHit(itemPlacement) || //Don't place on large 
 				  IsWithinRadius(itemPlacement, _snake.SnakeData[0], 3) || //Don't place too close to snake head.
-				  CheckWithinRadius(itemPlacement, _snake.SnakeData, 1) || //Don't place anywhere near entire body.
-				  !IsWithinRadius(itemPlacement, _snake.SnakeData[^1], 20) //Place within 7 cells of the tail. Temporary rule? I kind of like it. //TODO: decide.
+				  CheckWithinRadius(itemPlacement, _snake.SnakeData, 1) || //Don't place directly next to entire body.
+				  !IsWithinRadius(itemPlacement, _snake.SnakeData[^1], 20) //Place around the tail. Temporary rule? I kind of like it.
 				 ));
 
 		return itemPlacement;
@@ -215,7 +214,7 @@ public partial class Items : Node
 			WallNodes.Add(newItem);
 			WallsData.Add(_newItemPosition);
 		}
-		if (newItem.SceneFilePath == _largeWallNode.SceneFilePath)
+		if (newItem.SceneFilePath == LargeWallNode.SceneFilePath)
 		{
 			LargeWallNodes.Add(newItem);
 			LargeWallsData.Add(_newItemPosition);
@@ -227,10 +226,11 @@ public partial class Items : Node
 		}
 	}
 
-	internal void ItemResult(Node2D item)
+	internal void ItemResult(Node2D item, int i)
+	//TODO: refactor, out Score, instead of manipulating from here.
 	{
 		if (item.SceneFilePath == WallNode.SceneFilePath 
-			|| item.SceneFilePath == _largeWallNode.SceneFilePath) 
+			|| item.SceneFilePath == LargeWallNode.SceneFilePath) 
 		{
 			_main.EndGame();
 		}
@@ -238,7 +238,6 @@ public partial class Items : Node
 			
 		{
 			_main.Score += 25;
-			Debug.Assert(_snake != null, nameof(_snake) + " != null");
 			_snake.AddSegment(_snake.OldData[^1]);
 		}
 		if (item.SceneFilePath == _ripeEggNode.SceneFilePath)
@@ -322,6 +321,54 @@ public partial class Items : Node
 					break;
 			}
 		}
+		
+		if (item.SceneFilePath != WallNode.SceneFilePath && item.SceneFilePath != LargeWallNode.SceneFilePath)
+		{
+			item.QueueFree();
+			ItemsData.RemoveAt(i);
+			ItemNodes.RemoveAt(i);
+		}
 			
+	}
+
+	public void EggEaten()
+	{
+		Tally++;
+		MoveEgg();
+		GenerateFromItemLookup();
+	}
+
+	public void Reset()
+	{
+		Tally = 0;
+		if (ItemNodes != null)
+		{
+			foreach (Node2D node in ItemNodes)
+			{
+				node.QueueFree();
+			}
+		}
+		if (WallNodes != null)
+		{
+			foreach (Node2D node in WallNodes)
+			{
+				node.QueueFree();
+			}
+		}
+		if (LargeWallNodes != null)
+		{
+			foreach (Node2D node in LargeWallNodes)
+			{
+				node.QueueFree();
+			}
+		}
+
+		ItemNodes = new List<Node2D>();
+		ItemsData = new List<Vector2I>();
+		WallNodes = new List<Node2D>();
+		WallsData = new List<Vector2I>();
+		LargeWallNodes = new List<Node2D>();
+		LargeWallsData = new List<Vector2I>();
+		MoveEgg();
 	}
 }
