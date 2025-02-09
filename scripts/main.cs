@@ -113,7 +113,7 @@ public partial class Main : Node
 		_gameStarted = false;
 		GetNode<Timer>("MoveTimer").Stop();
 		GetNode<CanvasLayer>("GameOverMenu").Visible = true;
-		string message = $"Game Over!\nScore: {Score}";
+		string message = $"\n\nssSss!\n\nGame Over!\n\nScore: {Score}";
 		GetNode<CanvasLayer>("GameOverMenu").GetNode<Panel>("GameOverPanel").GetNode<Label>("GameOverLabel").Text = message;
 		//var test = GetNode<AnimatedSprite2D>("Background");
 		//test.Frame = 0;
@@ -233,7 +233,7 @@ public partial class Main : Node
 					return;
 				}
 				
-				EndGame();
+				DeductHealth();
 			}
 		}
 	}
@@ -244,14 +244,19 @@ public partial class Main : Node
 		if ((Snake.SnakeData[0].X * CellPixelSize) < BoardLeft || Snake.SnakeData[0].X > BoardCellSize - 1 
 											  || ((Snake.SnakeData[0].Y + 1) * CellPixelSize) < BoardTop || (Snake.SnakeData[0].Y > BoardCellSize))
 		{
-			EndGame();
+			DeductHealth();
 		}
 		// if (Snake.SnakeData[0].X < 0 || Snake.SnakeData[0].X > BoardCellSize - 1 || Snake.SnakeData[0].Y < 1 || Snake.SnakeData[0].Y > BoardCellSize)
 		// {
 		// 	EndGame();
 		// }
 	}
-	
+
+	private void DeductHealth()
+	{
+		EndGame();
+	}
+
 	private void _on_game_over_menu_restart()
 	{
 		NewGame();

@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=3 uid="uid://crx46ynm1y1wq"]
 
-[ext_resource type="Texture2D" uid="uid://drh7pchj5yssn" path="res://assets/sprites/Combo Meter Under.png" id="1_2ps56"]
-[ext_resource type="Texture2D" uid="uid://w6n158732y4r" path="res://assets/sprites/Combo Meter Over.png" id="2_f0g7t"]
-[ext_resource type="Texture2D" uid="uid://bwb4k1frx08nk" path="res://assets/sprites/Combo Meter Progress.png" id="3_2ru7t"]
+[ext_resource type="Texture2D" uid="uid://c76nu56168pg6" path="res://assets/sprites/Combo Meter Under.png" id="1_2ps56"]
+[ext_resource type="Texture2D" uid="uid://d1ihw5sseinfi" path="res://assets/sprites/Combo Meter Over copy.png" id="2_w78bo"]
+[ext_resource type="Texture2D" uid="uid://bgvcu0xixidj0" path="res://assets/sprites/Combo Meter Progress.png" id="3_2ru7t"]
 
 [node name="ComboMeter" type="Control"]
 layout_mode = 3
@@ -12,10 +12,16 @@ offset_bottom = 95.0
 
 [node name="TextureProgressBar" type="TextureProgressBar" parent="."]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_right = 102.0
+offset_bottom = 100.0
 value = 33.0
 fill_mode = 5
 texture_under = ExtResource("1_2ps56")
-texture_over = ExtResource("2_f0g7t")
+texture_over = ExtResource("2_w78bo")
 texture_progress = ExtResource("3_2ru7t")
+texture_progress_offset = Vector2(5, 5)
+radial_initial_angle = 65.0
+radial_center_offset = Vector2(0, -2)
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 3.0
