@@ -201,6 +201,15 @@ public partial class Main : Node
 				UpdateHudScore();
 			}
 		}
+		for (int i = 0; i < Items.WallsData.Count; i++)
+		{
+			if (Snake.SnakeData[0] == Items.WallsData[i])
+			{
+				Items.ItemResult(Items.WallNodes[i], i);
+				UpdateHudScore();
+			}
+		}
+		
 	}
 	
 	internal bool CheckLargeItemHit(Vector2I position)
@@ -241,8 +250,9 @@ public partial class Main : Node
 	private void CheckOutOfBound()
 	{
 		//if snake X is < Board X Position || snake X is > Board Size + X Position || snake Y is < Board Y Position || snake Y is > Board Size + Y Position
-		if ((Snake.SnakeData[0].X * CellPixelSize) < BoardLeft || Snake.SnakeData[0].X > BoardCellSize - 1 
-											  || ((Snake.SnakeData[0].Y + 1) * CellPixelSize) < BoardTop || (Snake.SnakeData[0].Y > BoardCellSize))
+		if ((Snake.SnakeData[0].X * CellPixelSize) < BoardLeft || ((Snake.SnakeData[0].X + 1) * CellPixelSize) > BoardRight 
+											  || ((Snake.SnakeData[0].Y + 1) * CellPixelSize) < BoardTop || ((Snake.SnakeData[0].Y + 4) * CellPixelSize) > BoardBottom)
+			//TODO: GUI offsets
 		{
 			DeductHealth();
 		}
