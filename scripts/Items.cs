@@ -149,7 +149,9 @@ public partial class Items : Node
 			{
 				_main.EndGame(); //TODO: for REVIEW place a stopping here and see if this can be easily triggered on a long-lasting game. 
 			}
-			itemPlacement = new Vector2I(rndm.Next(0, _main.BoardCellSize - 1), rndm.Next(3, _main.BoardCellSize - 1));
+			itemPlacement = new Vector2I(rndm.Next(1, _main.BoardCellSize - 0), rndm.Next(3, _main.BoardCellSize - 3)); 
+			//TODO: more dynamic way to factor for GUI frame in offsets?
+			
 		} while ((occupiedPositions.Contains(itemPlacement) || //Don't place on an occupied position.
 				  _main.CheckLargeItemHit(itemPlacement) || //Don't place on large 
 				  IsWithinRadius(itemPlacement, _snake.SnakeData[0], 3) || //Don't place too close to snake head.
@@ -214,7 +216,7 @@ public partial class Items : Node
 			WallNodes.Add(newItem);
 			WallsData.Add(_newItemPosition);
 		}
-		if (newItem.SceneFilePath == LargeWallNode.SceneFilePath)
+		else if (newItem.SceneFilePath == LargeWallNode.SceneFilePath)
 		{
 			LargeWallNodes.Add(newItem);
 			LargeWallsData.Add(_newItemPosition);
@@ -235,7 +237,6 @@ public partial class Items : Node
 			_main.EndGame();
 		}
 		if (item.SceneFilePath == _freshEggNode.SceneFilePath)
-			
 		{
 			_main.Score += 25;
 			_snake.AddSegment(_snake.OldData[^1]);

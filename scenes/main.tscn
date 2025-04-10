@@ -1,14 +1,14 @@
 [gd_scene load_steps=12 format=3 uid="uid://dwuicj4fifd38"]
 
 [ext_resource type="Script" path="res://scripts/Main.cs" id="1_oifwq"]
-[ext_resource type="Texture2D" uid="uid://cgd7b31wynr6m" path="res://assets/sprites/Grid.png" id="2_a1cr7"]
+[ext_resource type="Texture2D" uid="uid://cwtryc81q7x7a" path="res://assets/sprites/Grid.png" id="2_a1cr7"]
 [ext_resource type="PackedScene" uid="uid://srvuytqmi2cm" path="res://scenes/snake_segments.tscn" id="2_vh6ou"]
 [ext_resource type="PackedScene" uid="uid://c04wsqka0wuf" path="res://scenes/hud.tscn" id="3_4f2l8"]
-[ext_resource type="Texture2D" uid="uid://yuoqkt0cyoka" path="res://assets/sprites/Grid 2.png" id="4_ee02f"]
-[ext_resource type="Texture2D" uid="uid://b4kcexkhynyrq" path="res://assets/sprites/Egg.png" id="5_5bxva"]
-[ext_resource type="Texture2D" uid="uid://cxf0ooxv4uwmf" path="res://assets/sprites/Grid 3.png" id="5_6fup4"]
+[ext_resource type="Texture2D" uid="uid://b6rb8m0j35fd1" path="res://assets/sprites/Grid 2.png" id="4_ee02f"]
+[ext_resource type="Texture2D" uid="uid://c02chr05hbddf" path="res://assets/sprites/Egg.png" id="5_5bxva"]
+[ext_resource type="Texture2D" uid="uid://cqkix77lq7y02" path="res://assets/sprites/Grid 3.png" id="5_6fup4"]
 [ext_resource type="PackedScene" uid="uid://vvfybxmrur6n" path="res://scenes/game_over_menu.tscn" id="6_n0b3j"]
-[ext_resource type="Texture2D" uid="uid://bt6dmuotbm2qg" path="res://assets/sprites/Grid 4.png" id="6_o8seh"]
+[ext_resource type="Texture2D" uid="uid://c2evprkrofy7l" path="res://assets/sprites/Grid 4.png" id="6_o8seh"]
 [ext_resource type="PackedScene" uid="uid://bus8ubbqf6t8f" path="res://scenes/item_manager.tscn" id="16_xuxgj"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_tp2o2"]
@@ -36,11 +36,12 @@ script = ExtResource("1_oifwq")
 SnakeSegmentPs = ExtResource("2_vh6ou")
 
 [node name="Background" type="AnimatedSprite2D" parent="."]
-position = Vector2(450, 510)
+position = Vector2(480, 540)
 sprite_frames = SubResource("SpriteFrames_tp2o2")
 speed_scale = 0.0
 
 [node name="Hud" parent="." instance=ExtResource("3_4f2l8")]
+layer = 0
 
 [node name="MoveTimer" type="Timer" parent="."]
 wait_time = 0.75
