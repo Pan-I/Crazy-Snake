@@ -20,22 +20,21 @@
 
 A remake of Snake, with some twists, as a Godot project. Written entirely in C#. Game includes a long list of items that have a wide range of effects on the game and game play, as well as a complex and high-scoring point system.
 
-#### Current Major Update Set (*'Minor' Semantic*)
+#### Current Major Update Set (v0.3)
 The current version (v0.3.x) will focus on the following, with more details to come:
 - GUI overhaul
 - Combo scoring system
 - More TBD
 
-
-|                                                                *Where v0.3.x is now*                                                                |
-| :-------------------------------------------------------------------------------------------------------------------------------------------------: |
-| <img src="" alt="broken link of game screenshot 2" width="450"/> |
-|                                                                *Where v0.3.x is now*                                                                |
-
-|                                                              *Where v0.3. started*                                                              |
+|                                                              *Where v0.3.x is now*                                                              |
 | :---------------------------------------------------------------------------------------------------------------------------------------------: |
-| <img src="" alt="broken link of game screenshot 3" width="450"/> |
-|                                                              *Where v0.3. started*                                                               |
+| <img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.3%20Gameplay.gif" alt="broken link of game screenshot 2" width="600"/> |
+|                                                              *Where v0.3.x is now*                                                              |
+
+|                                                                    *Where v0.3. started*                                                                     |
+| :----------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| <img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.2.3.0%20Gameplay.gif?raw=true" alt="broken link of game screenshot 3" width="450"/> |
+|                                                                    *Where v0.3. started*                                                                     |
 
 
 ---
