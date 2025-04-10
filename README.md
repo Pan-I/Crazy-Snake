@@ -28,7 +28,7 @@ The current version (v0.3.x) will focus on the following, with more details to c
 
 |                                                              *Where v0.3.x is now*                                                              |
 | :---------------------------------------------------------------------------------------------------------------------------------------------: |
-| <img src="https://github.com/Pan-I/Crazy-Snake/blob/PrimaryTrunk/readme_links/v0.3%20Gameplay.gif" alt="broken link of game screenshot 2" width="600"/> |
+| <img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.3%20Gameplay.gif" alt="broken link of game screenshot 2" width="600"/> |
 |                                                              *Where v0.3.x is now*                                                              |
 
 |                                                                    *Where v0.3. started*                                                                     |
