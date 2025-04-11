@@ -1,8 +1,8 @@
 [gd_scene load_steps=8 format=3 uid="uid://vvfybxmrur6n"]
 
 [ext_resource type="Script" path="res://scripts/GameOverMenu.cs" id="1_q07w7"]
-[ext_resource type="StyleBox" uid="uid://cmudauep2g1t1" path="res://scenes/button_style_Hov_ph.tres" id="3_7bjhg"]
-[ext_resource type="StyleBox" uid="uid://cn4wxgnlbcqsb" path="res://scenes/button_style_Pres_ph.tres" id="4_h7oyr"]
+[ext_resource type="StyleBox" uid="uid://c35tliosim4in" path="res://scenes/button_style_Hov_ph.tres" id="3_7bjhg"]
+[ext_resource type="StyleBox" uid="uid://ncmimx42i5cb" path="res://scenes/button_style_Pres_ph.tres" id="4_h7oyr"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sbhrb"]
 bg_color = Color(0.509804, 0.709804, 0.176471, 0.560784)
@@ -14,6 +14,9 @@ border_color = Color(0.25098, 0.14902, 1, 0.768627)
 border_blend = true
 
 [sub_resource type="FontFile" id="FontFile_3o3av"]
+subpixel_positioning = 0
+msdf_pixel_range = 14
+msdf_size = 128
 cache/0/36/0/ascent = 0.0
 cache/0/36/0/descent = 0.0
 cache/0/36/0/underline_position = 0.0

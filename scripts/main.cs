@@ -21,6 +21,7 @@ The author can be contacted at pan.i.githubcontact@gmail.com
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Godot;
 
 namespace Snake.scripts;
@@ -108,6 +109,7 @@ public partial class Main : Node
 
 	internal void EndGame()
 	{
+		Debug.Print("Walls: " + Items.WallNodes.Count.ToString());
 		Snake.DeadSnake();
 		GetTree().Paused = true;
 		_gameStarted = false;
@@ -161,7 +163,7 @@ public partial class Main : Node
 	{
 		if (eggEaten)
 		{
-			if (1 + Snake.SnakeData.Count + Items.WallsData.Count + (Items.LargeWallsData.Count*4) == BoardCellSize)
+			if (1 + Snake.SnakeData.Count + Items.WallsData.Count + (Items.LargeWallsData.Count*4) >= BoardCellSize*BoardCellSize )
 			{
 				EndGame();
 			}

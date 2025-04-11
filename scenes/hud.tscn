@@ -1,8 +1,8 @@
 [gd_scene load_steps=11 format=3 uid="uid://c04wsqka0wuf"]
 
 [ext_resource type="PackedScene" uid="uid://srvuytqmi2cm" path="res://scenes/snake_segments.tscn" id="1_uxavj"]
-[ext_resource type="StyleBox" uid="uid://cgpe5n5aid6dc" path="res://scenes/healthbox_style_flat.tres" id="2_0i724"]
-[ext_resource type="StyleBox" uid="uid://d1vdcybwt3dtx" path="res://scenes/retroDigital_style_flat.tres" id="2_1vtuo"]
+[ext_resource type="StyleBox" uid="uid://bk3osegj8et2i" path="res://scenes/healthbox_style_flat.tres" id="2_0i724"]
+[ext_resource type="StyleBox" uid="uid://bo3cjcdcolywe" path="res://scenes/retroDigital_style_flat.tres" id="2_1vtuo"]
 [ext_resource type="PackedScene" uid="uid://crx46ynm1y1wq" path="res://scenes/combo_meter.tscn" id="2_5njtd"]
 [ext_resource type="StyleBox" uid="uid://c57kmp4ubiyu0" path="res://scenes/new_style_box_flat.tres" id="3_8bf8i"]
 
@@ -251,6 +251,7 @@ size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_d5do4")
 
 [node name="ComboLabel" type="Label" parent="ComboPanel"]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -284,6 +285,7 @@ offset_bottom = 9.75995
 theme_override_styles/panel = SubResource("StyleBoxFlat_5g781")
 
 [node name="ComboMeter" parent="." instance=ExtResource("2_5njtd")]
+visible = false
 offset_left = 790.0
 offset_top = 771.0
 offset_right = 790.0

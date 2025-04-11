@@ -92,17 +92,16 @@ public partial class Items : Node
 			{ 1, new List<Node2D> { WallNode, _freshEggNode } },
 			{ 2, new List<Node2D> { _ripeEggNode } },
 			{ 3, new List<Node2D> { _rottenEggNode } },
-			{ 4, new List<Node2D> { _mushroomNode } },
-			{ 5, new List<Node2D> { _shinyEggNode } },
-			{ 6, new List<Node2D> { _skullNode } },
-			{ 7, new List<Node2D> { _dewDropNode } },
-			{ 8, new List<Node2D> { _lavaEggNode } },
-			{ 10, new List<Node2D> { _frogNode } },
-			{ 12, new List<Node2D> { LargeWallNode } },
-			{ 13, new List<Node2D> { _alienEggNode } },
-			{ 21, new List<Node2D> { _iceEggNode } },
-			{ 22, new List<Node2D> { _pillItemNode } },
-			{ 34, new List<Node2D> { _discoEggNode } }
+			{ 5, new List<Node2D> { _mushroomNode } },
+			{ 8, new List<Node2D> { _shinyEggNode } },
+			{ 13, new List<Node2D> { _skullNode, LargeWallNode } },
+			{ 21, new List<Node2D> { _dewDropNode } },
+			{ 34, new List<Node2D> { _lavaEggNode } },
+			{ 55, new List<Node2D> { _frogNode } },
+			{ 89, new List<Node2D> { _alienEggNode } },
+			{ 144, new List<Node2D> { _iceEggNode } },
+			{ 233, new List<Node2D> { _pillItemNode } },
+			{ 377, new List<Node2D> { _discoEggNode } }
 		};
 	}
 
@@ -149,7 +148,7 @@ public partial class Items : Node
 			{
 				_main.EndGame(); //TODO: for REVIEW place a stopping here and see if this can be easily triggered on a long-lasting game. 
 			}
-			itemPlacement = new Vector2I(rndm.Next(1, _main.BoardCellSize - 0), rndm.Next(3, _main.BoardCellSize - 3)); 
+			itemPlacement = new Vector2I(rndm.Next(1, _main.BoardCellSize + 1), rndm.Next(3, _main.BoardCellSize - 4)); 
 			//TODO: more dynamic way to factor for GUI frame in offsets?
 			
 		} while ((occupiedPositions.Contains(itemPlacement) || //Don't place on an occupied position.
@@ -231,11 +230,20 @@ public partial class Items : Node
 	internal void ItemResult(Node2D item, int i)
 	//TODO: refactor, out Score, instead of manipulating from here.
 	{
+				
+		if (item.SceneFilePath != WallNode.SceneFilePath && item.SceneFilePath != LargeWallNode.SceneFilePath)
+		{
+			item.QueueFree();
+			ItemsData.RemoveAt(i);
+			ItemNodes.RemoveAt(i);
+		}
+
 		if (item.SceneFilePath == WallNode.SceneFilePath 
 			|| item.SceneFilePath == LargeWallNode.SceneFilePath) 
 		{
 			_main.EndGame();
 		}
+		//Good eggs
 		if (item.SceneFilePath == _freshEggNode.SceneFilePath)
 		{
 			_main.Score += 25;
@@ -255,7 +263,7 @@ public partial class Items : Node
 
 		if (item.SceneFilePath == _alienEggNode.SceneFilePath)
 		{
-			_main.Score *= 5;
+			_main.Score *= 10;
 			_snake.AddSegment(_snake.OldData[^1]);
 		}
 
@@ -264,40 +272,51 @@ public partial class Items : Node
 			_main.Score *= _main.Score;
 			_snake.AddSegment(_snake.OldData[^1]);
 		}
+		//Bad eggs
 		if (item.SceneFilePath == _rottenEggNode.SceneFilePath)
 		{
-			_main.Score -= 75;
+			_main.Score -= Math.Max(150, _main.Score * 0.5);
 			_snake.AddSegment(_snake.OldData[^1]);
 		}
 		if(item.SceneFilePath == _lavaEggNode.SceneFilePath)
 		{
-			_main.Score /= 2;
+			_main.Score  -= Math.Max(375, _main.Score * 0.75);
 			_snake.AddSegment(_snake.OldData[^1]);
 		}
 		if (item.SceneFilePath == _iceEggNode.SceneFilePath)
 		{
-			_main.Score = Math.Sqrt(Math.Abs(_main.Score));
+			_main.Score = Math.Min(_main.Score - 10000, Math.Sqrt(Math.Abs(_main.Score)));
 			_snake.AddSegment(_snake.OldData[^1]);
 		}
+		//Complex Scorers
 		if (item.SceneFilePath == _mushroomNode.SceneFilePath)
 		{
+			// If the score is negative, set it to a fixed value of -1.
+			// Otherwise, apply a slight exponential increase (power of 1.05) to the absolute value of the score.
 			_main.Score = (_main.Score < 0) ? (-1) : Math.Pow(Math.Abs(_main.Score), 1.05);
 		}
 		if (item.SceneFilePath == _dewDropNode.SceneFilePath)
 		{
+			// Set the score to its absolute value, effectively removing any negative sign.
 			_main.Score = Math.Abs(_main.Score);
 		}
 		if (item.SceneFilePath == _frogNode.SceneFilePath)
 		{
-			_main.Score = (_main.Score < 0) ? (Math.Abs(_main.Score) - Math.Pow(Math.Abs(_main.Score), 1.15)): Math.Pow(Math.Abs(_main.Score), 1.15);
+			// If the score is negative, reduce it further by subtracting an exponential value (power of 1.15).
+			// If the score is positive, apply an exponential increase (power of 1.15).
+			_main.Score = (_main.Score < 0) ? (Math.Abs(_main.Score) - Math.Pow(Math.Abs(_main.Score), 1.15)) 
+				: Math.Pow(Math.Abs(_main.Score), 1.15);
 		}
 		if (item.SceneFilePath == _pillItemNode.SceneFilePath)
 		{
-			_main.Score = (_main.Score < 0) ? (0 - Math.Pow(Math.Abs(_main.Score), 1.5)) : Math.Pow(Math.Abs(_main.Score), 1.5);
+			// If the score is negative, apply a larger exponential reduction (power of 1.5) to the absolute value.
+			// If the score is positive, apply an exponential increase (power of 1.5).
+			_main.Score = (_main.Score < 0) ? (0 - Math.Pow(Math.Abs(_main.Score), 1.5)) 
+				: Math.Pow(Math.Abs(_main.Score), 1.5);
 		}
 		if (item.SceneFilePath == _skullNode.SceneFilePath)
 		{
-			Tally = 0;
+			//Tally = 0;
 			
 			Random rnd = new Random();
 			int result;
@@ -322,14 +341,6 @@ public partial class Items : Node
 					break;
 			}
 		}
-		
-		if (item.SceneFilePath != WallNode.SceneFilePath && item.SceneFilePath != LargeWallNode.SceneFilePath)
-		{
-			item.QueueFree();
-			ItemsData.RemoveAt(i);
-			ItemNodes.RemoveAt(i);
-		}
-			
 	}
 
 	public void EggEaten()
