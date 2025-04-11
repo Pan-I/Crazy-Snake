@@ -149,7 +149,7 @@ public partial class Items : Node
 			{
 				_main.EndGame(); //TODO: for REVIEW place a stopping here and see if this can be easily triggered on a long-lasting game. 
 			}
-			itemPlacement = new Vector2I(rndm.Next(1, _main.BoardCellSize - 0), rndm.Next(3, _main.BoardCellSize - 3)); 
+			itemPlacement = new Vector2I(rndm.Next(1, _main.BoardCellSize + 1), rndm.Next(3, _main.BoardCellSize - 4)); 
 			//TODO: more dynamic way to factor for GUI frame in offsets?
 			
 		} while ((occupiedPositions.Contains(itemPlacement) || //Don't place on an occupied position.
@@ -231,6 +231,14 @@ public partial class Items : Node
 	internal void ItemResult(Node2D item, int i)
 	//TODO: refactor, out Score, instead of manipulating from here.
 	{
+				
+		if (item.SceneFilePath != WallNode.SceneFilePath && item.SceneFilePath != LargeWallNode.SceneFilePath)
+		{
+			item.QueueFree();
+			ItemsData.RemoveAt(i);
+			ItemNodes.RemoveAt(i);
+		}
+
 		if (item.SceneFilePath == WallNode.SceneFilePath 
 			|| item.SceneFilePath == LargeWallNode.SceneFilePath) 
 		{
@@ -322,14 +330,6 @@ public partial class Items : Node
 					break;
 			}
 		}
-		
-		if (item.SceneFilePath != WallNode.SceneFilePath && item.SceneFilePath != LargeWallNode.SceneFilePath)
-		{
-			item.QueueFree();
-			ItemsData.RemoveAt(i);
-			ItemNodes.RemoveAt(i);
-		}
-			
 	}
 
 	public void EggEaten()
