@@ -251,6 +251,7 @@ size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_d5do4")
 
 [node name="ComboLabel" type="Label" parent="ComboPanel"]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -284,6 +285,7 @@ offset_bottom = 9.75995
 theme_override_styles/panel = SubResource("StyleBoxFlat_5g781")
 
 [node name="ComboMeter" parent="." instance=ExtResource("2_5njtd")]
+visible = false
 offset_left = 790.0
 offset_top = 771.0
 offset_right = 790.0
