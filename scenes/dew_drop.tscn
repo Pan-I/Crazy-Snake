@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://qujuucwpjsc3"]
 
-[ext_resource type="Texture2D" uid="uid://dcu0h575ajjbu" path="res://assets/sprites/Dew Drop.png" id="1_gnapb"]
+[ext_resource type="Texture2D" uid="uid://cafu62k02obws" path="res://assets/sprites/Dew Drop.png" id="1_gnapb"]
 
 [node name="DewDrop" type="Sprite2D"]
 texture = ExtResource("1_gnapb")

@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://cp8qumyiyakoj"]
 
-[ext_resource type="Texture2D" uid="uid://cu13x8ybsd5am" path="res://assets/sprites/Frog.png" id="1_pqgqj"]
+[ext_resource type="Texture2D" uid="uid://cog204g1ow4m6" path="res://assets/sprites/Frog.png" id="1_pqgqj"]
 
 [node name="Frog" type="Sprite2D"]
 texture = ExtResource("1_pqgqj")
