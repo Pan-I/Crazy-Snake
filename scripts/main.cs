@@ -197,14 +197,6 @@ public partial class Main : Node
 		
 		Items.EggEaten();
 		Snake.AddSegment(Snake.OldData[^1]);
-		if (Snake.SnakeNodes.Count < 6)
-		{
-			GetNode<Timer>("MoveTimer").WaitTime = 0.17;
-		}
-		else
-		{
-			GetNode<Timer>("MoveTimer").WaitTime = 0.1;
-		}
 		GetNode<AnimatedSprite2D>("Background").Visible = true;
 		ComboTally++;
 		if (!IsInCombo)
@@ -217,6 +209,14 @@ public partial class Main : Node
 			else if (ComboTally > 3)
 			{
 				GetNode<AnimatedSprite2D>("Background").Frame = 2;
+			}
+			if (Snake.SnakeNodes.Count < 6)
+			{
+				GetNode<Timer>("MoveTimer").WaitTime = 0.17;
+			}
+			else
+			{
+				GetNode<Timer>("MoveTimer").WaitTime = 0.1;
 			}
 			if (ComboTally >= 7)
 			{
