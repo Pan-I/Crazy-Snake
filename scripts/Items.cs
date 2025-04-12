@@ -263,13 +263,13 @@ public partial class Items : Node
 
 		if (item.SceneFilePath == _alienEggNode.SceneFilePath)
 		{
-			_main.Score *= 10;
+			_main.Score *= 9;
 			_snake.AddSegment(_snake.OldData[^1]);
 		}
 
 		if (item.SceneFilePath == _discoEggNode.SceneFilePath)
 		{
-			_main.Score *= _main.Score;
+			_main.Score *= Math.Sqrt(Math.Abs(_main.Score));
 			_snake.AddSegment(_snake.OldData[^1]);
 		}
 		//Bad eggs
