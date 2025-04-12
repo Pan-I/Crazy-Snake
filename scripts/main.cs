@@ -199,6 +199,12 @@ public partial class Main : Node
 		Snake.AddSegment(Snake.OldData[^1]);
 		GetNode<AnimatedSprite2D>("Background").Visible = true;
 		ComboTally++;
+
+		if (ComboTally >= 2 && Snake.SnakeNodes.Count >= 6)
+		{
+			GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter").Visible = true;
+		}
+		
 		if (!IsInCombo)
 		{
 			Score += 1;
@@ -355,6 +361,7 @@ public partial class Main : Node
 		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Label>("ComboLabel").Visible = false;
 		GetNode<AnimatedSprite2D>("Background").Frame = 0;
 		GetNode<Timer>("MoveTimer").WaitTime = 0.1;
+		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter").Visible = false;
 	}
 	internal void CancelCombo()
 	{
@@ -364,6 +371,7 @@ public partial class Main : Node
 		ComboPointsY = 0;
 		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Label>("ComboLabel").Visible = false;
 		GetNode<AnimatedSprite2D>("Background").Frame = 0;
+		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter").Visible = false;
 	}
 	
 	private void DeductHealth()
