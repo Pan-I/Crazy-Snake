@@ -384,15 +384,15 @@ public partial class Items : Node
 			//End Combo, No Combo Score Change
 			if (isInCombo)
 			{
+				_main.ComboPointsX *= Math.Abs(_main.ComboPointsX);
+				_main.ComboPointsY *= Math.Abs(_main.ComboPointsY);
 				_main.EndCombo();
 			}
 			else
 			{
-				
+				_main.Score = Math.Abs(_main.Score);
 			}
-			
 			// Set the score to its absolute value, effectively removing any negative sign.
-			_main.Score = Math.Abs(_main.Score);
 		}
 		if (item.SceneFilePath == _frogNode.SceneFilePath)
 		{
@@ -431,10 +431,15 @@ public partial class Items : Node
 		{
 			//Tally = 0;
 			
+			_main.CancelCombo();
+			
 			Random rnd = new Random();
 			int result;
-			do { result = rnd.Next(-1, 7); } while (result % 2 == 0); //results can only be odd
-			
+			do
+			{
+				result = rnd.Next(-1, 7);
+			} while (result % 2 == 0); //results can only be odd
+
 			switch (result)
 			{
 				case -1:

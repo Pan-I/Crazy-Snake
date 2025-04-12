@@ -40,6 +40,7 @@ public partial class Main : Node
 	internal double ComboPointsX; // X combo-specific scoring
 	internal double ComboPointsY;  // Y combo-specific scoring
 	internal int ComboTally;
+	internal int Lives;
 	
 	//Grid Variables
 	internal int BoardCellSize;
@@ -70,7 +71,7 @@ public partial class Main : Node
 	public override void _Ready()
 	{
 		// The WaitTime is the amount of seconds between each snake movement.
-		// .1-.2 is a good regular gameplay #speed; .75 is a good debug speed for animations etc.
+		// .1-.2 is a good regular gameplay #speed; .75 is a good debug speed for animations etc. //TODO: getting overwritten now, with combos, refactor?
 		GetNode<Timer>("MoveTimer").WaitTime = 0.1;
 		BoardPosition = GetNode<AnimatedSprite2D>("Background").Position;
 		BoardScale = GetNode<AnimatedSprite2D>("Background").Scale;
@@ -91,10 +92,13 @@ public partial class Main : Node
 
 	private void NewGame()
 	{
+		Lives = 5;
+		GetNode<Timer>("MoveTimer").WaitTime = 0.25;
 		GetTree().Paused = false;
 		GetTree().CallGroup("snake", "queue_free");
 		Score = 0;
 		GetNode<CanvasLayer>("GameOverMenu").Visible = false;
+		GetNode<AnimatedSprite2D>("Background").Visible = false;
 		UpdateHudScore();
 		MoveDirection = UpMove;
 		Snake.CanMove = true;
@@ -193,10 +197,27 @@ public partial class Main : Node
 		
 		Items.EggEaten();
 		Snake.AddSegment(Snake.OldData[^1]);
+		if (Snake.SnakeNodes.Count < 6)
+		{
+			GetNode<Timer>("MoveTimer").WaitTime = 0.17;
+		}
+		else
+		{
+			GetNode<Timer>("MoveTimer").WaitTime = 0.1;
+		}
+		GetNode<AnimatedSprite2D>("Background").Visible = true;
 		ComboTally++;
 		if (!IsInCombo)
 		{
 			Score += 1;
+			if (ComboTally > 3 && ComboTally % 2 == 0)
+			{
+				GetNode<AnimatedSprite2D>("Background").Frame = 1;
+			}
+			else if (ComboTally > 3)
+			{
+				GetNode<AnimatedSprite2D>("Background").Frame = 2;
+			}
 			if (ComboTally >= 7)
 			{
 				StartCombo();
@@ -204,6 +225,18 @@ public partial class Main : Node
 		}
 		else
 		{
+			if (ComboTally % 2 == 0)
+			{
+				GetNode<AnimatedSprite2D>("Background").Frame = 4;
+			}
+			else if (ComboTally % 3 == 0)
+			{
+				GetNode<AnimatedSprite2D>("Background").Frame = 5;
+			}
+			else
+			{
+				GetNode<AnimatedSprite2D>("Background").Frame = 3;
+			}
 			ComboPointsX += 2;
 		}
 
@@ -263,7 +296,14 @@ public partial class Main : Node
 					return;
 				}
 				
-				DeductHealth();
+				if (IsInCombo)
+				{
+					DeductHealth();
+				}
+				else
+				{
+					DeductHealth();
+				}
 			}
 		}
 	}
@@ -271,11 +311,19 @@ public partial class Main : Node
 	private void CheckOutOfBound()
 	{
 		//if snake X is < Board X Position || snake X is > Board Size + X Position || snake Y is < Board Y Position || snake Y is > Board Size + Y Position
+		
 		if ((Snake.SnakeData[0].X * CellPixelSize) < BoardLeft || ((Snake.SnakeData[0].X + 1) * CellPixelSize) > BoardRight 
 											  || ((Snake.SnakeData[0].Y + 1) * CellPixelSize) < BoardTop || ((Snake.SnakeData[0].Y + 4) * CellPixelSize) > BoardBottom)
 			//TODO: GUI offsets
 		{
-			DeductHealth();
+			if (IsInCombo)
+			{
+				DeductHealth();
+			}
+			else
+			{
+				DeductHealth();
+			}
 		}
 		// if (Snake.SnakeData[0].X < 0 || Snake.SnakeData[0].X > BoardCellSize - 1 || Snake.SnakeData[0].Y < 1 || Snake.SnakeData[0].Y > BoardCellSize)
 		// {
@@ -290,6 +338,8 @@ public partial class Main : Node
 		ComboPointsY = 1;
 		Debug.Print("Combo Started!");
 		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Label>("ComboLabel").Visible = true;
+		GetNode<AnimatedSprite2D>("Background").Frame = 3;
+		GetNode<Timer>("MoveTimer").WaitTime = 0.066;
 	}
 
 	internal void EndCombo()
@@ -303,6 +353,8 @@ public partial class Main : Node
 		ComboPointsY = 0;
 		UpdateHudScore();
 		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Label>("ComboLabel").Visible = false;
+		GetNode<AnimatedSprite2D>("Background").Frame = 0;
+		GetNode<Timer>("MoveTimer").WaitTime = 0.1;
 	}
 	internal void CancelCombo()
 	{
@@ -311,12 +363,22 @@ public partial class Main : Node
 		ComboPointsX = 0;
 		ComboPointsY = 0;
 		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Label>("ComboLabel").Visible = false;
+		GetNode<AnimatedSprite2D>("Background").Frame = 0;
 	}
 	
 	private void DeductHealth()
 	{
 		EndCombo();
-		EndGame();
+		if (Lives >= 1)
+		{
+			//Lives--;
+			EndGame();
+		}
+
+		if (Lives == 0)
+		{
+			EndGame();
+		}
 	}
 
 	private void _on_game_over_menu_restart()
