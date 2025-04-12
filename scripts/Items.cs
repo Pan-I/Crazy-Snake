@@ -227,7 +227,7 @@ public partial class Items : Node
 		}
 	}
 
-	internal void ItemResult(Node2D item, int i)
+	internal void ItemResult(Node2D item, int i, bool isInCombo)
 	//TODO: refactor, out Score, instead of manipulating from here.
 	{
 				
@@ -246,73 +246,186 @@ public partial class Items : Node
 		//Good eggs
 		if (item.SceneFilePath == _freshEggNode.SceneFilePath)
 		{
-			_main.Score += 25;
+			//Modify X during Combo
+			if (isInCombo)
+			{
+				_main.ComboPointsY += 2;
+			}
+			else
+			{
+				_main.Score += 2;
+			}
+			
 			_snake.AddSegment(_snake.OldData[^1]);
 		}
 		if (item.SceneFilePath == _ripeEggNode.SceneFilePath)
 		{
-			_main.Score *= 1.5;
+			//Modify Y during Combo
+			if (isInCombo)
+			{
+				_main.ComboPointsY *= 1.5;
+			}
+			else
+			{
+				_main.Score += 3;	
+			}
 			_snake.AddSegment(_snake.OldData[^1]);
 		}
 
 		if (item.SceneFilePath == _shinyEggNode.SceneFilePath)
 		{
-			_main.Score *= 2;
+			//Modify Y during Combo
+			if (isInCombo)
+			{
+				_main.ComboPointsY *= 2;
+			}
+			else
+			{
+				_main.Score += 5;
+			}
+			
+
 			_snake.AddSegment(_snake.OldData[^1]);
 		}
 
 		if (item.SceneFilePath == _alienEggNode.SceneFilePath)
 		{
-			_main.Score *= 9;
+			//Modify Y during Combo
+			if (isInCombo)
+			{
+				_main.ComboPointsY *= 5;
+			}
+			else
+			{
+				_main.Score += 8;
+			}
+			
+
 			_snake.AddSegment(_snake.OldData[^1]);
 		}
 
 		if (item.SceneFilePath == _discoEggNode.SceneFilePath)
 		{
-			_main.Score *= Math.Sqrt(Math.Abs(_main.Score));
+			//Modify Y during Combo
+			if (isInCombo)
+			{
+				_main.ComboPointsY *= Math.Sqrt(Math.Abs(_main.Score));
+			}
+			else
+			{
+				_main.Score += 13;
+			}
+			
+			
 			_snake.AddSegment(_snake.OldData[^1]);
 		}
 		//Bad eggs
 		if (item.SceneFilePath == _rottenEggNode.SceneFilePath)
 		{
-			_main.Score -= Math.Max(150, _main.Score * 0.5);
+			//End Combo, Modify X
+			if (isInCombo)
+			{
+				_main.ComboPointsX -= Math.Max(10, _main.Score * 0.25);
+			}
+			else
+			{
+				_main.Score -= Math.Max(10, _main.Score * 0.10);
+			}
+			
+			_main.EndCombo();
 			_snake.AddSegment(_snake.OldData[^1]);
 		}
 		if(item.SceneFilePath == _lavaEggNode.SceneFilePath)
 		{
-			_main.Score  -= Math.Max(375, _main.Score * 0.75);
+			//End Combo, Modify Y
+			if (isInCombo)
+			{			
+				_main.ComboPointsY  *= 0.25;
+			}
+			else
+			{
+				_main.Score  -= Math.Max(75, _main.Score * 0.75);
+			}
+			
+			_main.EndCombo();
 			_snake.AddSegment(_snake.OldData[^1]);
 		}
 		if (item.SceneFilePath == _iceEggNode.SceneFilePath)
 		{
-			_main.Score = Math.Min(_main.Score - 10000, Math.Sqrt(Math.Abs(_main.Score)));
+			//Cancel Combo
+			if (isInCombo)
+			{
+				_main.CancelCombo();
+			}
+			else
+			{
+				_main.Score = Math.Min(_main.Score - 10000, Math.Sqrt(Math.Abs(_main.Score)));
+			}
 			_snake.AddSegment(_snake.OldData[^1]);
 		}
 		//Complex Scorers
 		if (item.SceneFilePath == _mushroomNode.SceneFilePath)
 		{
-			// If the score is negative, set it to a fixed value of -1.
-			// Otherwise, apply a slight exponential increase (power of 1.05) to the absolute value of the score.
-			_main.Score = (_main.Score < 0) ? (-1) : Math.Pow(Math.Abs(_main.Score), 1.05);
+			//Start Combo, Modify X
+			if (isInCombo)
+			{
+				_main.ComboPointsX *= 1.25;
+			}
+			else
+			{
+				// If the score is negative, set it to a fixed value of -1.
+				// Otherwise, apply a slight exponential increase (power of 1.05) to the absolute value of the score.
+				_main.Score = (_main.Score < 0) ? (-1) : Math.Pow(Math.Abs(_main.Score), 1.05);
+				_main.StartCombo();	
+			}
 		}
 		if (item.SceneFilePath == _dewDropNode.SceneFilePath)
 		{
+			//End Combo, No Combo Score Change
+			if (isInCombo)
+			{
+				_main.EndCombo();
+			}
+			else
+			{
+				
+			}
+			
 			// Set the score to its absolute value, effectively removing any negative sign.
 			_main.Score = Math.Abs(_main.Score);
 		}
 		if (item.SceneFilePath == _frogNode.SceneFilePath)
 		{
-			// If the score is negative, reduce it further by subtracting an exponential value (power of 1.15).
-			// If the score is positive, apply an exponential increase (power of 1.15).
-			_main.Score = (_main.Score < 0) ? (Math.Abs(_main.Score) - Math.Pow(Math.Abs(_main.Score), 1.15)) 
-				: Math.Pow(Math.Abs(_main.Score), 1.15);
+			//Start Combo, Modify Y
+			if (isInCombo)
+			{
+				_main.ComboPointsY *= 3;
+			}
+			else
+			{
+				// If the score is negative, reduce it further by subtracting an exponential value (power of 1.15).
+				// If the score is positive, apply an exponential increase (power of 1.15).
+				_main.Score = (_main.Score < 0) ? (Math.Abs(_main.Score) - Math.Pow(Math.Abs(_main.Score), 1.15)) 
+					: Math.Pow(Math.Abs(_main.Score), 1.15);
+				_main.StartCombo();
+			}
 		}
 		if (item.SceneFilePath == _pillItemNode.SceneFilePath)
 		{
-			// If the score is negative, apply a larger exponential reduction (power of 1.5) to the absolute value.
-			// If the score is positive, apply an exponential increase (power of 1.5).
-			_main.Score = (_main.Score < 0) ? (0 - Math.Pow(Math.Abs(_main.Score), 1.5)) 
-				: Math.Pow(Math.Abs(_main.Score), 1.5);
+			//Start Combo, Modify X & Y
+			if (isInCombo)
+			{
+				_main.ComboPointsX *= 8;
+				_main.ComboPointsY *= 8;
+			}
+			else
+			{
+				// If the score is negative, apply a larger exponential reduction (power of 1.5) to the absolute value.
+				// If the score is positive, apply an exponential increase (power of 1.5).
+				_main.Score = (_main.Score < 0) ? (0 - Math.Pow(Math.Abs(_main.Score), 1.5)) 
+					: Math.Pow(Math.Abs(_main.Score), 1.5);
+				_main.StartCombo();	
+			}
 		}
 		if (item.SceneFilePath == _skullNode.SceneFilePath)
 		{

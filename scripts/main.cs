@@ -36,6 +36,10 @@ public partial class Main : Node
 	internal double Score;
 	private bool _gameStarted;
 	private bool _pause;
+	internal bool IsInCombo;
+	internal double ComboPointsX; // X combo-specific scoring
+	internal double ComboPointsY;  // Y combo-specific scoring
+	internal int ComboTally;
 	
 	//Grid Variables
 	internal int BoardCellSize;
@@ -109,6 +113,7 @@ public partial class Main : Node
 
 	internal void EndGame()
 	{
+		EndCombo();
 		Debug.Print("Walls: " + Items.WallNodes.Count.ToString());
 		Snake.DeadSnake();
 		GetTree().Paused = true;
@@ -178,6 +183,7 @@ public partial class Main : Node
 	{
 		Score = Math.Round(Score, 0);
 		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ScorePanel").GetNode<Label>("ScoreLabel").Text = $"Score: {Score} ";
+		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Label>("ComboLabel").Text = $"Combo: {ComboPointsX} * {ComboPointsY}";
 	}
 	
 	private bool CheckEggEaten()
@@ -187,7 +193,20 @@ public partial class Main : Node
 		
 		Items.EggEaten();
 		Snake.AddSegment(Snake.OldData[^1]);
-		Score += 5;
+		ComboTally++;
+		if (!IsInCombo)
+		{
+			Score += 1;
+			if (ComboTally >= 7)
+			{
+				StartCombo();
+			}
+		}
+		else
+		{
+			ComboPointsX += 5;
+		}
+
 		UpdateHudScore();
 
 		return true;
@@ -199,7 +218,7 @@ public partial class Main : Node
 		{
 			if (Snake.SnakeData[0] == Items.ItemsData[i])
 			{
-				Items.ItemResult(Items.ItemNodes[i], i);
+				Items.ItemResult(Items.ItemNodes[i], i, IsInCombo);
 				UpdateHudScore();
 			}
 		}
@@ -207,7 +226,7 @@ public partial class Main : Node
 		{
 			if (Snake.SnakeData[0] == Items.WallsData[i])
 			{
-				Items.ItemResult(Items.WallNodes[i], i);
+				Items.ItemResult(Items.WallNodes[i], i, IsInCombo);
 				UpdateHudScore();
 			}
 		}
@@ -264,8 +283,39 @@ public partial class Main : Node
 		// }
 	}
 
+	internal void StartCombo()
+	{
+		IsInCombo = true;
+		ComboPointsX = Math.Max(1, ComboTally);
+		ComboPointsY = 1;
+		Debug.Print("Combo Started!");
+		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Label>("ComboLabel").Visible = true;
+	}
+
+	internal void EndCombo()
+	{
+		IsInCombo = false;
+		ComboTally = 0;
+		double comboPoints = (ComboPointsX * ComboPointsY);
+		Debug.Print("Combo Ended with Score: " + ComboPointsX + " x " + ComboPointsY + " = " + comboPoints);
+		Score += comboPoints > 0 ? comboPoints : Math.Min(ComboPointsX, ComboPointsY);
+		ComboPointsX = 0;
+		ComboPointsY = 0;
+		UpdateHudScore();
+		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Label>("ComboLabel").Visible = false;
+	}
+	internal void CancelCombo()
+	{
+		Debug.Print("Combo Cancelled!");
+		IsInCombo = false;
+		ComboPointsX = 0;
+		ComboPointsY = 0;
+		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Label>("ComboLabel").Visible = false;
+	}
+	
 	private void DeductHealth()
 	{
+		EndCombo();
 		EndGame();
 	}
 
