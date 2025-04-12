@@ -183,7 +183,7 @@ public partial class Main : Node
 	{
 		Score = Math.Round(Score, 0);
 		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ScorePanel").GetNode<Label>("ScoreLabel").Text = $"Score: {Score} ";
-		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Label>("ComboLabel").Text = $"Combo: {ComboPointsX} * {ComboPointsY}";
+		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Label>("ComboLabel").Text = $"CRRAAAZZY Combo: {ComboPointsX} * {ComboPointsY}";
 	}
 	
 	private bool CheckEggEaten()
@@ -204,7 +204,7 @@ public partial class Main : Node
 		}
 		else
 		{
-			ComboPointsX += 5;
+			ComboPointsX += 2;
 		}
 
 		UpdateHudScore();
