@@ -128,10 +128,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 21.0
-offset_top = 15.0
-offset_right = -566.0
-offset_bottom = -13.0
+offset_left = 23.0
+offset_top = 12.0
+offset_right = -571.0
+offset_bottom = -12.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_kmc48")
@@ -158,89 +158,83 @@ theme_override_styles/normal = ExtResource("2_1vtuo")
 text = "Score: 0"
 vertical_alignment = 1
 
-[node name="HealthDressingPanel" type="Panel" parent="ScorePanel"]
+[node name="HealthPanel" type="Panel" parent="ScorePanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 655.0
-offset_top = 10.0
+offset_top = 12.0
 offset_right = -140.0
-offset_bottom = -10.0
+offset_bottom = -13.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = ExtResource("2_0i724")
 
-[node name="SnakeSegments" parent="ScorePanel" instance=ExtResource("1_uxavj")]
-position = Vector2(660, 15)
-scale = Vector2(2, 2)
+[node name="LivesSegments" parent="ScorePanel/HealthPanel" instance=ExtResource("1_uxavj")]
+position = Vector2(5, 5)
+scale = Vector2(1.5, 1.5)
 frame = 11
 speed_scale = 0.0
+offset = Vector2(18, 18)
 
 [node name="DressingBoxPanel10" type="Panel" parent="ScorePanel"]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 528.0
-offset_top = 44.0
-offset_right = -452.0
-offset_bottom = -41.0
-grow_horizontal = 2
-grow_vertical = 2
+anchors_preset = -1
+anchor_left = 0.488889
+anchor_top = 0.488889
+anchor_right = 0.572222
+anchor_bottom = 0.544444
 theme_override_styles/panel = ExtResource("3_8bf8i")
+metadata/_edit_use_anchors_ = true
 
 [node name="DressingBoxPanel11" type="Panel" parent="ScorePanel"]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 528.0
-offset_top = 52.0
-offset_right = -477.0
-offset_bottom = -33.0
+anchors_preset = -1
+anchor_left = 0.488889
+anchor_top = 0.577778
+anchor_right = 0.558333
+anchor_bottom = 0.633333
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = ExtResource("3_8bf8i")
+metadata/_edit_use_anchors_ = true
 
 [node name="DressingBoxPanel12" type="Panel" parent="ScorePanel"]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 528.0
-offset_top = 36.0
-offset_right = -477.0
-offset_bottom = -49.0
+anchors_preset = -1
+anchor_left = 0.488889
+anchor_top = 0.4
+anchor_right = 0.558333
+anchor_bottom = 0.455556
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = ExtResource("3_8bf8i")
+metadata/_edit_use_anchors_ = true
 
 [node name="DressingBoxPanel13" type="Panel" parent="ScorePanel"]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 528.0
-offset_top = 28.0
-offset_right = -502.0
-offset_bottom = -57.0
+anchors_preset = -1
+anchor_left = 0.488889
+anchor_top = 0.311111
+anchor_right = 0.535185
+anchor_bottom = 0.366667
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = ExtResource("3_8bf8i")
+metadata/_edit_use_anchors_ = true
 
 [node name="DressingBoxPanel14" type="Panel" parent="ScorePanel"]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 528.0
-offset_top = 60.0
-offset_right = -502.0
-offset_bottom = -25.0
+anchors_preset = -1
+anchor_left = 0.488889
+anchor_top = 0.666667
+anchor_right = 0.535185
+anchor_bottom = 0.722222
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = ExtResource("3_8bf8i")
+metadata/_edit_use_anchors_ = true
 
 [node name="Bottom Panel" type="Panel" parent="."]
 anchors_preset = 12
