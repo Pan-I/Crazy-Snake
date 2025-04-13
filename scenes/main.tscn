@@ -82,6 +82,10 @@ wait_time = 0.5
 [node name="HealthTimer" type="Timer" parent="."]
 wait_time = 0.2
 
+[node name="HudFlashTimer" type="Timer" parent="."]
+wait_time = 0.1
+
 [connection signal="timeout" from="MoveTimer" to="." method="_on_move_timer_timeout"]
 [connection signal="Restart" from="GameOverMenu" to="." method="_on_game_over_menu_restart"]
 [connection signal="timeout" from="HealthTimer" to="." method="_on_health_timer_timeout"]
+[connection signal="timeout" from="HudFlashTimer" to="." method="_on_hud_flash_timer_timeout"]

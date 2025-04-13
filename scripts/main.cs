@@ -140,6 +140,16 @@ public partial class Main : Node
 		styleBox.SetBorderWidthAll(10);
 		GetNode<Timer>("HealthTimer").Start();
 		test.AddThemeStyleboxOverride("panel", styleBox);
+
+		var test2 = HealthNodes.Count;
+		
+		for (int i = 0; i < test2; i++)
+		{
+			var healthSegment = HealthNodes[0];
+			GetNode<CanvasLayer>("Hud").RemoveChild(healthSegment);
+			HealthNodes.RemoveAt(0);
+		}
+		
 		
 		EndCombo();
 		Debug.Print("Walls: " + Items.WallNodes.Count.ToString());
@@ -193,6 +203,23 @@ public partial class Main : Node
 		CheckFullBoard(eggEaten);
 		CheckItemHit();
 		CheckLargeItemHit(Snake.SnakeData[0]);
+	}
+	
+	private void _on_hud_flash_timer_timeout()
+	{
+		//hex code of original window color05395241
+		/*var test = GetNode<CanvasLayer>("Hud").GetNode<Panel>("WindowDressingPanel");
+		
+		test.RemoveThemeStyleboxOverride("panel");
+		
+		StyleBoxFlat styleBox = new StyleBoxFlat();
+		
+		styleBox.BgColor = new Color("05395241");
+		styleBox.BorderColor = new Color("1e3553");
+		styleBox.SetBorderWidthAll(10);
+		// Apply the StyleBox to the panel's style override
+		test.AddThemeStyleboxOverride("panel", styleBox);
+		GetNode<Timer>("HudFlashTimer").Stop();*/
 	}
 	
 	
@@ -260,13 +287,16 @@ public partial class Main : Node
 			return false;
 		
 		Items.EggEaten();
+		HudFlash();
 		Snake.AddSegment(Snake.OldData[^1]);
 		GetNode<AnimatedSprite2D>("Background").Visible = true;
 		ComboTally++;
 
-		if (ComboTally >= 2 && Snake.SnakeNodes.Count >= 6)
+		if (ComboTally >= 2 && Snake.SnakeNodes.Count >= 4)
 		{
 			GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter").Visible = true;
+			GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter").Modulate = new Color("ffffff7f");
+			GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter").GetNode<TextureProgressBar>("TextureProgressBar").Value = ComboTally/7;
 		}
 		
 		if (!IsInCombo)
@@ -295,6 +325,8 @@ public partial class Main : Node
 		}
 		else
 		{
+			GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter").Modulate = new Color("ffffff");
+			GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter").GetNode<TextureProgressBar>("TextureProgressBar").Value = 100;
 			if (ComboTally % 2 == 0)
 			{
 				GetNode<AnimatedSprite2D>("Background").Frame = 4;
@@ -409,11 +441,17 @@ public partial class Main : Node
 
 	internal void StartCombo()
 	{
+		if (ComboTally < 7)
+		{
+			ComboTally = 7;
+		}
 		IsInCombo = true;
 		ComboPointsX = Math.Max(1, ComboTally);
 		ComboPointsY = 1;
 		Debug.Print("Combo Started!");
 		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Label>("ComboLabel").Visible = true;
+		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter").Modulate = new Color("ffffff");
+		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter").GetNode<TextureProgressBar>("TextureProgressBar").Value = 100;
 		GetNode<AnimatedSprite2D>("Background").Frame = 3;
 		GetNode<Timer>("MoveTimer").WaitTime = 0.075;
 	}
@@ -476,6 +514,7 @@ public partial class Main : Node
 
 	internal void DeductHealth()
 	{
+		HudFlash();
 		var test = GetNode<CanvasLayer>("Hud").GetNode<Panel>("WindowDressingPanel");
 		StyleBoxFlat styleBox = new StyleBoxFlat();
 		styleBox.BgColor = new Color("d4414a9e");
@@ -497,6 +536,23 @@ public partial class Main : Node
 		{
 			EndGame();
 		}
+	}
+
+	internal void HudFlash()
+	{
+		//hex code of original window color05395241
+		/*var test = GetNode<CanvasLayer>("Hud").GetNode<Panel>("WindowDressingPanel");
+
+		test.RemoveThemeStyleboxOverride("panel");
+
+		StyleBoxFlat styleBox = new StyleBoxFlat();
+
+		styleBox.BgColor = new Color("05395241");
+		styleBox.BorderColor = new Color("1e3553");
+		styleBox.SetBorderWidthAll(10);
+		// Apply the StyleBox to the panel's style override
+		test.AddThemeStyleboxOverride("panel", styleBox);
+		GetNode<Timer>("HudFlashTimer").Stop();*/
 	}
 
 	private void _on_game_over_menu_restart()
