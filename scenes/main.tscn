@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://dwuicj4fifd38"]
+[gd_scene load_steps=39 format=3 uid="uid://dwuicj4fifd38"]
 
 [ext_resource type="Script" path="res://scripts/Main.cs" id="1_oifwq"]
 [ext_resource type="PackedScene" uid="uid://srvuytqmi2cm" path="res://scenes/snake_segments.tscn" id="2_vh6ou"]
@@ -14,7 +14,29 @@
 [ext_resource type="Texture2D" uid="uid://ch2b080rxvtn8" path="res://assets/sprites/Grid 5.png" id="9_tx5c6"]
 [ext_resource type="Texture2D" uid="uid://dp63rxl0fgkpa" path="res://assets/sprites/Grid 7.png" id="10_n40xh"]
 [ext_resource type="Texture2D" uid="uid://cu15r1gfihgjq" path="res://assets/sprites/Grid 9.png" id="11_mchle"]
+[ext_resource type="AudioStream" uid="uid://dv643sy741wcf" path="res://assets/sfx/effects/wind_down.wav" id="16_s783f"]
 [ext_resource type="PackedScene" uid="uid://bus8ubbqf6t8f" path="res://scenes/item_manager.tscn" id="16_xuxgj"]
+[ext_resource type="AudioStream" uid="uid://fvjwic5oopin" path="res://assets/sfx/effects/hurt.wav" id="17_tsij4"]
+[ext_resource type="AudioStream" uid="uid://bs7ybgn48gpnt" path="res://assets/sfx/effects/item_egg_alt.wav" id="18_8sh5f"]
+[ext_resource type="AudioStream" uid="uid://bq2chuufnad5" path="res://assets/sfx/effects/block_destroy.wav" id="18_r38j8"]
+[ext_resource type="AudioStream" uid="uid://cu5grghw2t8u1" path="res://assets/sfx/effects/end_combo.wav" id="19_28r1q"]
+[ext_resource type="AudioStream" uid="uid://dhqklwmikx8y1" path="res://assets/sfx/effects/sound.wav" id="19_fj3yn"]
+[ext_resource type="AudioStream" uid="uid://d337qso6ubf0x" path="res://assets/sfx/effects/item_simpleBad.wav" id="20_bh4nf"]
+[ext_resource type="AudioStream" uid="uid://cpevflmmjhp8f" path="res://assets/sfx/effects/start_combo.wav" id="20_lrsqd"]
+[ext_resource type="AudioStream" uid="uid://5ltavicr5vt6" path="res://assets/sfx/effects/new_game.wav" id="21_sj1d4"]
+[ext_resource type="AudioStream" uid="uid://cc3lhv8idwjjo" path="res://assets/sfx/effects/launch_sound.wav" id="24_qdhvb"]
+[ext_resource type="AudioStream" uid="uid://bxl0gx51ae8p7" path="res://assets/sfx/effects/item_complexNeutral.wav" id="25_dgpds"]
+[ext_resource type="AudioStream" uid="uid://cpycw2qywqh4s" path="res://assets/sfx/effects/creepy_.wav" id="25_k7eiy"]
+[ext_resource type="AudioStream" uid="uid://c4t2scwo7rls6" path="res://assets/sfx/effects/item_comboComplexGood.wav" id="26_je5gc"]
+[ext_resource type="AudioStream" uid="uid://denfh2memu078" path="res://assets/sfx/effects/item_comboComplexBad.wav" id="27_crhh2"]
+[ext_resource type="AudioStream" uid="uid://dngpnqiy05nvb" path="res://assets/sfx/effects/radio_searching.wav" id="29_p0e7i"]
+[ext_resource type="AudioStream" uid="uid://c2m55nikm20o3" path="res://assets/sfx/effects/jump_up.wav" id="30_75yww"]
+[ext_resource type="AudioStream" uid="uid://bhj24nx20bdk5" path="res://assets/sfx/effects/level up teleport.wav" id="32_ao6tp"]
+[ext_resource type="AudioStream" uid="uid://cj0ogkeqc54as" path="res://assets/sfx/effects/falling_alien.wav" id="33_e6iws"]
+[ext_resource type="AudioStream" uid="uid://xqkbax7j8djj" path="res://assets/sfx/music/545218__victor_natas__evil-music.wav" id="34_kt3gf"]
+[ext_resource type="AudioStream" uid="uid://qh0axl21me7t" path="res://assets/sfx/music/560738__migfus20__teaser-background-music.mp3" id="35_4faav"]
+[ext_resource type="AudioStream" uid="uid://d3e4o85dfnrvc" path="res://assets/sfx/music/251461__joshuaempyre__arcade-music-loop.wav" id="36_mah17"]
+[ext_resource type="AudioStream" uid="uid://o73f6ewhx4q6" path="res://assets/sfx/music/702337__seth_makes_sounds__edgy-game-music-120bpm.wav" id="37_tt6i2"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_tp2o2"]
 animations = [{
@@ -84,6 +106,76 @@ wait_time = 0.2
 
 [node name="HudFlashTimer" type="Timer" parent="."]
 wait_time = 0.2
+
+[node name="SFXAudioStreamGroup" type="Node" parent="."]
+
+[node name="NewGame" type="AudioStreamPlayer" parent="SFXAudioStreamGroup"]
+stream = ExtResource("21_sj1d4")
+
+[node name="GameOver" type="AudioStreamPlayer" parent="SFXAudioStreamGroup"]
+stream = ExtResource("16_s783f")
+
+[node name="ItemEggAlt" type="AudioStreamPlayer" parent="SFXAudioStreamGroup"]
+stream = ExtResource("18_8sh5f")
+
+[node name="ItemSimpleGood" type="AudioStreamPlayer" parent="SFXAudioStreamGroup"]
+stream = ExtResource("19_fj3yn")
+
+[node name="ItemSimpleBad" type="AudioStreamPlayer" parent="SFXAudioStreamGroup"]
+stream = ExtResource("20_bh4nf")
+
+[node name="Hurt" type="AudioStreamPlayer" parent="SFXAudioStreamGroup"]
+stream = ExtResource("17_tsij4")
+
+[node name="BlockDestroy" type="AudioStreamPlayer" parent="SFXAudioStreamGroup"]
+stream = ExtResource("18_r38j8")
+
+[node name="StartCombo" type="AudioStreamPlayer" parent="SFXAudioStreamGroup"]
+stream = ExtResource("20_lrsqd")
+
+[node name="LaunchStartCombo" type="AudioStreamPlayer" parent="SFXAudioStreamGroup"]
+stream = ExtResource("24_qdhvb")
+
+[node name="EndCombo" type="AudioStreamPlayer" parent="SFXAudioStreamGroup"]
+stream = ExtResource("19_28r1q")
+
+[node name="CreepyEndCombo" type="AudioStreamPlayer" parent="SFXAudioStreamGroup"]
+stream = ExtResource("25_k7eiy")
+
+[node name="ItemComplexNeutral" type="AudioStreamPlayer" parent="SFXAudioStreamGroup"]
+stream = ExtResource("25_dgpds")
+
+[node name="ItemComplexGood" type="AudioStreamPlayer" parent="SFXAudioStreamGroup"]
+stream = ExtResource("26_je5gc")
+
+[node name="ItemComplexBad" type="AudioStreamPlayer" parent="SFXAudioStreamGroup"]
+stream = ExtResource("27_crhh2")
+
+[node name="Radio_Search" type="AudioStreamPlayer" parent="SFXAudioStreamGroup"]
+stream = ExtResource("29_p0e7i")
+
+[node name="Jump_Up" type="AudioStreamPlayer" parent="SFXAudioStreamGroup"]
+stream = ExtResource("30_75yww")
+
+[node name="Teleport" type="AudioStreamPlayer" parent="SFXAudioStreamGroup"]
+stream = ExtResource("32_ao6tp")
+
+[node name="Falling_Alien" type="AudioStreamPlayer" parent="SFXAudioStreamGroup"]
+stream = ExtResource("33_e6iws")
+
+[node name="MusicAudioStreamGroup" type="Node" parent="."]
+
+[node name="NewGameMusic" type="AudioStreamPlayer" parent="MusicAudioStreamGroup"]
+stream = ExtResource("34_kt3gf")
+
+[node name="BasicGameMusic" type="AudioStreamPlayer" parent="MusicAudioStreamGroup"]
+stream = ExtResource("35_4faav")
+
+[node name="ComboGameMusic" type="AudioStreamPlayer" parent="MusicAudioStreamGroup"]
+stream = ExtResource("36_mah17")
+
+[node name="GameOverMusic" type="AudioStreamPlayer" parent="MusicAudioStreamGroup"]
+stream = ExtResource("37_tt6i2")
 
 [connection signal="timeout" from="MoveTimer" to="." method="_on_move_timer_timeout"]
 [connection signal="Restart" from="GameOverMenu" to="." method="_on_game_over_menu_restart"]

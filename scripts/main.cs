@@ -55,6 +55,10 @@ public partial class Main : Node
 	internal float BoardBottom;
 	
 	
+	//Music variables;
+	private bool first;
+	private bool firstCombo;
+	
 	
 	//Movement Variables
 	internal Vector2I UpMove = new (0, -1);
@@ -94,6 +98,13 @@ public partial class Main : Node
 
 	private void NewGame()
 	{
+		first = true;
+		firstCombo = true;
+		GetNode<AudioStreamPlayer>("SFXAudioStreamGroup/NewGame").Play();
+		GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/BasicGameMusic").Stop();
+		GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/ComboGameMusic").Stop();
+		GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/GameOverMusic").Stop();
+		GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/NewGameMusic").Play();
 		GetNode<Timer>("MoveTimer").WaitTime = 0.25;
 		GetTree().Paused = false;
 		GetTree().CallGroup("snake", "queue_free");
@@ -133,6 +144,12 @@ public partial class Main : Node
 
 	internal void EndGame()
 	{
+		GetNode<AudioStreamPlayer>("SFXAudioStreamGroup/GameOver").Play();
+		GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/BasicGameMusic").Stop();
+		GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/ComboGameMusic").Stop();
+		GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/NewGameMusic").Stop();
+		GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/GameOverMusic").Play(16);
+		GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/GameOverMusic").VolumeDb = 3;
 		var test = GetNode<CanvasLayer>("Hud").GetNode<Panel>("WindowDressingPanel");
 		StyleBoxFlat styleBox = new StyleBoxFlat();
 		styleBox.BgColor = new Color("d4414a9e");
@@ -159,7 +176,7 @@ public partial class Main : Node
 		var headSegment = Snake.SnakeNodes[0];
 		RemoveChild(headSegment);
 		Snake.SnakeNodes.RemoveAt(0);
-		GetTree().Paused = true;
+		//GetTree().Paused = true;
 		_gameStarted = false;
 		GetNode<Timer>("MoveTimer").Stop();
 		GetNode<CanvasLayer>("GameOverMenu").Visible = true;
@@ -321,9 +338,19 @@ public partial class Main : Node
 			return false;
 		
 		Items.EggEaten();
+		GetNode<AudioStreamPlayer>("SFXAudioStreamGroup/ItemEggAlt").Play();
 		Snake.AddSegment(Snake.OldData[^1]);
 		GetNode<AnimatedSprite2D>("Background").Visible = true;
 		ComboTally++;
+
+		if (first)
+		{
+			GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/BasicGameMusic").Play();
+			GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/ComboGameMusic").Stop();
+			GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/GameOverMusic").Stop();
+			GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/NewGameMusic").Stop();
+			first = false;
+		}
 
 		if (ComboTally >= 2 && Snake.SnakeNodes.Count >= 4)
 		{
@@ -478,6 +505,33 @@ public partial class Main : Node
 		{
 			ComboTally = 7;
 		}
+
+		if (firstCombo)
+		{
+			GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/BasicGameMusic").VolumeDb = -100;
+			var audioPlayer = GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/ComboGameMusic");
+
+			// Load the WAV file
+			var audioStream = GD.Load<AudioStream>("res://assets/sfx/music/251461__joshuaempyre__arcade-music-loop.wav");
+
+			// Assign the stream to the player
+			audioPlayer.Stream = audioStream;
+
+			// Enable looping
+			//audioPlayer. = true;
+			
+			GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/ComboGameMusic").Play();
+			//GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/ComboGameMusic").Autoplay = true;
+			firstCombo = false;
+		}
+		else
+		{
+			GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/BasicGameMusic").VolumeDb = -100;
+			GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/ComboGameMusic").VolumeDb = 1;
+		}
+		
+		
+		GetNode<AudioStreamPlayer>("SFXAudioStreamGroup/StartCombo").Play();
 		IsInCombo = true;
 		ComboPointsX = Math.Max(1, ComboTally);
 		ComboPointsY = 1;
@@ -491,6 +545,10 @@ public partial class Main : Node
 
 	internal void EndCombo()
 	{
+		GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/BasicGameMusic").VolumeDb = 1;
+		GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/ComboGameMusic").VolumeDb = -100;
+		GetNode<AudioStreamPlayer>("SFXAudioStreamGroup/EndCombo").Play();
+		
 		IsInCombo = false;
 		ComboTally = 0;
 		double comboPoints = (ComboPointsX * ComboPointsY);
@@ -507,6 +565,7 @@ public partial class Main : Node
 	
 	internal void CancelCombo()
 	{
+		GetNode<AudioStreamPlayer>("SFXAudioStreamGroup/CreepyEndCombo").Play();
 		Debug.Print("Combo Cancelled!");
 		IsInCombo = false;
 		ComboPointsX = 0;
@@ -551,6 +610,7 @@ public partial class Main : Node
 
 	internal void DeductHealth()
 	{
+		GetNode<AudioStreamPlayer>("SFXAudioStreamGroup/Hurt").Play();
 		HudFlash(1);
 		var test = GetNode<CanvasLayer>("Hud").GetNode<Panel>("WindowDressingPanel");
 		StyleBoxFlat styleBox = new StyleBoxFlat();

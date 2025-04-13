@@ -253,6 +253,10 @@ public partial class Items : Node
 			
 			//_main.EndGame();
 		}
+		else
+		{
+			_main.GetNode<AudioStreamPlayer>("SFXAudioStreamGroup/ItemComplexNeutral").Play();
+		}
 		//Good eggs
 		if (item.SceneFilePath == _freshEggNode.SceneFilePath)
 		{
