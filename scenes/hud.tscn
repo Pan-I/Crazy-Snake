@@ -1,10 +1,10 @@
 [gd_scene load_steps=11 format=3 uid="uid://c04wsqka0wuf"]
 
-[ext_resource type="PackedScene" uid="uid://srvuytqmi2cm" path="res://scenes/snake_segments.tscn" id="1_uxavj"]
 [ext_resource type="StyleBox" uid="uid://bk3osegj8et2i" path="res://scenes/healthbox_style_flat.tres" id="2_0i724"]
 [ext_resource type="StyleBox" uid="uid://bo3cjcdcolywe" path="res://scenes/retroDigital_style_flat.tres" id="2_1vtuo"]
 [ext_resource type="PackedScene" uid="uid://crx46ynm1y1wq" path="res://scenes/combo_meter.tscn" id="2_5njtd"]
 [ext_resource type="StyleBox" uid="uid://c57kmp4ubiyu0" path="res://scenes/new_style_box_flat.tres" id="3_8bf8i"]
+[ext_resource type="StyleBox" uid="uid://c3fqstchosrkb" path="res://scenes/window_panel_style.tres" id="4_a80yt"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d5do4"]
 bg_color = Color(0.447059, 0.415686, 0.776471, 1)
@@ -17,17 +17,13 @@ border_width_right = 10
 border_width_bottom = 10
 border_color = Color(0.117647, 0.207843, 0.32549, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pa66y"]
+bg_color = Color(0.447059, 0.415686, 0.776471, 0)
+corner_detail = 1
+
 [sub_resource type="FontVariation" id="FontVariation_wv1dd"]
 variation_embolden = 2.0
 variation_transform = Transform2D(1, 0.25, 0.25, 1, 0.5, 0.5)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5g781"]
-bg_color = Color(0.392157, 0.760784, 0.972549, 0.0352941)
-border_width_left = 10
-border_width_top = 10
-border_width_right = 10
-border_width_bottom = 10
-border_color = Color(0.239216, 0.235294, 0.584314, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_56bnj"]
 bg_color = Color(0.392157, 0.760784, 0.972549, 0)
@@ -40,8 +36,8 @@ border_color = Color(0.117647, 0.207843, 0.32549, 1)
 [node name="Hud" type="CanvasLayer"]
 
 [node name="LeftPanel" type="Panel" parent="."]
-anchors_preset = 9
-anchor_bottom = 1.0
+anchors_preset = -1
+anchor_bottom = 0.97451
 offset_right = 30.0
 grow_vertical = 2
 size_flags_horizontal = 0
@@ -53,7 +49,7 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 930.0
-offset_bottom = 28.0
+offset_bottom = -25.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 8
@@ -124,10 +120,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 21.0
-offset_top = 15.0
-offset_right = -566.0
-offset_bottom = -13.0
+offset_left = 23.0
+offset_top = 12.0
+offset_right = -571.0
+offset_bottom = -12.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_kmc48")
@@ -154,101 +150,319 @@ theme_override_styles/normal = ExtResource("2_1vtuo")
 text = "Score: 0"
 vertical_alignment = 1
 
-[node name="HealthDressingPanel" type="Panel" parent="ScorePanel"]
+[node name="HealthPanel" type="Panel" parent="ScorePanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 655.0
-offset_top = 10.0
+offset_top = 12.0
 offset_right = -140.0
-offset_bottom = -10.0
+offset_bottom = -13.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = ExtResource("2_0i724")
 
-[node name="SnakeSegments" parent="ScorePanel" instance=ExtResource("1_uxavj")]
-position = Vector2(660, 15)
-scale = Vector2(2, 2)
-frame = 11
-speed_scale = 0.0
-
 [node name="DressingBoxPanel10" type="Panel" parent="ScorePanel"]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 528.0
-offset_top = 44.0
-offset_right = -452.0
-offset_bottom = -41.0
-grow_horizontal = 2
-grow_vertical = 2
+anchors_preset = -1
+anchor_left = 0.488889
+anchor_top = 0.488889
+anchor_right = 0.572222
+anchor_bottom = 0.544444
 theme_override_styles/panel = ExtResource("3_8bf8i")
+metadata/_edit_use_anchors_ = true
 
 [node name="DressingBoxPanel11" type="Panel" parent="ScorePanel"]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 528.0
-offset_top = 52.0
-offset_right = -477.0
-offset_bottom = -33.0
+anchors_preset = -1
+anchor_left = 0.488889
+anchor_top = 0.577778
+anchor_right = 0.558333
+anchor_bottom = 0.633333
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = ExtResource("3_8bf8i")
+metadata/_edit_use_anchors_ = true
 
 [node name="DressingBoxPanel12" type="Panel" parent="ScorePanel"]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 528.0
-offset_top = 36.0
-offset_right = -477.0
-offset_bottom = -49.0
+anchors_preset = -1
+anchor_left = 0.488889
+anchor_top = 0.4
+anchor_right = 0.558333
+anchor_bottom = 0.455556
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = ExtResource("3_8bf8i")
+metadata/_edit_use_anchors_ = true
 
 [node name="DressingBoxPanel13" type="Panel" parent="ScorePanel"]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 528.0
-offset_top = 28.0
-offset_right = -502.0
-offset_bottom = -57.0
+anchors_preset = -1
+anchor_left = 0.488889
+anchor_top = 0.311111
+anchor_right = 0.535185
+anchor_bottom = 0.366667
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = ExtResource("3_8bf8i")
+metadata/_edit_use_anchors_ = true
 
 [node name="DressingBoxPanel14" type="Panel" parent="ScorePanel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.488889
+anchor_top = 0.666667
+anchor_right = 0.535185
+anchor_bottom = 0.722222
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("3_8bf8i")
+metadata/_edit_use_anchors_ = true
+
+[node name="Bottom Panel" type="Panel" parent="."]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -70.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_d5do4")
+
+[node name="DressingBoxPanel" type="Panel" parent="Bottom Panel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 528.0
-offset_top = 60.0
-offset_right = -502.0
-offset_bottom = -25.0
+offset_left = 40.0
+offset_top = 20.0
+offset_right = -1003.0
+offset_bottom = -15.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = ExtResource("3_8bf8i")
+
+[node name="DressingBoxPanel2" type="Panel" parent="Bottom Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 112.0
+offset_top = 20.0
+offset_right = -883.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("3_8bf8i")
+
+[node name="DressingBoxPanel3" type="Panel" parent="Bottom Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 232.0
+offset_top = 20.0
+offset_right = -763.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("3_8bf8i")
+
+[node name="DressingBoxPanel4" type="Panel" parent="Bottom Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 344.0
+offset_top = 26.0
+offset_right = -590.0
+offset_bottom = -19.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("3_8bf8i")
+
+[node name="DressingBoxPanel5" type="Panel" parent="Bottom Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 512.0
+offset_top = 20.0
+offset_right = -483.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("3_8bf8i")
+
+[node name="DressingBoxPanel6" type="Panel" parent="Bottom Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 632.0
+offset_top = 20.0
+offset_right = -363.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("3_8bf8i")
+
+[node name="DressingBoxPanel7" type="Panel" parent="Bottom Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 752.0
+offset_top = 20.0
+offset_right = -291.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("3_8bf8i")
+
+[node name="DressingBoxPanel8" type="Panel" parent="Bottom Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 872.0
+offset_top = 32.0
+offset_right = -171.0
+offset_bottom = -31.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("3_8bf8i")
+
+[node name="DressingBoxPanel9" type="Panel" parent="Bottom Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 872.0
+offset_top = 37.0
+offset_right = -171.0
+offset_bottom = -26.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("3_8bf8i")
+
+[node name="DressingBoxPanel10" type="Panel" parent="Bottom Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 872.0
+offset_top = 42.0
+offset_right = -171.0
+offset_bottom = -21.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("3_8bf8i")
+
+[node name="DressingBoxPanel11" type="Panel" parent="Bottom Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 912.0
+offset_top = 32.0
+offset_right = -131.0
+offset_bottom = -31.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("3_8bf8i")
+
+[node name="DressingBoxPanel12" type="Panel" parent="Bottom Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 912.0
+offset_top = 37.0
+offset_right = -131.0
+offset_bottom = -26.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("3_8bf8i")
+
+[node name="DressingBoxPanel13" type="Panel" parent="Bottom Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 912.0
+offset_top = 42.0
+offset_right = -131.0
+offset_bottom = -21.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("3_8bf8i")
+
+[node name="DressingBoxPanel14" type="Panel" parent="Bottom Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 952.0
+offset_top = 32.0
+offset_right = -91.0
+offset_bottom = -31.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("3_8bf8i")
+
+[node name="DressingBoxPanel15" type="Panel" parent="Bottom Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 952.0
+offset_top = 37.0
+offset_right = -91.0
+offset_bottom = -26.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("3_8bf8i")
+
+[node name="DressingBoxPanel16" type="Panel" parent="Bottom Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 952.0
+offset_top = 42.0
+offset_right = -91.0
+offset_bottom = -21.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("3_8bf8i")
+
+[node name="WindowDressingPanel" type="Panel" parent="."]
+anchors_preset = -1
+anchor_left = 0.031
+anchor_top = 0.086
+anchor_right = 0.861
+anchor_bottom = 0.912
+offset_left = -13.48
+offset_top = -6.0
+offset_right = 9.12
+offset_bottom = 27.0
+theme_override_styles/panel = ExtResource("4_a80yt")
 
 [node name="ComboPanel" type="Panel" parent="."]
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -90.0
-offset_bottom = 30.0
+offset_top = -68.0
+offset_bottom = -2.0
 grow_horizontal = 2
 grow_vertical = 0
 size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_d5do4")
+theme_override_styles/panel = SubResource("StyleBoxFlat_pa66y")
 
 [node name="ComboLabel" type="Label" parent="ComboPanel"]
 visible = false
@@ -257,7 +471,7 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 58.0
-offset_top = -212.0
+offset_top = -135.0
 offset_right = -410.0
 grow_horizontal = 2
 grow_vertical = 2
@@ -272,224 +486,19 @@ theme_override_font_sizes/font_size = 32
 text = "Combo: Eggs * Special"
 vertical_alignment = 1
 
-[node name="WindowDressingPanel" type="Panel" parent="."]
-anchors_preset = -1
-anchor_left = 0.031
-anchor_top = 0.086
-anchor_right = 0.861
-anchor_bottom = 0.912
-offset_left = -13.48
-offset_top = -7.72
-offset_right = 10.1199
-offset_bottom = 9.75995
-theme_override_styles/panel = SubResource("StyleBoxFlat_5g781")
-
-[node name="ComboMeter" parent="." instance=ExtResource("2_5njtd")]
+[node name="ComboMeter" parent="ComboPanel" instance=ExtResource("2_5njtd")]
 visible = false
 offset_left = 790.0
-offset_top = 771.0
+offset_top = -159.0
 offset_right = 790.0
-offset_bottom = 771.0
+offset_bottom = -159.0
 scale = Vector2(2, 2)
 
 [node name="OutsideBorderDressingPanel" type="Panel" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = 1.0
-offset_bottom = 31.0
+offset_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_56bnj")
-
-[node name="DressingBoxPanel" type="Panel" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 40.0
-offset_top = 964.0
-offset_right = -1003.0
-offset_bottom = 2.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = ExtResource("3_8bf8i")
-
-[node name="DressingBoxPanel2" type="Panel" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 112.0
-offset_top = 964.0
-offset_right = -883.0
-offset_bottom = 2.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = ExtResource("3_8bf8i")
-
-[node name="DressingBoxPanel3" type="Panel" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 232.0
-offset_top = 964.0
-offset_right = -763.0
-offset_bottom = 2.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = ExtResource("3_8bf8i")
-
-[node name="DressingBoxPanel4" type="Panel" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 344.0
-offset_top = 982.0
-offset_right = -590.0
-offset_bottom = -9.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = ExtResource("3_8bf8i")
-
-[node name="DressingBoxPanel5" type="Panel" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 512.0
-offset_top = 964.0
-offset_right = -483.0
-offset_bottom = 2.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = ExtResource("3_8bf8i")
-
-[node name="DressingBoxPanel6" type="Panel" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 632.0
-offset_top = 964.0
-offset_right = -363.0
-offset_bottom = 2.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = ExtResource("3_8bf8i")
-
-[node name="DressingBoxPanel7" type="Panel" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 752.0
-offset_top = 964.0
-offset_right = -291.0
-offset_bottom = 2.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = ExtResource("3_8bf8i")
-
-[node name="DressingBoxPanel8" type="Panel" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 872.0
-offset_top = 1016.0
-offset_right = -171.0
-offset_bottom = 2.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = ExtResource("3_8bf8i")
-
-[node name="DressingBoxPanel9" type="Panel" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 872.0
-offset_top = 1008.0
-offset_right = -171.0
-offset_bottom = -6.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = ExtResource("3_8bf8i")
-
-[node name="DressingBoxPanel10" type="Panel" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 872.0
-offset_top = 1000.0
-offset_right = -171.0
-offset_bottom = -14.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = ExtResource("3_8bf8i")
-
-[node name="DressingBoxPanel11" type="Panel" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 912.0
-offset_top = 1016.0
-offset_right = -131.0
-offset_bottom = 2.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = ExtResource("3_8bf8i")
-
-[node name="DressingBoxPanel12" type="Panel" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 912.0
-offset_top = 1008.0
-offset_right = -131.0
-offset_bottom = -6.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = ExtResource("3_8bf8i")
-
-[node name="DressingBoxPanel13" type="Panel" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 912.0
-offset_top = 1000.0
-offset_right = -131.0
-offset_bottom = -14.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = ExtResource("3_8bf8i")
-
-[node name="DressingBoxPanel14" type="Panel" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 952.0
-offset_top = 1016.0
-offset_right = -91.0
-offset_bottom = 2.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = ExtResource("3_8bf8i")
-
-[node name="DressingBoxPanel15" type="Panel" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 952.0
-offset_top = 1008.0
-offset_right = -91.0
-offset_bottom = -6.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = ExtResource("3_8bf8i")
-
-[node name="DressingBoxPanel16" type="Panel" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 952.0
-offset_top = 1000.0
-offset_right = -91.0
-offset_bottom = -14.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = ExtResource("3_8bf8i")

@@ -31,11 +31,11 @@ public class Snake
 	private readonly Main _main;
 	internal List<Vector2I> OldData;
 	internal List<Vector2I> SnakeData;
-	private List<Node2D> _oldSnakeNodes;
+	internal List<Node2D> OldSnakeNodes;
 	internal List<Node2D> SnakeNodes;
 	private Dictionary<string, (Vector2 offset, float rotation, bool flipV, bool flipH, Vector2 direction)> _headDirection;
-	private List<string> _snakeMoveData;
-	private List<string> _oldSnakeMoveData;
+	internal List<string> SnakeMoveData;
+	internal List<string> OldSnakeMoveData;
 	private readonly Vector2I _startPosition = new (14, 16);
 	internal bool CanMove;
 
@@ -48,10 +48,10 @@ public class Snake
 	{
 		OldData = new List<Vector2I>();
 		SnakeData = new List<Vector2I>();
-		_oldSnakeNodes = new List<Node2D>();
+		OldSnakeNodes = new List<Node2D>();
 		SnakeNodes = new List<Node2D>();
-		_snakeMoveData = new List<string>();
-		_oldSnakeMoveData = new List<string>();
+		SnakeMoveData = new List<string>();
+		OldSnakeMoveData = new List<string>();
 
 		for (int i = 0; i < 3; i++)
 		{
@@ -63,7 +63,7 @@ public class Snake
 	
 	{
 		SnakeData.Add(position);
-		_snakeMoveData.Add("");
+		SnakeMoveData.Add("");
 		var snakeSegment = _main.SnakeSegmentPs.Instantiate<AnimatedSprite2D>();
 		snakeSegment.Position = position * _main.CellPixelSize + new Vector2I(0, _main.CellPixelSize);
 		switch (SnakeNodes.Count)
@@ -80,7 +80,8 @@ public class Snake
 
 		_main.AddChild(snakeSegment);
 		SnakeNodes.Add(snakeSegment);
-		_oldSnakeNodes.Add(snakeSegment);
+		OldSnakeNodes.Add(snakeSegment);
+		
 	}
 
 	internal void KeyPressSnakeDirection()
@@ -91,7 +92,7 @@ public class Snake
 			if (Input.IsActionPressed(action.Key) && _main.MoveDirection != -action.Value.direction)
 			{
 				_main.MoveDirection = (Vector2I)action.Value.direction;
-				_snakeMoveData[0] = action.Key; 
+				SnakeMoveData[0] = action.Key; 
 				CanMove = false;
 
 				var headSprite = (AnimatedSprite2D)SnakeNodes[0];
@@ -110,11 +111,11 @@ public class Snake
 	{
 		CanMove = true;
 		OldData = SnakeData.ToList();
-		_oldSnakeMoveData = _snakeMoveData.ToList();
+		OldSnakeMoveData = SnakeMoveData.ToList();
 		// Create a deep copy of the snake sprites to keep visual bend.
 		for (int i = 0; i < SnakeNodes.Count; i++)
 		{
-			_oldSnakeNodes[i] = _main.CloneAnimatedSprite2D((AnimatedSprite2D)SnakeNodes[i]);
+			OldSnakeNodes[i] = _main.CloneAnimatedSprite2D((AnimatedSprite2D)SnakeNodes[i]);
 		}
 		SnakeData[0] += _main.MoveDirection;// Update snake's head position data
 		// Update other body segments data
@@ -125,7 +126,7 @@ public class Snake
 			if (i > 1 && i < SnakeNodes.Count - 1)
 			{
 				currentSegment = (AnimatedSprite2D)SnakeNodes[i];
-				var previousSegment = (AnimatedSprite2D)_oldSnakeNodes[i - 1];
+				var previousSegment = (AnimatedSprite2D)OldSnakeNodes[i - 1];
 				currentSegment.Frame = previousSegment.Frame;
 				currentSegment.Offset = new Vector2(15, 15);
 				currentSegment.FlipH = false;
@@ -137,7 +138,7 @@ public class Snake
 				currentSegment = (AnimatedSprite2D)SnakeNodes[i];
 				currentSegment.Visible = true;
 				SnakeData[i] = OldData[i - 1];
-				_snakeMoveData[i] = _oldSnakeMoveData[i - 1];
+				SnakeMoveData[i] = OldSnakeMoveData[i - 1];
 			}
 			HandleTailSegments(i);
 			if (SnakeNodes.Count > 4 && i > 4)
@@ -165,7 +166,7 @@ public class Snake
 		{
 			currentSegment = (AnimatedSprite2D)SnakeNodes[i];
 			currentSegment.Frame = 6;
-			var currentDirection = _snakeMoveData[i];
+			var currentDirection = SnakeMoveData[i];
 			foreach (var action in _headDirection)
 			{
 				if (currentDirection == action.Key)
@@ -181,7 +182,7 @@ public class Snake
 		{
 			currentSegment = (AnimatedSprite2D)SnakeNodes[i];
 			currentSegment.Frame = 8;
-			var currentDirection = _snakeMoveData[i];
+			var currentDirection = SnakeMoveData[i];
 			foreach (var action in _headDirection)
 			{
 				if (currentDirection == action.Key)
@@ -197,7 +198,7 @@ public class Snake
 		{
 			currentSegment = (AnimatedSprite2D)SnakeNodes[i];
 			currentSegment.Frame = 10;
-			var currentDirection = _snakeMoveData[i];
+			var currentDirection = SnakeMoveData[i];
 			foreach (var action in _headDirection)
 			{
 				if (currentDirection == action.Key)
@@ -217,9 +218,9 @@ public class Snake
 		AnimatedSprite2D tailBase = fullTail ? (AnimatedSprite2D)SnakeNodes[^3] : (AnimatedSprite2D)SnakeNodes[^2];
 		AnimatedSprite2D tailShaft = fullTail ? (AnimatedSprite2D)SnakeNodes[^2] : (AnimatedSprite2D)SnakeNodes[^1];
 		AnimatedSprite2D tailTip = fullTail ? (AnimatedSprite2D)SnakeNodes[^1] : null;
-		string tailBaseMovement = fullTail ? _snakeMoveData[^3] : _snakeMoveData[^2];
-		string tailShaftMovement = fullTail ? _snakeMoveData[^2] : _snakeMoveData[^1];
-		string tailTipMovement = fullTail ? _snakeMoveData[^1] : null;
+		string tailBaseMovement = fullTail ? SnakeMoveData[^3] : SnakeMoveData[^2];
+		string tailShaftMovement = fullTail ? SnakeMoveData[^2] : SnakeMoveData[^1];
+		string tailTipMovement = fullTail ? SnakeMoveData[^1] : null;
 		
 		tailBase.FlipV = false;
 		tailShaft.FlipV = false;
