@@ -25,6 +25,8 @@ using System.Diagnostics;
 using Godot;
 
 namespace Snake.scripts;
+// Suppress a specific warning (replace "WarningCode" with the actual code)
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Category", "WarningCode")]
 
 public partial class Main : Node
 {
@@ -92,7 +94,6 @@ public partial class Main : Node
 
 	private void NewGame()
 	{
-		Lives = 5;
 		GetNode<Timer>("MoveTimer").WaitTime = 0.25;
 		GetTree().Paused = false;
 		GetTree().CallGroup("snake", "queue_free");
@@ -104,6 +105,21 @@ public partial class Main : Node
 		Snake.CanMove = true;
 		Snake.GenerateSnake();
 		Items.Reset();
+		GenerateHealthBar();
+		
+		//hex code of original window color64c2f809
+		var test = GetNode<CanvasLayer>("Hud").GetNode<Panel>("WindowDressingPanel");
+		
+		test.RemoveThemeStyleboxOverride("panel");
+		
+		StyleBoxFlat styleBox = new StyleBoxFlat();
+		
+		styleBox.BgColor = new Color("64c2f809");
+		styleBox.BorderColor = new Color("3d3c95");
+		styleBox.SetBorderWidthAll(10);
+		// Apply the StyleBox to the panel's style override
+		test.AddThemeStyleboxOverride("panel", styleBox);
+		
 	}
 
 	internal void StartGame()
@@ -117,9 +133,21 @@ public partial class Main : Node
 
 	internal void EndGame()
 	{
+		var test = GetNode<CanvasLayer>("Hud").GetNode<Panel>("WindowDressingPanel");
+		StyleBoxFlat styleBox = new StyleBoxFlat();
+		styleBox.BgColor = new Color("d4414a9e");
+		styleBox.BorderColor = new Color("7d2549");
+		styleBox.SetBorderWidthAll(10);
+		GetNode<Timer>("HealthTimer").Start();
+		test.AddThemeStyleboxOverride("panel", styleBox);
+		
 		EndCombo();
 		Debug.Print("Walls: " + Items.WallNodes.Count.ToString());
 		Snake.DeadSnake();
+		Snake.SnakeData.RemoveAt(0);
+		var headSegment = Snake.SnakeNodes[0];
+		RemoveChild(headSegment);
+		Snake.SnakeNodes.RemoveAt(0);
 		GetTree().Paused = true;
 		_gameStarted = false;
 		GetNode<Timer>("MoveTimer").Stop();
@@ -156,7 +184,6 @@ public partial class Main : Node
 		} 
 	}
 	
-		
 	private void _on_move_timer_timeout()
 	{
 		Snake.UpdateSnake();
@@ -166,6 +193,43 @@ public partial class Main : Node
 		CheckFullBoard(eggEaten);
 		CheckItemHit();
 		CheckLargeItemHit(Snake.SnakeData[0]);
+	}
+	
+	
+	private void _on_health_timer_timeout()
+	{
+		if (HealthNodes.Count <= 2)
+		{
+			//hex code of original window color64c2f809
+			var test = GetNode<CanvasLayer>("Hud").GetNode<Panel>("WindowDressingPanel");
+		
+			test.RemoveThemeStyleboxOverride("panel");
+		
+			StyleBoxFlat styleBox = new StyleBoxFlat();
+		
+			styleBox.BgColor = new Color("f60c1315");
+			styleBox.BorderColor = new Color("b32e42");
+			styleBox.SetBorderWidthAll(10);
+			// Apply the StyleBox to the panel's style override
+			test.AddThemeStyleboxOverride("panel", styleBox);
+		}
+		else
+		{
+			//hex code of original window color64c2f809
+			var test = GetNode<CanvasLayer>("Hud").GetNode<Panel>("WindowDressingPanel");
+		
+			test.RemoveThemeStyleboxOverride("panel");
+		
+			StyleBoxFlat styleBox = new StyleBoxFlat();
+		
+			styleBox.BgColor = new Color("64c2f809");
+			styleBox.BorderColor = new Color("3d3c95");
+			styleBox.SetBorderWidthAll(10);
+			// Apply the StyleBox to the panel's style override
+			test.AddThemeStyleboxOverride("panel", styleBox);
+		}
+		
+		GetNode<Timer>("HealthTimer").Stop();
 	}
 
 	private void CheckFullBoard(bool eggEaten)
@@ -273,7 +337,6 @@ public partial class Main : Node
 	}
 	
 	internal bool CheckLargeItemHit(Vector2I position)
-	
 	{
 		bool hit = false;
 		for (int i = 0; i < Items.LargeWallsData.Count; i++)
@@ -301,7 +364,19 @@ public partial class Main : Node
 				{
 					return;
 				}
-				
+
+				for (int j = Snake.SnakeData.Count - 1; j > i; j--)
+				{
+					var snakeSegment = Snake.SnakeNodes[j];
+					RemoveChild(snakeSegment);
+					Snake.SnakeData.RemoveAt(j);
+					Snake.OldData.RemoveAt(j);
+					Snake.SnakeNodes.RemoveAt(j);
+					Snake.OldSnakeNodes.RemoveAt(j);
+					Snake.SnakeMoveData.RemoveAt(j);
+					Snake.OldSnakeMoveData.RemoveAt(j);
+				}
+
 				if (IsInCombo)
 				{
 					DeductHealth();
@@ -317,24 +392,19 @@ public partial class Main : Node
 	private void CheckOutOfBound()
 	{
 		//if snake X is < Board X Position || snake X is > Board Size + X Position || snake Y is < Board Y Position || snake Y is > Board Size + Y Position
-		
 		if ((Snake.SnakeData[0].X * CellPixelSize) < BoardLeft || ((Snake.SnakeData[0].X + 1) * CellPixelSize) > BoardRight 
 											  || ((Snake.SnakeData[0].Y + 1) * CellPixelSize) < BoardTop || ((Snake.SnakeData[0].Y + 4) * CellPixelSize) > BoardBottom)
 			//TODO: GUI offsets
 		{
 			if (IsInCombo)
 			{
-				DeductHealth();
+				EndGame();
 			}
 			else
 			{
-				DeductHealth();
+				EndGame();
 			}
 		}
-		// if (Snake.SnakeData[0].X < 0 || Snake.SnakeData[0].X > BoardCellSize - 1 || Snake.SnakeData[0].Y < 1 || Snake.SnakeData[0].Y > BoardCellSize)
-		// {
-		// 	EndGame();
-		// }
 	}
 
 	internal void StartCombo()
@@ -345,7 +415,7 @@ public partial class Main : Node
 		Debug.Print("Combo Started!");
 		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Label>("ComboLabel").Visible = true;
 		GetNode<AnimatedSprite2D>("Background").Frame = 3;
-		GetNode<Timer>("MoveTimer").WaitTime = 0.066;
+		GetNode<Timer>("MoveTimer").WaitTime = 0.075;
 	}
 
 	internal void EndCombo()
@@ -363,6 +433,7 @@ public partial class Main : Node
 		GetNode<Timer>("MoveTimer").WaitTime = 0.1;
 		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter").Visible = false;
 	}
+	
 	internal void CancelCombo()
 	{
 		Debug.Print("Combo Cancelled!");
@@ -374,15 +445,54 @@ public partial class Main : Node
 		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter").Visible = false;
 	}
 	
-	private void DeductHealth()
+	internal void GenerateHealthBar()
 	{
+		HealthData = new List<Vector2I>();
+		HealthNodes = new List<Node2D>();
+		var _healthStartPosition = GetNode<CanvasLayer>("Hud").GetNode<Panel>("ScorePanel").GetNode<Panel>("HealthPanel").Position;
+		//5,5 offset
+		var test = new Vector2I((int)(_healthStartPosition.X + 8), (int)(_healthStartPosition.Y + 10));
+		for (int i = 0; i < 6; i++)
+		{
+			AddHealthSegment(test + new Vector2I((int)(i * CellPixelSize*1.5), 0));
+		}
+		Lives = HealthNodes.Count;
+	}
+
+	public List<Node2D> HealthNodes { get; set; }
+	public List<Vector2I> HealthData { get; set; }
+
+	internal void AddHealthSegment(Vector2I position)
+	
+	{
+		HealthData.Add(position);
+		var healthSegment = SnakeSegmentPs.Instantiate<AnimatedSprite2D>();
+		healthSegment.Position = position;
+		healthSegment.Scale = new Vector2((float)1.5, (float)1.5);
+		GetNode<CanvasLayer>("Hud").AddChild(healthSegment);
+		HealthNodes.Add(healthSegment);
+	}
+
+
+	internal void DeductHealth()
+	{
+		var test = GetNode<CanvasLayer>("Hud").GetNode<Panel>("WindowDressingPanel");
+		StyleBoxFlat styleBox = new StyleBoxFlat();
+		styleBox.BgColor = new Color("d4414a9e");
+		styleBox.BorderColor = new Color("7d2549");
+		styleBox.SetBorderWidthAll(10);
+		GetNode<Timer>("HealthTimer").Start();
+		test.AddThemeStyleboxOverride("panel", styleBox);
+		
 		EndCombo();
+		HealthData.RemoveAt(0);
+		var healthSegment = HealthNodes[0];
+		GetNode<CanvasLayer>("Hud").RemoveChild(healthSegment);
+		HealthNodes.RemoveAt(0);
 		if (Lives >= 1)
 		{
-			//Lives--;
-			EndGame();
+			Lives--;
 		}
-
 		if (Lives == 0)
 		{
 			EndGame();

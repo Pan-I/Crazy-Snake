@@ -231,17 +231,27 @@ public partial class Items : Node
 	//TODO: refactor, out Score, instead of manipulating from here.
 	{
 				
-		if (item.SceneFilePath != WallNode.SceneFilePath && item.SceneFilePath != LargeWallNode.SceneFilePath)
+		if (item.SceneFilePath != LargeWallNode.SceneFilePath)
 		{
-			item.QueueFree();
-			ItemsData.RemoveAt(i);
-			ItemNodes.RemoveAt(i);
+			if (item.SceneFilePath == WallNode.SceneFilePath)
+			{				
+				item.QueueFree();
+				WallsData.RemoveAt(i);
+				WallNodes.RemoveAt(i);}
+			else
+			{
+				item.QueueFree();
+				ItemsData.RemoveAt(i);
+				ItemNodes.RemoveAt(i);
+			}
 		}
 
 		if (item.SceneFilePath == WallNode.SceneFilePath 
-			|| item.SceneFilePath == LargeWallNode.SceneFilePath) 
+			|| item.SceneFilePath == LargeWallNode.SceneFilePath)
 		{
-			_main.EndGame();
+			_main.DeductHealth();
+			
+			//_main.EndGame();
 		}
 		//Good eggs
 		if (item.SceneFilePath == _freshEggNode.SceneFilePath)
