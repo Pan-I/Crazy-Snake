@@ -230,7 +230,6 @@ public partial class Items : Node
 	internal void ItemResult(Node2D item, int i, bool isInCombo)
 	//TODO: refactor, out Score, instead of manipulating from here.
 	{
-				
 		if (item.SceneFilePath != LargeWallNode.SceneFilePath)
 		{
 			if (item.SceneFilePath == WallNode.SceneFilePath)
@@ -243,6 +242,7 @@ public partial class Items : Node
 				item.QueueFree();
 				ItemsData.RemoveAt(i);
 				ItemNodes.RemoveAt(i);
+				_main.HudFlash(2);
 			}
 		}
 

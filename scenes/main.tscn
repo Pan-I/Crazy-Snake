@@ -83,7 +83,7 @@ wait_time = 0.5
 wait_time = 0.2
 
 [node name="HudFlashTimer" type="Timer" parent="."]
-wait_time = 0.1
+wait_time = 0.2
 
 [connection signal="timeout" from="MoveTimer" to="." method="_on_move_timer_timeout"]
 [connection signal="Restart" from="GameOverMenu" to="." method="_on_game_over_menu_restart"]
