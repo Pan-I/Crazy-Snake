@@ -89,7 +89,7 @@ public partial class Items : Node
 	{
 		_itemRates = new Dictionary<int, List<Node2D>>
 		{
-			{ 1, new List<Node2D> { WallNode, _freshEggNode } },
+			{ 1, new List<Node2D> { WallNode, _freshEggNode} },
 			{ 2, new List<Node2D> { _ripeEggNode } },
 			{ 3, new List<Node2D> { _rottenEggNode } },
 			{ 5, new List<Node2D> { _mushroomNode } },

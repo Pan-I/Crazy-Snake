@@ -202,7 +202,11 @@ public partial class Main : Node
 		bool eggEaten =  CheckEggEaten();
 		CheckFullBoard(eggEaten);
 		CheckItemHit();
-		CheckLargeItemHit(Snake.SnakeData[0]);
+		if (CheckLargeItemHit(Snake.SnakeData[0]))
+		{
+			//TODO: needs proper item check, large walls deduct and disappear?
+			EndGame();
+		}
 	}
 	
 	private void _on_hud_flash_timer_timeout()
