@@ -542,6 +542,10 @@ public partial class Main : Node
 		healthSegment.Scale = new Vector2((float)1.5, (float)1.5);
 		GetNode<CanvasLayer>("Hud").AddChild(healthSegment);
 		HealthNodes.Add(healthSegment);
+		if (HealthNodes.Count == 6)
+		{
+			healthSegment.Frame = 1;
+		}
 	}
 
 
@@ -557,10 +561,17 @@ public partial class Main : Node
 		test.AddThemeStyleboxOverride("panel", styleBox);
 		
 		EndCombo();
-		HealthData.RemoveAt(0);
-		var healthSegment = HealthNodes[0];
+		
+		
+		HealthData.RemoveAt(HealthData.Count - 1);
+		var healthSegment = HealthNodes[^1];
 		GetNode<CanvasLayer>("Hud").RemoveChild(healthSegment);
-		HealthNodes.RemoveAt(0);
+		HealthNodes.RemoveAt(HealthNodes.Count - 1);
+		
+		healthSegment = HealthNodes[^1];
+		GetNode<CanvasLayer>("Hud").GetNode<AnimatedSprite2D>(healthSegment.SceneFilePath).Frame = 1;
+		
+		
 		if (Lives >= 1)
 		{
 			Lives--;
