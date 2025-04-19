@@ -68,8 +68,9 @@ wait_time = 0.75
 
 [node name="Egg" type="Sprite2D" parent="."]
 position = Vector2(60, 60)
+scale = Vector2(1.25, 1.25)
 texture = ExtResource("5_5bxva")
-offset = Vector2(15, 15)
+offset = Vector2(12, 10)
 
 [node name="GameOverMenu" parent="." instance=ExtResource("6_n0b3j")]
 process_mode = 2

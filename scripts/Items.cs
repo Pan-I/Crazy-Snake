@@ -111,6 +111,7 @@ public partial class Items : Node
 		do { EggPosition = RandomPlacement(); }
 		while ( CheckWallTrap() );
 		_main.GetNode<Node2D>("Egg").Position = EggPosition * _main.CellPixelSize + new Vector2I(0, _main.CellPixelSize);
+		_main.GetNode<Node2D>("Egg").ZIndex = 999;
 	}
 
 	private bool CheckWallTrap()
