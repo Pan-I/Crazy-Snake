@@ -562,21 +562,20 @@ public partial class Main : Node
 		
 		EndCombo();
 		
-		
 		HealthData.RemoveAt(HealthData.Count - 1);
-		var healthSegment = HealthNodes[^1];
+		AnimatedSprite2D healthSegment = (AnimatedSprite2D)HealthNodes[^1];
 		GetNode<CanvasLayer>("Hud").RemoveChild(healthSegment);
 		HealthNodes.RemoveAt(HealthNodes.Count - 1);
 		
-		healthSegment = HealthNodes[^1];
-		GetNode<CanvasLayer>("Hud").GetNode<AnimatedSprite2D>(healthSegment.SceneFilePath).Frame = 1;
+		healthSegment = (AnimatedSprite2D)HealthNodes[^1];
+		healthSegment.Frame = 1;
 		
 		
-		if (Lives >= 1)
+		if (Lives > 1)
 		{
 			Lives--;
 		}
-		if (Lives == 0)
+		if (Lives <= 1)
 		{
 			EndGame();
 		}
