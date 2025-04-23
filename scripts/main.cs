@@ -321,6 +321,7 @@ public partial class Main : Node
 			return false;
 		
 		Items.EggEaten();
+		HudFlash();
 		Snake.AddSegment(Snake.OldData[^1]);
 		GetNode<AnimatedSprite2D>("Background").Visible = true;
 		ComboTally++;
