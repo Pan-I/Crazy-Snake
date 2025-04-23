@@ -94,7 +94,7 @@ public partial class Main : Node
 
 	private void NewGame()
 	{
-		GetNode<Timer>("MoveTimer").WaitTime = 0.25;
+		GetNode<Timer>("MoveTimer").WaitTime = 0.5;
 		GetTree().Paused = false;
 		GetTree().CallGroup("snake", "queue_free");
 		Score = 0;
@@ -345,7 +345,7 @@ public partial class Main : Node
 			}
 			if (Snake.SnakeNodes.Count < 6)
 			{
-				GetNode<Timer>("MoveTimer").WaitTime = 0.17;
+				GetNode<Timer>("MoveTimer").WaitTime = 0.25;
 			}
 			else
 			{
@@ -486,7 +486,7 @@ public partial class Main : Node
 		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter").Modulate = new Color("ffffff");
 		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter").GetNode<TextureProgressBar>("TextureProgressBar").Value = 100;
 		GetNode<AnimatedSprite2D>("Background").Frame = 3;
-		GetNode<Timer>("MoveTimer").WaitTime = 0.075;
+		GetNode<Timer>("MoveTimer").WaitTime = 0.066;
 	}
 
 	internal void EndCombo()
