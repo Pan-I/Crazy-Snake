@@ -20,13 +20,14 @@
 
 A remake of Snake, with some twists, as a Godot project. Written entirely in C#. Game includes a long list of items that have a wide range of effects on the game and game play, as well as a complex and high-scoring point system.
 
+#### Current Major Update Set (v0.3.1)
 
 |                                                               *Where v0.3.x is now*                                                               |
 | :-----------------------------------------------------------------------------------------------------------------------------------------------: |
 | <img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.3.1%20Gameplay.gif" alt="broken link of game screenshot 2" width="600"/> |
 |                                                               *Where v0.3.x is now*                                                               |
 
-#### Current Major Update Set (v0.3.1)
+
 The current version (v0.3.x) will focus on the following, with more details to come:
 - GUI overhaul
 	- Shiny new look to give game a bit more of an atmosphere
