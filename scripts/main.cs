@@ -105,7 +105,7 @@ public partial class Main : Node
 		GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/ComboGameMusic").Stop();
 		GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/GameOverMusic").Stop();
 		GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/NewGameMusic").Play();
-		GetNode<Timer>("MoveTimer").WaitTime = 0.25;
+		GetNode<Timer>("MoveTimer").WaitTime = 0.5;
 		GetTree().Paused = false;
 		GetTree().CallGroup("snake", "queue_free");
 		Score = 0;
@@ -351,7 +351,6 @@ public partial class Main : Node
 			GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/NewGameMusic").Stop();
 			first = false;
 		}
-
 		if (ComboTally >= 2 && Snake.SnakeNodes.Count >= 4)
 		{
 			GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter").Visible = true;
@@ -372,7 +371,7 @@ public partial class Main : Node
 			}
 			if (Snake.SnakeNodes.Count < 6)
 			{
-				GetNode<Timer>("MoveTimer").WaitTime = 0.17;
+				GetNode<Timer>("MoveTimer").WaitTime = 0.25;
 			}
 			else
 			{
@@ -505,7 +504,6 @@ public partial class Main : Node
 		{
 			ComboTally = 7;
 		}
-
 		if (firstCombo)
 		{
 			GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/BasicGameMusic").VolumeDb = -100;
@@ -540,7 +538,7 @@ public partial class Main : Node
 		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter").Modulate = new Color("ffffff");
 		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter").GetNode<TextureProgressBar>("TextureProgressBar").Value = 100;
 		GetNode<AnimatedSprite2D>("Background").Frame = 3;
-		GetNode<Timer>("MoveTimer").WaitTime = 0.075;
+		GetNode<Timer>("MoveTimer").WaitTime = 0.066;
 	}
 
 	internal void EndCombo()
@@ -622,21 +620,20 @@ public partial class Main : Node
 		
 		EndCombo();
 		
-		
 		HealthData.RemoveAt(HealthData.Count - 1);
-		var healthSegment = HealthNodes[^1];
+		AnimatedSprite2D healthSegment = (AnimatedSprite2D)HealthNodes[^1];
 		GetNode<CanvasLayer>("Hud").RemoveChild(healthSegment);
 		HealthNodes.RemoveAt(HealthNodes.Count - 1);
 		
-		healthSegment = HealthNodes[^1];
-		GetNode<CanvasLayer>("Hud").GetNode<AnimatedSprite2D>(healthSegment.SceneFilePath).Frame = 1;
+		healthSegment = (AnimatedSprite2D)HealthNodes[^1];
+		healthSegment.Frame = 1;
 		
 		
-		if (Lives >= 1)
+		if (Lives > 1)
 		{
 			Lives--;
 		}
-		if (Lives == 0)
+		if (Lives <= 1)
 		{
 			EndGame();
 		}
