@@ -94,7 +94,7 @@ public partial class Main : Node
 
 	private void NewGame()
 	{
-		GetNode<Timer>("MoveTimer").WaitTime = 0.25;
+		GetNode<Timer>("MoveTimer").WaitTime = 0.5;
 		GetTree().Paused = false;
 		GetTree().CallGroup("snake", "queue_free");
 		Score = 0;
@@ -150,6 +150,7 @@ public partial class Main : Node
 			HealthNodes.RemoveAt(0);
 		}
 		
+		HudFlash(1);
 		
 		EndCombo();
 		Debug.Print("Walls: " + Items.WallNodes.Count.ToString());
@@ -211,19 +212,48 @@ public partial class Main : Node
 	
 	private void _on_hud_flash_timer_timeout()
 	{
-		//hex code of original window color05395241
-		/*var test = GetNode<CanvasLayer>("Hud").GetNode<Panel>("WindowDressingPanel");
 		
-		test.RemoveThemeStyleboxOverride("panel");
-		
-		StyleBoxFlat styleBox = new StyleBoxFlat();
-		
-		styleBox.BgColor = new Color("05395241");
-		styleBox.BorderColor = new Color("1e3553");
-		styleBox.SetBorderWidthAll(10);
-		// Apply the StyleBox to the panel's style override
-		test.AddThemeStyleboxOverride("panel", styleBox);
-		GetNode<Timer>("HudFlashTimer").Stop();*/
+		// Get the parent panel node
+		Panel parentPanel = GetNode<CanvasLayer>("Hud").GetNode<Panel>("RightPanel");
+
+		// Loop through all children of the parent panel
+		foreach (Node child in parentPanel.GetChildren())
+		{
+			// Check if the child is a Panel
+			if (child is Panel childPanel)
+			{
+				// Create a new StyleBoxFlat
+				StyleBoxFlat styleBox = new StyleBoxFlat();
+
+				// Set the desired color for the background
+				styleBox.BgColor = new Color("05395241");
+				styleBox.BorderColor = new Color("1e3553");
+				styleBox.SetBorderWidthAll(10);
+				// Apply the style override to the child panel
+				childPanel.AddThemeStyleboxOverride("panel", styleBox);
+			}
+		}
+		// Get the parent panel node
+		parentPanel = GetNode<CanvasLayer>("Hud").GetNode<Panel>("BottomPanel");
+
+		// Loop through all children of the parent panel
+		foreach (Node child in parentPanel.GetChildren())
+		{
+			// Check if the child is a Panel
+			if (child is Panel childPanel)
+			{
+				// Create a new StyleBoxFlat
+				StyleBoxFlat styleBox = new StyleBoxFlat();
+
+				// Set the desired color for the background
+				styleBox.BgColor = new Color("05395241");
+				styleBox.BorderColor = new Color("1e3553");
+				styleBox.SetBorderWidthAll(10);
+				// Apply the style override to the child panel
+				childPanel.AddThemeStyleboxOverride("panel", styleBox);
+			}
+		}
+		GetNode<Timer>("HudFlashTimer").Stop();
 	}
 	
 	
@@ -291,7 +321,6 @@ public partial class Main : Node
 			return false;
 		
 		Items.EggEaten();
-		HudFlash();
 		Snake.AddSegment(Snake.OldData[^1]);
 		GetNode<AnimatedSprite2D>("Background").Visible = true;
 		ComboTally++;
@@ -302,7 +331,7 @@ public partial class Main : Node
 			GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter").Modulate = new Color("ffffff7f");
 			GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter").GetNode<TextureProgressBar>("TextureProgressBar").Value = ComboTally/7;
 		}
-		
+		HudFlash(0);
 		if (!IsInCombo)
 		{
 			Score += 1;
@@ -316,7 +345,7 @@ public partial class Main : Node
 			}
 			if (Snake.SnakeNodes.Count < 6)
 			{
-				GetNode<Timer>("MoveTimer").WaitTime = 0.17;
+				GetNode<Timer>("MoveTimer").WaitTime = 0.25;
 			}
 			else
 			{
@@ -457,7 +486,7 @@ public partial class Main : Node
 		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter").Modulate = new Color("ffffff");
 		GetNode<CanvasLayer>("Hud").GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter").GetNode<TextureProgressBar>("TextureProgressBar").Value = 100;
 		GetNode<AnimatedSprite2D>("Background").Frame = 3;
-		GetNode<Timer>("MoveTimer").WaitTime = 0.075;
+		GetNode<Timer>("MoveTimer").WaitTime = 0.066;
 	}
 
 	internal void EndCombo()
@@ -513,12 +542,16 @@ public partial class Main : Node
 		healthSegment.Scale = new Vector2((float)1.5, (float)1.5);
 		GetNode<CanvasLayer>("Hud").AddChild(healthSegment);
 		HealthNodes.Add(healthSegment);
+		if (HealthNodes.Count == 6)
+		{
+			healthSegment.Frame = 1;
+		}
 	}
 
 
 	internal void DeductHealth()
 	{
-		HudFlash();
+		HudFlash(1);
 		var test = GetNode<CanvasLayer>("Hud").GetNode<Panel>("WindowDressingPanel");
 		StyleBoxFlat styleBox = new StyleBoxFlat();
 		styleBox.BgColor = new Color("d4414a9e");
@@ -528,24 +561,89 @@ public partial class Main : Node
 		test.AddThemeStyleboxOverride("panel", styleBox);
 		
 		EndCombo();
-		HealthData.RemoveAt(0);
-		var healthSegment = HealthNodes[0];
+		
+		HealthData.RemoveAt(HealthData.Count - 1);
+		AnimatedSprite2D healthSegment = (AnimatedSprite2D)HealthNodes[^1];
 		GetNode<CanvasLayer>("Hud").RemoveChild(healthSegment);
-		HealthNodes.RemoveAt(0);
-		if (Lives >= 1)
+		HealthNodes.RemoveAt(HealthNodes.Count - 1);
+		
+		healthSegment = (AnimatedSprite2D)HealthNodes[^1];
+		healthSegment.Frame = 1;
+		
+		
+		if (Lives > 1)
 		{
 			Lives--;
 		}
-		if (Lives == 0)
+		if (Lives <= 1)
 		{
 			EndGame();
 		}
 	}
 
-	internal void HudFlash()
+	internal void HudFlash(int i)
 	{
+		// Create a new StyleBoxFlat
+		StyleBoxFlat styleBox = new StyleBoxFlat();
+		switch (i)
+		{
+			//Regular Egg-Eat
+			case 0:
+				// Set the desired color for the background
+				styleBox.BgColor = new Color("#05ff4d70");
+				styleBox.BorderColor = new Color("#1e3553");
+				styleBox.SetBorderWidthAll(10);
+				break;
+			//Deduct Health
+			case 1:
+				// Set the desired color for the background
+				styleBox.BgColor = new Color("#cd39528c");
+				styleBox.BorderColor = new Color("#591d47");//1e3553
+				styleBox.SetBorderWidthAll(10);
+				break;
+			//Other Item Eat
+			case 2:
+				// Set the desired color for the background
+				styleBox.BgColor = new Color("958e4685");
+				styleBox.BorderColor = new Color("39411b");
+				styleBox.SetBorderWidthAll(10);
+				break;
+			//IDK
+			default:
+				// // Set the desired color for the background
+				// styleBox.BgColor = new Color("65395241");
+				// styleBox.BorderColor = new Color("6e3553");
+				// styleBox.SetBorderWidthAll(10);
+				break;
+		}
+		// Get the parent panel node
+		Panel parentPanel = GetNode<CanvasLayer>("Hud").GetNode<Panel>("RightPanel");
+
+		// Loop through all children of the parent panel
+		foreach (Node child in parentPanel.GetChildren())
+		{
+			// Check if the child is a Panel
+			if (child is Panel childPanel)
+			{
+				// Apply the style override to the child panel
+				childPanel.AddThemeStyleboxOverride("panel", styleBox);
+			}
+		}
+		// Get the parent panel node
+		parentPanel = GetNode<CanvasLayer>("Hud").GetNode<Panel>("BottomPanel");
+
+		// Loop through all children of the parent panel
+		foreach (Node child in parentPanel.GetChildren())
+		{
+			// Check if the child is a Panel
+			if (child is Panel childPanel)
+			{
+				// Apply the style override to the child panel
+				childPanel.AddThemeStyleboxOverride("panel", styleBox);
+			}
+		}
 		//hex code of original window color05395241
-		/*var test = GetNode<CanvasLayer>("Hud").GetNode<Panel>("WindowDressingPanel");
+		/*var test = GetNode<CanvasLayer>("Hud").GetNode<Panel>("RightPanel");
 
 		test.RemoveThemeStyleboxOverride("panel");
 
@@ -555,8 +653,8 @@ public partial class Main : Node
 		styleBox.BorderColor = new Color("1e3553");
 		styleBox.SetBorderWidthAll(10);
 		// Apply the StyleBox to the panel's style override
-		test.AddThemeStyleboxOverride("panel", styleBox);
-		GetNode<Timer>("HudFlashTimer").Stop();*/
+		test.AddThemeStyleboxOverride("panel", styleBox);*/
+		GetNode<Timer>("HudFlashTimer").Start();
 	}
 
 	private void _on_game_over_menu_restart()
