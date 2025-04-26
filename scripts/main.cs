@@ -256,26 +256,48 @@ public partial class Main : Node
 		GetNode<Timer>("HudFlashTimer").Stop();
 	}
 	
-	
+	bool flashOn = false;
 	private void _on_health_timer_timeout()
 	{
 		if (HealthNodes.Count <= 2)
 		{
-			//hex code of original window color64c2f809
-			var test = GetNode<CanvasLayer>("Hud").GetNode<Panel>("WindowDressingPanel");
+			GetNode<Timer>("HealthTimer").WaitTime = .75;
+			if (!flashOn)
+			{
+				//hex code of original window color64c2f809
+				var test = GetNode<CanvasLayer>("Hud").GetNode<Panel>("WindowDressingPanel");
+
+				test.RemoveThemeStyleboxOverride("panel");
+
+				StyleBoxFlat styleBox = new StyleBoxFlat();
+
+				styleBox.BgColor = new Color("f60c1315");
+				styleBox.BorderColor = new Color("b32e42");
+				styleBox.SetBorderWidthAll(10);
+				// Apply the StyleBox to the panel's style override
+				test.AddThemeStyleboxOverride("panel", styleBox);
+				flashOn = true;
+			}
+			else
+			{
+				//hex code of original window color64c2f809
+				var test = GetNode<CanvasLayer>("Hud").GetNode<Panel>("WindowDressingPanel");
 		
-			test.RemoveThemeStyleboxOverride("panel");
+				test.RemoveThemeStyleboxOverride("panel");
 		
-			StyleBoxFlat styleBox = new StyleBoxFlat();
+				StyleBoxFlat styleBox = new StyleBoxFlat();
 		
-			styleBox.BgColor = new Color("f60c1315");
-			styleBox.BorderColor = new Color("b32e42");
-			styleBox.SetBorderWidthAll(10);
-			// Apply the StyleBox to the panel's style override
-			test.AddThemeStyleboxOverride("panel", styleBox);
+				styleBox.BgColor = new Color("64c2f809");
+				styleBox.BorderColor = new Color("3d3c95");
+				styleBox.SetBorderWidthAll(10);
+				// Apply the StyleBox to the panel's style override
+				test.AddThemeStyleboxOverride("panel", styleBox);
+				flashOn = false;
+			}
 		}
 		else
 		{
+			GetNode<Timer>("HealthTimer").WaitTime = .2;
 			//hex code of original window color64c2f809
 			var test = GetNode<CanvasLayer>("Hud").GetNode<Panel>("WindowDressingPanel");
 		
@@ -290,7 +312,7 @@ public partial class Main : Node
 			test.AddThemeStyleboxOverride("panel", styleBox);
 		}
 		
-		GetNode<Timer>("HealthTimer").Stop();
+		//GetNode<Timer>("HealthTimer").Stop();
 	}
 
 	private void CheckFullBoard(bool eggEaten)
