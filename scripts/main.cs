@@ -144,6 +144,7 @@ public partial class Main : Node
 
 	internal void EndGame()
 	{
+		GetNode<Timer>("MoveTimer").Stop();
 		GetNode<AudioStreamPlayer>("SFXAudioStreamGroup/GameOver").Play();
 		GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/BasicGameMusic").Stop();
 		GetNode<AudioStreamPlayer>("MusicAudioStreamGroup/ComboGameMusic").Stop();
@@ -184,6 +185,8 @@ public partial class Main : Node
 		GetNode<CanvasLayer>("GameOverMenu").GetNode<Panel>("GameOverPanel").GetNode<Label>("GameOverLabel").Text = message;
 		//var test = GetNode<AnimatedSprite2D>("Background");
 		//test.Frame = 0;
+		GetNode<Timer>("MoveTimer").Stop();
+		GetNode<Timer>("MoveTimer").WaitTime = 100000000000^1000;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
