@@ -21,6 +21,7 @@ The author can be contacted at pan.i.githubcontact@gmail.com
 
 using System;
 using Godot;
+using Snake.scripts.Domain;
 
 namespace Snake.scripts;
 
@@ -32,10 +33,10 @@ public partial class Main : Node
 	[Signal] public delegate void HudFlashRequestedEventHandler(int type);
 	private SnakeManager Snake { get; }
 	private ItemManager Items { get; }
-	private BoardManager Board { get; }
-	private ScoreManager Score { get; }
-	private HealthManager Health { get; }
-	private TimeManager Time { get; }
+	private Domain.BoardManager Board { get; }
+	private Domain.ScoreManager Score { get; }
+	private Domain.HealthManager Health { get; }
+	private Domain.TimeManager Time { get; }
 	// ReSharper disable once InconsistentNaming
 	private Domain.UiManager UI { get; }
 
@@ -50,10 +51,10 @@ public partial class Main : Node
 	{
 		Snake = new SnakeManager();
 		Items = new ItemManager(Snake);
-		Board = new BoardManager();
-		Score = new ScoreManager();
-		Health = new HealthManager();
-		Time = new TimeManager();
+		Board = new Domain.BoardManager();
+		Score = new Domain.ScoreManager();
+		Health = new Domain.HealthManager();
+		Time = new Domain.TimeManager();
 		UI = new Domain.UiManager();
 	}
 
@@ -197,7 +198,7 @@ public partial class Main : Node
 		Snake.MoveDirection = _moveDirection;
 		Snake.GenerateSnake();
 		
-		Items.Reset();
+		Items.Dispose();
 		Health.Initialize(
 			GetNode<CanvasLayer>("Hud").GetNode<Panel>("ScorePanel").GetNode<Panel>("HealthPanel").Position,
 			Board.CellPixelSize,

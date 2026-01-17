@@ -22,7 +22,7 @@ The author can be contacted at pan.i.githubcontact@gmail.com
 using System.Collections.Generic;
 using Godot;
 
-namespace Snake.scripts;
+namespace Snake.scripts.Domain;
 
 public partial class HealthManager : GodotObject
 {

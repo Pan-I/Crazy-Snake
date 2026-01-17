@@ -1,4 +1,4 @@
-﻿namespace Snake.scripts;
+﻿namespace Snake.scripts.Domain;
 
 public static class InputLogic
 {

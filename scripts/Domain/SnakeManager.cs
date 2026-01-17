@@ -24,7 +24,16 @@ using System.Diagnostics;
 using System.Linq;
 using Godot;
 
-namespace Snake.scripts;
+namespace Snake.scripts.Domain;
+
+public struct SnakeVisualState
+{
+	public int Frame;
+	public float Rotation;
+	public Vector2 Offset;
+	public bool FlipH;
+	public bool FlipV;
+}
 
 public partial class SnakeManager : GodotObject, ISnakeManager
 {
@@ -46,23 +55,24 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 
 	public List<Vector2I> OldData { get; set; }
 	public List<Vector2I> SnakeData { get; set; }
-	internal List<Node2D> OldSnakeNodes;
+	internal List<SnakeVisualState> OldSnakeStates; // Changed from List<Node2D>
 	internal List<Node2D> SnakeNodes;
 	private Dictionary<string, (Vector2 offset, float rotation, bool flipV, bool flipH, Vector2 direction)> _headDirection;
 	internal List<string> SnakeMoveData;
 	internal List<string> OldSnakeMoveData;
 	private readonly Vector2I _startPosition = new (14, 16);
 	//internal bool CanMove;
-
+	
 	public SnakeManager()
 	{
 	}
 
 	internal void GenerateSnake()
 	{
+		//Dispose();
 		OldData = new List<Vector2I>();
 		SnakeData = new List<Vector2I>();
-		OldSnakeNodes = new List<Node2D>();
+		OldSnakeStates = new List<SnakeVisualState>();
 		SnakeNodes = new List<Node2D>();
 		SnakeMoveData = new List<string>();
 		OldSnakeMoveData = new List<string>();
@@ -72,6 +82,23 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 			AddSegment(_startPosition + new Vector2I(0, i));
 		}
 	}
+	
+	public new void Dispose()
+	{
+		// Clear out all those orphaned clones
+		if (SnakeNodes != null)
+		{
+			foreach (var node in SnakeNodes)
+			{
+				if (GodotObject.IsInstanceValid(node)) node.Free();
+				//node.QueueFree();
+			}
+			SnakeNodes.Clear();
+		}
+		
+		base.Dispose();
+	}
+
 
 	public void AddSegment(Vector2I position)
 	
@@ -94,7 +121,7 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 
 		EmitSignal(SignalName.SegmentAdded, snakeSegment);
 		SnakeNodes.Add(snakeSegment);
-		OldSnakeNodes.Add(snakeSegment);
+		//OldSnakeNodes.Add(snakeSegment);
 		
 	}
 
@@ -135,11 +162,22 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 
 		OldData = SnakeData.ToList();
 		OldSnakeMoveData = SnakeMoveData.ToList();
-		// Create a deep copy of the snake sprites to keep visual bend.
+
+		// Save current visual states before moving
+		OldSnakeStates = new List<SnakeVisualState>();
 		for (int i = 0; i < SnakeNodes.Count; i++)
 		{
-			OldSnakeNodes[i] = CloneAnimatedSprite2D((AnimatedSprite2D)SnakeNodes[i]);
+			var sprite = (AnimatedSprite2D)SnakeNodes[i];
+			OldSnakeStates.Add(new SnakeVisualState 
+			{
+				Frame = sprite.Frame,
+				Rotation = sprite.Rotation,
+				Offset = sprite.Offset,
+				FlipH = sprite.FlipH,
+				FlipV = sprite.FlipV
+			});
 		}
+		
 		SnakeData[0] += MoveDirection;// Update snake's head position data
 		// Update other body segments data
 		for (int i = 0; i < SnakeData.Count; i++)
@@ -149,12 +187,12 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 			if (i > 1 && i < SnakeNodes.Count - 1)
 			{
 				currentSegment = (AnimatedSprite2D)SnakeNodes[i];
-				var previousSegment = (AnimatedSprite2D)OldSnakeNodes[i - 1];
-				currentSegment.Frame = previousSegment.Frame;
-				currentSegment.Offset = new Vector2(15, 15);
-				currentSegment.FlipH = false;
-				currentSegment.FlipV = false;
-				currentSegment.Rotation = 0f;
+				var previousState = OldSnakeStates[i - 1]; // Reading from struct
+				currentSegment.Frame = previousState.Frame;
+				currentSegment.Rotation = previousState.Rotation;
+				currentSegment.Offset = previousState.Offset;
+				currentSegment.FlipH = previousState.FlipH;
+				currentSegment.FlipV = previousState.FlipV;
 			}
 			if (i > 0)
 			{
@@ -403,7 +441,7 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 			SnakeData.RemoveAt(j);
 			OldData.RemoveAt(j);
 			SnakeNodes.RemoveAt(j);
-			OldSnakeNodes.RemoveAt(j);
+			//OldSnakeNodes.RemoveAt(j);
 			SnakeMoveData.RemoveAt(j);
 			OldSnakeMoveData.RemoveAt(j);
 			EmitSignal(SignalName.SegmentRemoved, node);

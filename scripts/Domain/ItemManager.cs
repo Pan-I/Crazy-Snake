@@ -653,37 +653,47 @@ public partial class ItemManager : Node
 		}
 	}
 
-	public void Reset()
+	public new void Dispose()
 	{
 		Tally = 0;
 		if (ItemNodes != null)
 		{
 			foreach (Node2D node in ItemNodes)
 			{
-				node.QueueFree();
+				if (GodotObject.IsInstanceValid(node)) node.Free(); 
+				//node.QueueFree();
 			}
+			ItemNodes.Clear();
+			ItemsData.Clear();
 		}
 		if (WallNodes != null)
 		{
 			foreach (Node2D node in WallNodes)
 			{
-				node.QueueFree();
+				if (GodotObject.IsInstanceValid(node)) node.Free(); 
+				//node.QueueFree();
 			}
+			WallNodes.Clear();
+			WallsData.Clear();
 		}
 		if (LargeWallNodes != null)
 		{
 			foreach (Node2D node in LargeWallNodes)
 			{
-				node.QueueFree();
+				if (GodotObject.IsInstanceValid(node)) node.Free(); 
+				//node.QueueFree();
 			}
+			LargeWallNodes.Clear();
+			LargeWallsData.Clear();
 		}
-
+		//MEMO: avoids unnecessary null checks. Useful since we hash available positions.
 		ItemNodes = new List<Node2D>();
 		ItemsData = new List<Vector2I>();
 		WallNodes = new List<Node2D>();
 		WallsData = new List<Vector2I>();
 		LargeWallNodes = new List<Node2D>();
 		LargeWallsData = new List<Vector2I>();
+		
 		MoveEgg();
 	}
 }

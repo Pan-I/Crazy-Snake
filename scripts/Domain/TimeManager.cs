@@ -21,7 +21,7 @@ The author can be contacted at pan.i.githubcontact@gmail.com
 
 using Godot;
 
-namespace Snake.scripts;
+namespace Snake.scripts.Domain;
 
 public partial class TimeManager : GodotObject
 {
