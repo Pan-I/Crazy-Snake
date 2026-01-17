@@ -26,11 +26,26 @@ using Godot;
 
 namespace Snake.scripts;
 
-public class Snake
+public partial class SnakeManager : GodotObject, ISnakeManager
 {
-	private readonly Main _main;
-	internal List<Vector2I> OldData;
-	internal List<Vector2I> SnakeData;
+	[Signal] public delegate void RequestStartGameEventHandler();
+	[Signal] public delegate void DirectionChangedEventHandler(Vector2I direction, string action);
+	[Signal] public delegate void SegmentAddedEventHandler(Node2D node);
+	[Signal] public delegate void SegmentRemovedEventHandler(Node2D node);
+
+	// Directions
+	public static readonly Vector2I UpMove = new(0, -1);
+	public static readonly Vector2I DownMove = new(0, 1);
+	public static readonly Vector2I LeftMove = new(-1, 0);
+	public static readonly Vector2I RightMove = new(1, 0);
+
+	public PackedScene SnakeSegmentPs { get; set; }
+	public int CellPixelSize { get; set; }
+	public Vector2I MoveDirection { get; set; }
+	public bool ControlsReversed { get; set; }
+
+	public List<Vector2I> OldData { get; set; }
+	public List<Vector2I> SnakeData { get; set; }
 	internal List<Node2D> OldSnakeNodes;
 	internal List<Node2D> SnakeNodes;
 	private Dictionary<string, (Vector2 offset, float rotation, bool flipV, bool flipH, Vector2 direction)> _headDirection;
@@ -39,9 +54,8 @@ public class Snake
 	private readonly Vector2I _startPosition = new (14, 16);
 	internal bool CanMove;
 
-	public Snake(Main main)
+	public SnakeManager()
 	{
-		_main = main;
 	}
 
 	internal void GenerateSnake()
@@ -59,13 +73,13 @@ public class Snake
 		}
 	}
 
-	internal void AddSegment(Vector2I position)
+	public void AddSegment(Vector2I position)
 	
 	{
 		SnakeData.Add(position);
 		SnakeMoveData.Add("");
-		var snakeSegment = _main.SnakeSegmentPs.Instantiate<AnimatedSprite2D>();
-		snakeSegment.Position = position * _main.CellPixelSize + new Vector2I(0, _main.CellPixelSize);
+		var snakeSegment = SnakeSegmentPs.Instantiate<AnimatedSprite2D>();
+		snakeSegment.Position = position * CellPixelSize + new Vector2I(0, CellPixelSize);
 		switch (SnakeNodes.Count)
 		{
 			case 0:
@@ -78,7 +92,7 @@ public class Snake
 				break;
 		}
 
-		_main.AddChild(snakeSegment);
+		EmitSignal(SignalName.SegmentAdded, snakeSegment);
 		SnakeNodes.Add(snakeSegment);
 		OldSnakeNodes.Add(snakeSegment);
 		
@@ -89,20 +103,25 @@ public class Snake
 		if (!CanMove) return;
 		foreach (var action in _headDirection)
 		{
-			if (Input.IsActionPressed(action.Key) && _main.MoveDirection != -action.Value.direction)
+			if (Input.IsActionPressed(action.Key))
 			{
-				_main.MoveDirection = (Vector2I)action.Value.direction;
-				SnakeMoveData[0] = action.Key; 
-				CanMove = false;
+				var effectiveActionKey = InputLogic.GetEffectiveAction(action.Key, ControlsReversed);
+				var effectiveDirection = _headDirection[effectiveActionKey];
 
-				var headSprite = (AnimatedSprite2D)SnakeNodes[0];
-				headSprite.Rotation = action.Value.rotation;
-				headSprite.Offset = action.Value.offset;
-				headSprite.FlipV = action.Value.flipV;
-				headSprite.FlipH = action.Value.flipH;
+				if (MoveDirection != -effectiveDirection.direction)
+				{
+					EmitSignal(SignalName.DirectionChanged, (Vector2I)effectiveDirection.direction, effectiveActionKey);
+					CanMove = false;
 
-				_main.StartGame();
-				break; // Exit the loop once a movement is processed
+					var headSprite = (AnimatedSprite2D)SnakeNodes[0];
+					headSprite.Rotation = effectiveDirection.rotation;
+					headSprite.Offset = effectiveDirection.offset;
+					headSprite.FlipV = effectiveDirection.flipV;
+					headSprite.FlipH = effectiveDirection.flipH;
+
+					EmitSignal(SignalName.RequestStartGame);
+					break; // Exit the loop once a movement is processed
+				}
 			}
 		}
 	}
@@ -115,9 +134,9 @@ public class Snake
 		// Create a deep copy of the snake sprites to keep visual bend.
 		for (int i = 0; i < SnakeNodes.Count; i++)
 		{
-			OldSnakeNodes[i] = _main.CloneAnimatedSprite2D((AnimatedSprite2D)SnakeNodes[i]);
+			OldSnakeNodes[i] = CloneAnimatedSprite2D((AnimatedSprite2D)SnakeNodes[i]);
 		}
-		SnakeData[0] += _main.MoveDirection;// Update snake's head position data
+		SnakeData[0] += MoveDirection;// Update snake's head position data
 		// Update other body segments data
 		for (int i = 0; i < SnakeData.Count; i++)
 		{
@@ -150,7 +169,7 @@ public class Snake
 				BendTail(false);
 			}
 			// Update the position of the segment sprite
-			SnakeNodes[i].Position = SnakeData[i] * _main.CellPixelSize + new Vector2I(0, _main.CellPixelSize);
+			SnakeNodes[i].Position = SnakeData[i] * CellPixelSize + new Vector2I(0, CellPixelSize);
 			// Handle new neck bending for the second segment
 			if (i == 2)
 			{
@@ -361,15 +380,63 @@ public class Snake
 		test2.Frame = 11;
 	}
 
+	public void RemoveHead()
+	{
+		if (SnakeNodes.Count > 0)
+		{
+			var node = SnakeNodes[0];
+			SnakeData.RemoveAt(0);
+			SnakeNodes.RemoveAt(0);
+			EmitSignal(SignalName.SegmentRemoved, node);
+		}
+	}
+
+	public void RemoveTailFrom(int index)
+	{
+		for (int j = SnakeData.Count - 1; j > index; j--)
+		{
+			var node = SnakeNodes[j];
+			SnakeData.RemoveAt(j);
+			OldData.RemoveAt(j);
+			SnakeNodes.RemoveAt(j);
+			OldSnakeNodes.RemoveAt(j);
+			SnakeMoveData.RemoveAt(j);
+			OldSnakeMoveData.RemoveAt(j);
+			EmitSignal(SignalName.SegmentRemoved, node);
+		}
+	}
+
 	public void MapDirections()
 	{
 		// Map input actions to movement directions and settings
 		_headDirection = new Dictionary<string, (Vector2 offset, float rotation, bool flipV, bool flipH, Vector2 direction)>
 		{
-			{ "move_down",  (new Vector2(15, -15), 1.5708f, false, false, _main.DownMove) },
-			{ "move_up",    (new Vector2(-15, 15), 4.7183f, false, false, _main.UpMove) },
-			{ "move_left",  (new Vector2(-15, -15), 3.1416f, true, false, _main.LeftMove) },
-			{ "move_right", (new Vector2(15, 15), 0f, false, false, _main.RightMove) }
+			{ "move_down",  (new Vector2(15, -15), 1.5708f, false, false, DownMove) },
+			{ "move_up",    (new Vector2(-15, 15), 4.7183f, false, false, UpMove) },
+			{ "move_left",  (new Vector2(-15, -15), 3.1416f, true, false, LeftMove) },
+			{ "move_right", (new Vector2(15, 15), 0f, false, false, RightMove) }
 		};
+	}
+
+	internal AnimatedSprite2D CloneAnimatedSprite2D(AnimatedSprite2D original)
+	{
+		// Create a new instance
+		var copy = new AnimatedSprite2D();
+
+		// Copy essential properties
+		copy.Name = original.Name;
+		copy.Position = original.Position;
+		copy.Offset = original.Offset;
+		copy.Scale = original.Scale;
+		copy.Rotation = original.Rotation;
+		copy.Visible = original.Visible;
+		copy.SpriteFrames = original.SpriteFrames;
+
+		// Copy animation-related properties
+		copy.Frame = original.Frame;
+		copy.Animation = original.Animation;
+		copy.Autoplay = original.Autoplay;
+
+		return copy;
 	}
 }

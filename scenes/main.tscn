@@ -1,19 +1,19 @@
 [gd_scene load_steps=17 format=3 uid="uid://dwuicj4fifd38"]
 
-[ext_resource type="Script" path="res://scripts/Main.cs" id="1_oifwq"]
+[ext_resource type="Script" uid="uid://dodlkmcrisho6" path="res://scripts/Main.cs" id="1_oifwq"]
 [ext_resource type="PackedScene" uid="uid://srvuytqmi2cm" path="res://scenes/snake_segments.tscn" id="2_vh6ou"]
 [ext_resource type="PackedScene" uid="uid://c04wsqka0wuf" path="res://scenes/hud.tscn" id="3_4f2l8"]
-[ext_resource type="Texture2D" uid="uid://dxknysix0twce" path="res://assets/sprites/Grid 1.png" id="3_5e3uk"]
-[ext_resource type="Texture2D" uid="uid://c8ji68wobbukq" path="res://assets/sprites/Grid 2a.png" id="4_boxj3"]
-[ext_resource type="Texture2D" uid="uid://lsdevm6twpv8" path="res://assets/sprites/Egg.png" id="5_5bxva"]
-[ext_resource type="Texture2D" uid="uid://bk6lybgwcvmb8" path="res://assets/sprites/Grid 3.png" id="5_6fup4"]
-[ext_resource type="Texture2D" uid="uid://b8m0b71op7j3a" path="res://assets/sprites/Grid 2b.png" id="5_sj58i"]
+[ext_resource type="Texture2D" uid="uid://3jtxkhgn0m2s" path="res://assets/sprites/Grid 1.png" id="3_5e3uk"]
+[ext_resource type="Texture2D" uid="uid://dfxovxxgki7mp" path="res://assets/sprites/Grid 2a.png" id="4_boxj3"]
+[ext_resource type="Texture2D" uid="uid://ckp0deks5ty8r" path="res://assets/sprites/Egg.png" id="5_5bxva"]
+[ext_resource type="Texture2D" uid="uid://xdcubnow7b10" path="res://assets/sprites/Grid 3.png" id="5_6fup4"]
+[ext_resource type="Texture2D" uid="uid://eg71gca2ctvu" path="res://assets/sprites/Grid 2b.png" id="5_sj58i"]
 [ext_resource type="PackedScene" uid="uid://vvfybxmrur6n" path="res://scenes/game_over_menu.tscn" id="6_n0b3j"]
-[ext_resource type="Texture2D" uid="uid://bfe4nb3w54xak" path="res://assets/sprites/Grid 4a.png" id="7_psq6f"]
-[ext_resource type="Texture2D" uid="uid://36atnk2hvxln" path="res://assets/sprites/Grid 4b.png" id="8_11q3j"]
-[ext_resource type="Texture2D" uid="uid://b2qbxmbltj25w" path="res://assets/sprites/Grid 5.png" id="9_tx5c6"]
-[ext_resource type="Texture2D" uid="uid://cb24b0wcwxvfc" path="res://assets/sprites/Grid 7.png" id="10_n40xh"]
-[ext_resource type="Texture2D" uid="uid://br68dmxpepvht" path="res://assets/sprites/Grid 9.png" id="11_mchle"]
+[ext_resource type="Texture2D" uid="uid://x6g275ejlyp" path="res://assets/sprites/Grid 4a.png" id="7_psq6f"]
+[ext_resource type="Texture2D" uid="uid://cdmfi2ejjuymg" path="res://assets/sprites/Grid 4b.png" id="8_11q3j"]
+[ext_resource type="Texture2D" uid="uid://ddgxakiqqtujg" path="res://assets/sprites/Grid 5.png" id="9_tx5c6"]
+[ext_resource type="Texture2D" uid="uid://bmcfcelfxfhpu" path="res://assets/sprites/Grid 7.png" id="10_n40xh"]
+[ext_resource type="Texture2D" uid="uid://do0gk6cgqsvfq" path="res://assets/sprites/Grid 9.png" id="11_mchle"]
 [ext_resource type="PackedScene" uid="uid://bus8ubbqf6t8f" path="res://scenes/item_manager.tscn" id="16_xuxgj"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_tp2o2"]
@@ -67,10 +67,9 @@ layer = 0
 wait_time = 0.75
 
 [node name="Egg" type="Sprite2D" parent="."]
-position = Vector2(60, 60)
-scale = Vector2(1.25, 1.25)
+position = Vector2(135, 135)
+scale = Vector2(1.5, 1.5)
 texture = ExtResource("5_5bxva")
-offset = Vector2(12, 10)
 
 [node name="GameOverMenu" parent="." instance=ExtResource("6_n0b3j")]
 process_mode = 2
@@ -87,6 +86,5 @@ wait_time = 0.2
 wait_time = 0.2
 
 [connection signal="timeout" from="MoveTimer" to="." method="_on_move_timer_timeout"]
-[connection signal="Restart" from="GameOverMenu" to="." method="_on_game_over_menu_restart"]
 [connection signal="timeout" from="HealthTimer" to="." method="_on_health_timer_timeout"]
 [connection signal="timeout" from="HudFlashTimer" to="." method="_on_hud_flash_timer_timeout"]

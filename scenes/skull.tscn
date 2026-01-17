@@ -1,7 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://kl7umuvdq3fo"]
 
-[ext_resource type="Texture2D" uid="uid://cvx0wnrbxpoo2" path="res://assets/sprites/Skull.png" id="1_3ekxg"]
+[ext_resource type="Texture2D" uid="uid://cai12fqbbdc5w" path="res://assets/sprites/Skull.png" id="1_3ekxg"]
 
 [node name="Skull" type="Sprite2D"]
 texture = ExtResource("1_3ekxg")
-offset = Vector2(15, 15)

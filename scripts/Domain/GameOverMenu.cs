@@ -31,6 +31,3 @@ public partial class GameOverMenu : CanvasLayer
 		EmitSignal(SignalName.Restart);
 	}
 }
-
-
-

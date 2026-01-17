@@ -1,7 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bmacokslpunqr"]
 
-[ext_resource type="Texture2D" uid="uid://k4i2sjp6t3fo" path="res://assets/sprites/Mushroom.png" id="1_sg1o0"]
+[ext_resource type="Texture2D" uid="uid://bkuporn5wei4r" path="res://assets/sprites/Mushroom.png" id="1_sg1o0"]
 
 [node name="Mushroom" type="Sprite2D"]
 texture = ExtResource("1_sg1o0")
-offset = Vector2(15, 15)
