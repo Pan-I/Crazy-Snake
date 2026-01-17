@@ -429,4 +429,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-Snake.sln.DotSettings
+
+# Local Notes
+LOCAL TO-DO.md

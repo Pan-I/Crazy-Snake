@@ -52,7 +52,7 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 	internal List<string> SnakeMoveData;
 	internal List<string> OldSnakeMoveData;
 	private readonly Vector2I _startPosition = new (14, 16);
-	internal bool CanMove;
+	//internal bool CanMove;
 
 	public SnakeManager()
 	{
@@ -100,7 +100,7 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 
 	internal void KeyPressSnakeDirection()
 	{
-		if (!CanMove) return;
+		//if (!CanMove) return;
 		foreach (var action in _headDirection)
 		{
 			if (Input.IsActionPressed(action.Key))
@@ -111,7 +111,9 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 				if (MoveDirection != -effectiveDirection.direction)
 				{
 					EmitSignal(SignalName.DirectionChanged, (Vector2I)effectiveDirection.direction, effectiveActionKey);
-					CanMove = false;
+					//CanMove = false;  //MEMO: I believe setting this to false is what is causing feedback about input responsiveness. But removing this creates the possibility of turning back on yourself.
+					//TODO: Leave in for future testing. Implement check to prevent turning back on self (180degree). Can possibly remove property from class completely.
+
 
 					var headSprite = (AnimatedSprite2D)SnakeNodes[0];
 					headSprite.Rotation = effectiveDirection.rotation;
@@ -128,7 +130,9 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 
 	internal void UpdateSnake()
 	{
-		CanMove = true;
+		//CanMove = false;  //MEMO: I believe setting this to false is what is causing feedback about input responsiveness. But removing this creates the possibility of turning back on yourself.
+		//TODO: Leave in for future testing. Implement check to prevent turning back on self (180degree). Can possibly remove property from class completely.
+
 		OldData = SnakeData.ToList();
 		OldSnakeMoveData = SnakeMoveData.ToList();
 		// Create a deep copy of the snake sprites to keep visual bend.

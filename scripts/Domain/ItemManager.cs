@@ -158,7 +158,9 @@ public partial class ItemManager : Node
 
 	internal void MoveEgg()
 	{
-		do { EggPosition = RandomPlacement(); }
+		List<Vector2I> available = FindAvailableSpots(Vector2I.Zero);
+		
+		do { EggPosition = RandomPlacement(available); }
 		while ( CheckWallTrap() );
 		if (EggNode != null)
 		{
@@ -186,15 +188,10 @@ public partial class ItemManager : Node
 		return false;
 	}
 
-	private Vector2I RandomPlacement()
+	private Vector2I RandomPlacement(List<Vector2I> available)
 	{
-		//TODO: possible parameter for introducing larger objects when being placed to avoid placing on top of other  Or does the large item hit in main cover this?
 		Random rndm = new Random();
-		HashSet<Vector2I> occupiedPositions = new HashSet<Vector2I>(_snake.SnakeData) { EggPosition };
-		occupiedPositions.UnionWith(ItemsData);
-		occupiedPositions.UnionWith(WallsData);
-		occupiedPositions.UnionWith(LargeWallsData);
-
+		
 		int tryCounter = 0;
 		
 		Vector2I itemPlacement;
@@ -209,7 +206,7 @@ public partial class ItemManager : Node
 			itemPlacement = new Vector2I(rndm.Next(1, BoardCellSize + 1), rndm.Next(3, BoardCellSize - 4)); 
 			//TODO: more dynamic way to factor for GUI frame in offsets?
 			
-		} while ((occupiedPositions.Contains(itemPlacement) || //Don't place on an occupied position.
+		} while ((!available.Contains(itemPlacement) || //Don't place on an occupied position.
 				  CheckLargeItemHit(itemPlacement) || //Don't place on large 
 				  IsWithinRadius(itemPlacement, _snake.SnakeData[0], 3) || //Don't place too close to the snake head.
 				  CheckWithinRadius(itemPlacement, _snake.SnakeData, 1) || //Don't place directly next to the entire body.
@@ -281,32 +278,91 @@ public partial class ItemManager : Node
 	private void SpawnItem(Node2D newItem)
 	{
 		newItem.Visible = true;
-		_newItemPosition = RandomPlacement();
-		newItem.Position = _newItemPosition * CellPixelSize + 
-		                   new Vector2I(0, CellPixelSize) + 
-		                   PlacementOffset;
 		
-		//unsure if this even does anything. These get updated in Process();
-		//float pulseFactor = (float) (1.0 + 0.25 * Math.Sin(2.0 * Math.PI * _eggPulseTime / 3.0));
-		//newItem.Scale = new Vector2(pulseFactor, pulseFactor);
-
-		EmitSignal(SignalName.ItemSpawned, newItem);
+		Vector2I smallArea = new Vector2I(0, 0); //a single spot on the grid
+		Vector2I largeArea = new Vector2I(1, 1); //a 2X2 area on the grid
+		Vector2I veryLargeArea = new Vector2I(2, 2); //a 3X3 area on the grid; nothing takes up that size yet.
+		
 		if (newItem.SceneFilePath == WallNode.SceneFilePath)
 		{
+			List<Vector2I> available = FindAvailableSpots(smallArea);
+			_newItemPosition = RandomPlacement(available);
+			newItem.Position = _newItemPosition * CellPixelSize + 
+			                   new Vector2I(0, CellPixelSize) + 
+			                   PlacementOffset;
+			
 			WallNodes.Add(newItem);
 			WallsData.Add(_newItemPosition);
 		}
 		else if (newItem.SceneFilePath == LargeWallNode.SceneFilePath)
 		{
-			newItem.Position += PlacementOffset; //offset a second time to account for the large wall's largeness'
-			LargeWallNodes.Add(newItem);
-			LargeWallsData.Add(_newItemPosition);
+		 List<Vector2I> available = FindAvailableSpots(largeArea);
+		_newItemPosition = RandomPlacement(available);
+		newItem.Position = _newItemPosition * CellPixelSize + 
+		                   new Vector2I(0, CellPixelSize) + 
+		                   PlacementOffset;
+
+		newItem.Position += PlacementOffset; //offset a second time to account for the large wall's largeness'
+		LargeWallNodes.Add(newItem);
+		LargeWallsData.Add(_newItemPosition);
 		}
 		else
 		{
+			List<Vector2I> available = FindAvailableSpots(smallArea);
+			_newItemPosition = RandomPlacement(available);
+			newItem.Position = _newItemPosition * CellPixelSize + 
+			                   new Vector2I(0, CellPixelSize) + 
+			                   PlacementOffset;
+			
 			ItemNodes.Add(newItem);
 			ItemsData.Add(_newItemPosition);
 		}
+		EmitSignal(SignalName.ItemSpawned, newItem);
+	}
+
+	private List<Vector2I> FindAvailableSpots(Vector2I area)
+	{
+		List<Vector2I> available = new List<Vector2I>();
+		
+		HashSet<Vector2I> occupiedPositions = new HashSet<Vector2I>(_snake.SnakeData) { EggPosition };
+		occupiedPositions.UnionWith(ItemsData);
+		occupiedPositions.UnionWith(WallsData);
+		occupiedPositions.UnionWith(LargeWallsData);
+		
+		// Calculate the actual size needed (area + 1 since Vector2I(0,0) = 1x1)
+		int width = area.X + 1;
+		int height = area.Y + 1;
+	
+		// Iterate through all possible starting positions
+		for (int x = 0; x <= BoardCellSize - width; x++)
+		{
+			for (int y = 0; y <= BoardCellSize - height; y++)
+			{
+				Vector2I position = new Vector2I(x, y);
+			
+				// Check if all positions in the area are free
+				bool areaIsFree = true;
+				for (int dx = 0; dx < width; dx++)
+				{
+					for (int dy = 0; dy < height; dy++)
+					{
+						if (occupiedPositions.Contains(new Vector2I(x + dx, y + dy)))
+						{
+							areaIsFree = false;
+							break;
+						}
+					}
+					if (!areaIsFree) break;
+				}
+			
+				if (areaIsFree)
+				{
+					available.Add(position);
+				}
+			}
+		}
+		
+		return available;
 	}
 
 	internal void ItemResult(Node2D item, int i, bool isInCombo)

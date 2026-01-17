@@ -29,14 +29,15 @@ public partial class Main : Node
 {
 	#region Exports, Fields, Objects, and Properties
 	[Export] public PackedScene SnakeSegmentPs {get; set;}
-	
+	[Signal] public delegate void HudFlashRequestedEventHandler(int type);
 	private SnakeManager Snake { get; }
 	private ItemManager Items { get; }
 	private BoardManager Board { get; }
 	private ScoreManager Score { get; }
 	private HealthManager Health { get; }
 	private TimeManager Time { get; }
-	private UIManager UI { get; }
+	// ReSharper disable once InconsistentNaming
+	private Domain.UiManager UI { get; }
 
 	private bool _gameStarted;
 	private bool _pause;
@@ -53,7 +54,7 @@ public partial class Main : Node
 		Score = new ScoreManager();
 		Health = new HealthManager();
 		Time = new TimeManager();
-		UI = new UIManager();
+		UI = new Domain.UiManager();
 	}
 
 	public override void _Ready()
@@ -93,6 +94,13 @@ public partial class Main : Node
 
 	private void ConnectSignals()
 	{
+		// Main
+		this.HudFlashRequested += type =>
+		{
+			UI.HudFlash(type);
+			Time.StartHudFlashTimer();
+		};
+		
 		// Snake
 		Snake.SegmentAdded += (node) => AddChild(node);
 		Snake.SegmentRemoved += (node) => node.QueueFree();
@@ -126,7 +134,10 @@ public partial class Main : Node
 		Items.ComboEnded += () => Score.EndCombo();
 		Items.ComboCancelled += () => Score.CancelCombo();
 		Items.GameOverRequested += EndGame;
-		Items.HudFlashRequested += (type) => UI.HudFlash(type);
+		Items.HudFlashRequested += type =>
+		{
+			EmitSignal(SignalName.HudFlashRequested, type);
+		};
 
 		// Score
 		Score.ScoreChanged += (s, cx, cy, inCombo) => {
@@ -140,7 +151,7 @@ public partial class Main : Node
 		Health.HealthSegmentAdded += (node) => GetNode<CanvasLayer>("Hud").AddChild(node);
 		Health.HealthSegmentRemoved += (node) => node.QueueFree();
 		Health.HealthDeducted += () => {
-			UI.HudFlash(1);
+			EmitSignal(SignalName.HudFlashRequested, 1);
 			UI.UpdateWindowDressing(Health.Lives <= 2);
 			Time.StartHealthTimer();
 			Score.EndCombo();
@@ -183,7 +194,6 @@ public partial class Main : Node
 		UI.UpdateWindowDressing(false);
 		
 		_moveDirection = SnakeManager.UpMove;
-		Snake.CanMove = true;
 		Snake.MoveDirection = _moveDirection;
 		Snake.GenerateSnake();
 		
@@ -248,7 +258,7 @@ public partial class Main : Node
 		Score.ComboTally++;
 
 		UI.UpdateComboMeter(Score.ComboTally, Score.IsInCombo);
-		UI.HudFlash(0);
+		EmitSignal(SignalName.HudFlashRequested, 0);
 
 		if (!Score.IsInCombo)
 		{

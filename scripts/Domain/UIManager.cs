@@ -19,12 +19,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 The author can be contacted at pan.i.githubcontact@gmail.com
 */
 
-using System;
 using Godot;
 
-namespace Snake.scripts;
+namespace Snake.scripts.Domain;
 
-public partial class UIManager : GodotObject
+public partial class UiManager : GodotObject
 {
     private CanvasLayer _hud;
     private CanvasLayer _gameOverMenu;
