@@ -1,0 +1,33 @@
+<Project Sdk="Godot.NET.Sdk/4.5.1">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework Condition=" '$(GodotTargetPlatform)' == 'android' ">net9.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="NUnit" Version="4.1.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="readme_links\AGENTS.md" />
+    <Content Include="readme_links\ARCHITECTURE.md" />
+    <Content Include="readme_links\ATTRIBUTIONS.md" />
+    <Content Include="readme_links\Banner Image.png" />
+    <Content Include="readme_links\Banner Image.png.import" />
+    <Content Include="readme_links\CONTRIBUTING.md" />
+    <Content Include="readme_links\SETUP_ISSUES.md" />
+    <Content Include="readme_links\v0.1 Gameplay.gif" />
+    <Content Include="readme_links\v0.2 Gameplay.gif" />
+    <Content Include="readme_links\v0.2.2.3 Gameplay.gif" />
+    <Content Include="readme_links\v0.2.3.0 Gameplay.gif" />
+    <Content Include="readme_links\v0.3 Gameplay.gif" />
+    <Content Include="readme_links\v0.3.1 Gameplay.gif" />
+    <Content Include="Scripts\fix.gd" />
+    <Content Include="Scripts\fix.gd.uid" />
+    <Content Include="Scripts\GameController.cs.uid" />
+    <Content Include="Scripts\Main.cs.uid" />
+    <Content Include="README.md" />
+  </ItemGroup>
+</Project>

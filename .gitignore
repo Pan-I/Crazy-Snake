@@ -4,7 +4,6 @@ assets/
 .idea/
 *.cfg
 *.import
-*.csproj
 *.sln
 *.exe
 .obsidian/
@@ -429,3 +428,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Local Notes
+LOCAL TO-DO.md
