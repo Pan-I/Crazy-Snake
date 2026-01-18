@@ -25,11 +25,11 @@
 
 A remake of Snake, with some twists, as a Godot project. Written entirely in C#. Game includes a long list of items that have a wide range of effects on the game and game play, as well as a complex and high-scoring point system.
 
-#### Current Major Update Set (v0.3.1)
+#### Current Major Update Set (v0.3.2)
 
 |                                                               *Where v0.3.x is now*                                                               |
 | :-----------------------------------------------------------------------------------------------------------------------------------------------: |
-| <img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.3.1%20Gameplay.gif" alt="gameplay gif" width="600"/> |
+| <img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/Gameplay%20Preview/v0.3.1%20Gameplay.gif" alt="gameplay gif" width="600"/> |
 |                                                               *Where v0.3.x is now*                                                               |
 
 The current version (v0.3.x) focuses on:
@@ -38,10 +38,12 @@ The current version (v0.3.x) focuses on:
 - Combo scoring system
 - Ouroboros mechanics
 - Speed changes
+- Architecture Refactoring
+- Documentation
 
 |                                                                    *Where v0.3. started*                                                                     |
 | :----------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| <img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/v0.2.3.0%20Gameplay.gif?raw=true" alt="broken link of game screenshot 3" width="450"/> |
+| <img src="https://github.com/Pan-I/Crazy-Snake/blob/main/readme_links/Progress/v0.2.3.0%20Gameplay.gif?raw=true" alt="broken link of game screenshot 3" width="450"/> |
 |                                                                    *Where v0.3. started*                                                                     |
 ---
 ## 🏗 Architecture

@@ -1,6 +1,6 @@
 [gd_scene load_steps=17 format=3 uid="uid://dwuicj4fifd38"]
 
-[ext_resource type="Script" uid="uid://bfnspsftg2u1m" path="res://Scripts/Main.cs" id="1_a8y0u"]
+[ext_resource type="Script" uid="uid://ce0lqywlaoy1x" path="res://Scripts/Main.cs" id="1_a8y0u"]
 [ext_resource type="PackedScene" uid="uid://srvuytqmi2cm" path="res://scenes/snake_segments.tscn" id="2_vh6ou"]
 [ext_resource type="PackedScene" uid="uid://c04wsqka0wuf" path="res://scenes/hud.tscn" id="3_4f2l8"]
 [ext_resource type="Texture2D" uid="uid://3jtxkhgn0m2s" path="res://assets/sprites/Grid 1.png" id="3_5e3uk"]
