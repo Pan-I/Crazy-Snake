@@ -1,6 +1,6 @@
 [gd_scene load_steps=17 format=3 uid="uid://dwuicj4fifd38"]
 
-[ext_resource type="Script" uid="uid://ck5r1qw3eqcww" path="res://scripts/Main.cs" id="1_oifwq"]
+[ext_resource type="Script" uid="uid://bfnspsftg2u1m" path="res://Scripts/Main.cs" id="1_a8y0u"]
 [ext_resource type="PackedScene" uid="uid://srvuytqmi2cm" path="res://scenes/snake_segments.tscn" id="2_vh6ou"]
 [ext_resource type="PackedScene" uid="uid://c04wsqka0wuf" path="res://scenes/hud.tscn" id="3_4f2l8"]
 [ext_resource type="Texture2D" uid="uid://3jtxkhgn0m2s" path="res://assets/sprites/Grid 1.png" id="3_5e3uk"]
@@ -52,7 +52,7 @@ animations = [{
 }]
 
 [node name="Main" type="Node"]
-script = ExtResource("1_oifwq")
+script = ExtResource("1_a8y0u")
 SnakeSegmentPs = ExtResource("2_vh6ou")
 
 [node name="Background" type="AnimatedSprite2D" parent="."]
@@ -73,7 +73,6 @@ texture = ExtResource("5_5bxva")
 
 [node name="GameOverMenu" parent="." instance=ExtResource("6_n0b3j")]
 process_mode = 2
-script = null
 
 [node name="ItemManager" parent="." instance=ExtResource("16_xuxgj")]
 
@@ -87,5 +86,6 @@ wait_time = 0.2
 wait_time = 0.2
 
 [connection signal="timeout" from="MoveTimer" to="." method="_on_move_timer_timeout"]
+[connection signal="Restart" from="GameOverMenu" to="." method="_on_game_over_menu_restart"]
 [connection signal="timeout" from="HealthTimer" to="." method="_on_health_timer_timeout"]
 [connection signal="timeout" from="HudFlashTimer" to="." method="_on_hud_flash_timer_timeout"]

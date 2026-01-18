@@ -21,7 +21,7 @@ The author can be contacted at pan.i.githubcontact@gmail.com
 
 using Godot;
 
-namespace Snake.scripts.Domain;
+namespace Snake.Scripts.Domain.Managers;
 
 public partial class UiManager : GodotObject
 {

@@ -21,7 +21,7 @@ The author can be contacted at pan.i.githubcontact@gmail.com
 
 using Godot;
 
-namespace Snake.scripts.Domain;
+namespace Snake.Scripts.Domain.Managers;
 
 public partial class BoardManager : GodotObject
 {
@@ -40,11 +40,11 @@ public partial class BoardManager : GodotObject
         BoardBottom = boardPosition.Y + ((BoardCellSize * CellPixelSize) / 2);
     }
 
-    public bool IsOutOfBounds(Vector2I headPosition)
+    public bool IsOutOfBounds(Vector2I position)
     {
-        return (headPosition.X * CellPixelSize) < BoardLeft || 
-               ((headPosition.X + 1) * CellPixelSize) > BoardRight || 
-               ((headPosition.Y + 1) * CellPixelSize) < BoardTop || 
-               ((headPosition.Y + 4) * CellPixelSize) > BoardBottom;
+        return (position.X * CellPixelSize) < BoardLeft || 
+               ((position.X + 1) * CellPixelSize) > BoardRight || 
+               ((position.Y + 1) * CellPixelSize) < BoardTop || 
+               ((position.Y + 4) * CellPixelSize) > BoardBottom;
     }
 }

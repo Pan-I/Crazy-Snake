@@ -20,8 +20,9 @@ The author can be contacted at pan.i.githubcontact@gmail.com
 */
 
 using Godot;
+using Timer = Godot.Timer;
 
-namespace Snake.scripts.Domain;
+namespace Snake.Scripts.Domain.Managers;
 
 public partial class TimeManager : GodotObject
 {

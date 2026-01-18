@@ -21,7 +21,7 @@ The author can be contacted at pan.i.githubcontact@gmail.com
 
 using Godot;
 
-namespace Snake.scripts;
+namespace Snake.Scripts.GUI_Scripts;
 
 public partial class GameOverMenu : CanvasLayer
 {
@@ -29,6 +29,6 @@ public partial class GameOverMenu : CanvasLayer
 	
 	private void _on_restart_button_pressed()
 	{
-		EmitSignal(global::Snake.scripts.GameOverMenu.SignalName.Restart);
+		EmitSignal(global::Snake.Scripts.GUI_Scripts.GameOverMenu.SignalName.Restart);
 	}
 }

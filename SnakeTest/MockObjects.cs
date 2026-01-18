@@ -1,6 +1,7 @@
 ﻿using Godot;
 using System.Collections.Generic;
-using Snake.scripts;
+using Snake.Scripts;
+using Snake.Scripts.Interfaces;
 
 namespace Snake.Tests;
 

@@ -19,11 +19,17 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 The author can be contacted at pan.i.githubcontact@gmail.com
 */
 
-using System;
 using Godot;
-using Snake.scripts.Domain;
+using BoardManager = Snake.Scripts.Domain.Managers.BoardManager;
+using HealthManager = Snake.Scripts.Domain.Managers.HealthManager;
+using ScoreManager = Snake.Scripts.Domain.Managers.ScoreManager;
+using SnakeManager = Snake.Scripts.Domain.Managers.SnakeManager;
+using TimeManager = Snake.Scripts.Domain.Managers.TimeManager;
+using UiManager = Snake.Scripts.Domain.Managers.UiManager;
+using ItemManager = Snake.Scripts.Domain.Managers.ItemManager;
+using Timer = Godot.Timer;
 
-namespace Snake.scripts;
+namespace Snake.Scripts;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Category", "WarningCode")]
 public partial class Main : Node
@@ -33,12 +39,12 @@ public partial class Main : Node
 	[Signal] public delegate void HudFlashRequestedEventHandler(int type);
 	private SnakeManager Snake { get; }
 	private ItemManager Items { get; }
-	private Domain.BoardManager Board { get; }
-	private Domain.ScoreManager Score { get; }
-	private Domain.HealthManager Health { get; }
-	private Domain.TimeManager Time { get; }
+	private BoardManager Board { get; }
+	private ScoreManager Score { get; }
+	private HealthManager Health { get; }
+	private TimeManager Time { get; }
 	// ReSharper disable once InconsistentNaming
-	private Domain.UiManager UI { get; }
+	private UiManager UI { get; }
 
 	private bool _gameStarted;
 	private bool _pause;
@@ -51,11 +57,11 @@ public partial class Main : Node
 	{
 		Snake = new SnakeManager();
 		Items = new ItemManager(Snake);
-		Board = new Domain.BoardManager();
-		Score = new Domain.ScoreManager();
-		Health = new Domain.HealthManager();
-		Time = new Domain.TimeManager();
-		UI = new Domain.UiManager();
+		Board = new BoardManager();
+		Score = new ScoreManager();
+		Health = new HealthManager();
+		Time = new TimeManager();
+		UI = new UiManager();
 	}
 
 	public override void _Ready()

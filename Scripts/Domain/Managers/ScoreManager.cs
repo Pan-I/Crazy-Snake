@@ -23,7 +23,7 @@ using System;
 using System.Diagnostics;
 using Godot;
 
-namespace Snake.scripts.Domain;
+namespace Snake.Scripts.Domain.Managers;
 
 public partial class ScoreManager : GodotObject
 {

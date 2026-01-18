@@ -23,8 +23,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Godot;
+using Snake.Scripts.Domain.Utilities;
+using Snake.Scripts.Interfaces;
 
-namespace Snake.scripts.Domain;
+namespace Snake.Scripts.Domain.Managers;
 
 public struct SnakeVisualState
 {

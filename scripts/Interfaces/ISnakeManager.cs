@@ -1,7 +1,7 @@
-﻿using Godot;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Godot;
 
-namespace Snake.scripts;
+namespace Snake.Scripts.Interfaces;
 
 public interface ISnakeManager
 {

@@ -22,9 +22,10 @@ The author can be contacted at pan.i.githubcontact@gmail.com
 using System;
 using System.Collections.Generic;
 using Godot;
-using Snake.scripts.Domain;
+using Snake.Scripts.Domain.Utilities;
+using Snake.Scripts.Interfaces;
 
-namespace Snake.scripts;
+namespace Snake.Scripts.Domain.Managers;
 
 public partial class ItemManager : Node
 {

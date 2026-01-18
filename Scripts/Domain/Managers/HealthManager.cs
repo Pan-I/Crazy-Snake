@@ -22,7 +22,7 @@ The author can be contacted at pan.i.githubcontact@gmail.com
 using System.Collections.Generic;
 using Godot;
 
-namespace Snake.scripts.Domain;
+namespace Snake.Scripts.Domain.Managers;
 
 public partial class HealthManager : GodotObject
 {
@@ -85,11 +85,9 @@ public partial class HealthManager : GodotObject
         if (Lives > 1)
         {
             Lives--;
+            EmitSignal(SignalName.HealthDeducted);
         }
-
-        EmitSignal(SignalName.HealthDeducted);
-
-        if (Lives <= 1)
+        else
         {
             EmitSignal(SignalName.GameOverRequested);
         }

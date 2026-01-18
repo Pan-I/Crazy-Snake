@@ -1,4 +1,6 @@
-﻿namespace Snake.scripts.Domain;
+﻿using Snake.Scripts.Interfaces;
+
+namespace Snake.Scripts.Domain.Utilities;
 
 public class ItemEffectLogic
 {
