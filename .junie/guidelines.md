@@ -9,7 +9,6 @@ This document provides project-specific information for developers working on th
 *   **Building**:
     *   Use `dotnet build` from the root directory.
     *   If you encounter "Duplicate attribute" errors (e.g., `AssemblyCompanyAttribute`), run `dotnet clean` before building or testing. This often happens due to Godot's temporary file generation in `.godot/mono/temp/obj/`.
-*   **Assets**: Ensure `assets.zip` is extracted into the `assets/` folder in the project root.
 
 #### 2. Testing Information
 
@@ -51,11 +50,13 @@ This document provides project-specific information for developers working on th
 *   **Architecture**:
     *   **Manager-based**: Core logic is orchestrated by `Main.cs`, which delegates to specialized managers (e.g., `SnakeManager`, `ItemManager`, `ScoreManager`).
     *   **Signal-driven**: Communication between managers and the UI is primarily handled via Godot Signals to maintain decoupling.
+    *   **Setter Methods**: Use setter methods to enforce immutability of Manager properties and avoid direct modification of game state.
     *   **Interfaces**: Use interfaces defined in `Scripts/Interfaces/` (e.g., `ISnakeManager`) to facilitate testing and mocking.
 *   **Code Style**:
     *   Follow standard C# naming conventions (PascalCase for classes/methods, camelCase for local variables).
     *   Use file-scoped namespaces (C# 10+ feature).
     *   Utilize modern C# features (e.g., pattern matching, switch expressions) where appropriate.
+    *   Ensure `Main.cs` is always capitalized; any references to `Main.cs` should be maintained accordingly, references may be case-insensitive.
 *   **Godot Integration**:
     *   The project uses `Godot.NET.Sdk`. Be aware that some Godot-specific source generators might require the project to be opened in the Godot Editor to correctly resolve paths like `res://`.
     *   Avoid direct logic in `_Process` or `_Input` inside managers; instead, use methods that can be called by `Main.cs` or triggered by signals.

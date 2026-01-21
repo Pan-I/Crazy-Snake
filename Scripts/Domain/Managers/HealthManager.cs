@@ -19,7 +19,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 The author can be contacted at pan.i.githubcontact@gmail.com
 */
 
-using System.Collections.Generic;
 using Godot;
 
 namespace Snake.Scripts.Domain.Managers;
@@ -47,12 +46,12 @@ public partial class HealthManager : GodotObject
         var test = new Vector2I((int)(startPosition.X + 8), (int)(startPosition.Y + 10));
         for (int i = 0; i < 6; i++)
         {
-            AddHealthSegment(test + new Vector2I((int)(i * cellPixelSize * 1.5), 0), cellPixelSize, snakeSegmentPs);
+            AddHealthSegment(test + new Vector2I((int)(i * cellPixelSize * 1.5), 0), snakeSegmentPs);
         }
         Lives = HealthNodes.Count;
     }
 
-    private void AddHealthSegment(Vector2I position, int cellPixelSize, PackedScene snakeSegmentPs)
+    private void AddHealthSegment(Vector2I position, PackedScene snakeSegmentPs)
     {
         HealthData.Add(position);
         var healthSegment = snakeSegmentPs.Instantiate<AnimatedSprite2D>();

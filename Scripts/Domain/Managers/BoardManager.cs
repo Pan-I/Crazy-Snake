@@ -25,12 +25,12 @@ namespace Snake.Scripts.Domain.Managers;
 
 public partial class BoardManager : GodotObject
 {
-    public int BoardCellSize { get; set; } = 30;
-    public int CellPixelSize { get; set; } = 30;
-    public float BoardLeft { get; private set; }
-    public float BoardTop { get; private set; }
-    public float BoardRight { get; private set; }
-    public float BoardBottom { get; private set; }
+    public int BoardCellSize { get; private set; } = 30;
+    public int CellPixelSize { get; private set; } = 30;
+    private float BoardLeft { get; set; }
+    private float BoardTop { get; set; }
+    private float BoardRight { get; set; }
+    private float BoardBottom { get; set; }
 
     public void Initialize(Vector2 boardPosition)
     {

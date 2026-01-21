@@ -70,7 +70,7 @@ The project follows a **Manager-based architecture** orchestrated by `Main.cs`. 
 ## 📂 Project Structure
 ```plain text
 .
-├── assets/             # Game sprites, audio, and resources (needs unzipping)
+├── assets/             # Game sprites, audio, and resources
 ├── scenes/             # Godot Scene files (.tscn)
 ├── Scripts/            # C# Source Code
 │   ├── Domain/
@@ -90,14 +90,12 @@ The project follows a **Manager-based architecture** orchestrated by `Main.cs`. 
    ```bash
    git clone https://github.com/Pan-I/Crazy-Snake.git
    ```
-2. **Extract Assets**:
-   Unzip `assets.zip` into the project root so that an `assets/` folder exists.
-3. **Open in Godot**:
+2. **Open in Godot**:
    - Open Godot Engine 4.x.
    - Import the project by selecting `project.godot`.
-4. **Generate Solution**:
+3. **Generate Solution**:
    In Godot: `Project > Tools > C# > Create Solution` (if not already present).
-5. **Build & Run**:
+4. **Build & Run**:
    Press `F5` in Godot or use your preferred IDE.
 
 For common setup problems, check [SETUP_ISSUES.md](readme_links/SETUP_ISSUES.md).

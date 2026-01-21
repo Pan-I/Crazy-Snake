@@ -19,8 +19,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 The author can be contacted at pan.i.githubcontact@gmail.com
 */
 
-using System;
-using System.Collections.Generic;
 using Godot;
 using Snake.Scripts.Domain.Utilities;
 using Snake.Scripts.Interfaces;
@@ -39,15 +37,19 @@ public partial class ItemManager : Node
 	[Signal] public delegate void GameOverRequestedEventHandler();
 	[Signal] public delegate void HudFlashRequestedEventHandler(int type);
 	[Signal] public delegate void ItemSpawnedEventHandler(Node2D item);
+	[Signal] public delegate void EggMovedEventHandler();
+	[Signal] public delegate void BadFoodEatenEventHandler();
+	[Signal] public delegate void SpecialEggEatenEventHandler(bool isInCombo);
+	[Signal] public delegate void HighChimeRequestedEventHandler();
 	
-	private ISnakeManager _snake;
-	public int CellPixelSize { get; set; }
-	public int BoardCellSize { get; set; }
-	public Vector2I PlacementOffset { get; set; }
+	private readonly ISnakeManager _snake;
+	public int CellPixelSizeRef { get; set; }
+	public int BoardCellSizeRef { get; set; }
+	public Vector2I PlacementOffsetRef { get; set; }
 	public Node2D EggNode { get; set; }
-	public double CurrentScore { get; set; }
-	public double CurrentComboPointsX { get; set; }
-	public double CurrentComboPointsY { get; set; }
+	public double CurrentScoreRef { get; set; }
+	public double CurrentComboPointsXRef { get; set; }
+	public double CurrentComboPointsYRef { get; set; }
 
 	internal Node2D WallNode;
 	internal Vector2I EggPosition;
@@ -140,34 +142,35 @@ public partial class ItemManager : Node
 	{
 		_itemRates = new Dictionary<int, List<Node2D>>
 		{
-			{ 1, new List<Node2D> { WallNode, _freshEggNode} },
-			{ 2, new List<Node2D> { _ripeEggNode } },
-			{ 3, new List<Node2D> { _rottenEggNode } },
-			{ 5, new List<Node2D> { _mushroomNode } },
-			{ 8, new List<Node2D> { _shinyEggNode } },
-			{ 13, new List<Node2D> { _skullNode, LargeWallNode } },
-			{ 21, new List<Node2D> { _dewDropNode } },
-			{ 34, new List<Node2D> { _lavaEggNode } },
-			{ 55, new List<Node2D> { _frogNode } },
-			{ 89, new List<Node2D> { _alienEggNode } },
-			{ 144, new List<Node2D> { _iceEggNode } },
-			{ 233, new List<Node2D> { _pillItemNode } },
-			{ 377, new List<Node2D> { _discoEggNode } }
+			{ 1, [WallNode, _freshEggNode] },
+			{ 2, [_ripeEggNode] },
+			{ 3, [_rottenEggNode] },
+			{ 5, [_mushroomNode] },
+			{ 8, [_shinyEggNode] },
+			{ 13, [_skullNode, LargeWallNode] },
+			{ 21, [_dewDropNode] },
+			{ 34, [_lavaEggNode] },
+			{ 55, [_frogNode] },
+			{ 89, [_alienEggNode] },
+			{ 144, [_iceEggNode] },
+			{ 233, [_pillItemNode] },
+			{ 377, [_discoEggNode] }
 		};
 	}
 
 
 	internal void MoveEgg()
 	{
+		EmitSignal(SignalName.EggMoved);
 		List<Vector2I> available = FindAvailableSpots(Vector2I.Zero);
 		
 		do { EggPosition = RandomPlacement(available); }
 		while ( CheckWallTrap() );
 		if (EggNode != null)
 		{
-			EggNode.Position = EggPosition * CellPixelSize + 
-			                   new Vector2I(0, CellPixelSize) + 
-			                   PlacementOffset;
+			EggNode.Position = EggPosition * CellPixelSizeRef + 
+			                   new Vector2I(0, CellPixelSizeRef) + 
+			                   PlacementOffsetRef;
 			EggNode.ZIndex = 999;
 			_eggPulseTime = 0;
 			EggNode.Scale = Vector2.One;
@@ -204,7 +207,7 @@ public partial class ItemManager : Node
 			{
 				EmitSignal(SignalName.GameOverRequested);
 			}
-			itemPlacement = new Vector2I(rndm.Next(1, BoardCellSize + 1), rndm.Next(3, BoardCellSize - 4)); 
+			itemPlacement = new Vector2I(rndm.Next(1, BoardCellSizeRef + 1), rndm.Next(3, BoardCellSizeRef - 4)); 
 			//TODO: more dynamic way to factor for GUI frame in offsets?
 			
 		} while ((!available.Contains(itemPlacement) || //Don't place on an occupied position.
@@ -219,14 +222,7 @@ public partial class ItemManager : Node
 		//TODO: Needs a better implementation. (*Why? Don't remember what is wrong with this.*)
 		bool CheckWithinRadius(Vector2I newItemPlacement, List<Vector2I> listCoords, int radius)
 		{
-			foreach (var spot in listCoords)
-			{
-				if (IsWithinRadius(newItemPlacement, spot, radius))
-				{
-					return true;
-				}
-			}
-			return false;
+			return listCoords.Any(spot => IsWithinRadius(newItemPlacement, spot, radius));
 		}
 
 		// Helper function to check if a position is within a given radius
@@ -256,22 +252,15 @@ public partial class ItemManager : Node
 		return hit;
 	}
 
-	private void ReplaceItem()
-	{
-		//do nothing;
-	}
-
 	internal void GenerateFromItemLookup()
 	{
-		foreach (var rule in _itemRates)
+		// ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+		foreach (KeyValuePair<int, List<Node2D>> rule in _itemRates)
 		{
-			if (Tally % rule.Key == 0)
+			if (Tally % rule.Key != 0) continue;
+			foreach (var newItem in rule.Value.Select(itemNode => (Node2D)itemNode.Duplicate()))
 			{
-				foreach (var itemNode in rule.Value)
-				{
-					var newItem = (Node2D)itemNode.Duplicate();
-					SpawnItem(newItem);
-				}
+				SpawnItem(newItem);
 			}
 		}
 	}
@@ -282,15 +271,15 @@ public partial class ItemManager : Node
 		
 		Vector2I smallArea = new Vector2I(0, 0); //a single spot on the grid
 		Vector2I largeArea = new Vector2I(1, 1); //a 2X2 area on the grid
-		Vector2I veryLargeArea = new Vector2I(2, 2); //a 3X3 area on the grid; nothing takes up that size yet.
+		//Vector2I veryLargeArea = new Vector2I(2, 2); //a 3X3 area on the grid; nothing takes up that size yet.
 		
 		if (newItem.SceneFilePath == WallNode.SceneFilePath)
 		{
 			List<Vector2I> available = FindAvailableSpots(smallArea);
 			_newItemPosition = RandomPlacement(available);
-			newItem.Position = _newItemPosition * CellPixelSize + 
-			                   new Vector2I(0, CellPixelSize) + 
-			                   PlacementOffset;
+			newItem.Position = _newItemPosition * CellPixelSizeRef + 
+			                   new Vector2I(0, CellPixelSizeRef) + 
+			                   PlacementOffsetRef;
 			
 			WallNodes.Add(newItem);
 			WallsData.Add(_newItemPosition);
@@ -299,11 +288,11 @@ public partial class ItemManager : Node
 		{
 		 List<Vector2I> available = FindAvailableSpots(largeArea);
 		_newItemPosition = RandomPlacement(available);
-		newItem.Position = _newItemPosition * CellPixelSize + 
-		                   new Vector2I(0, CellPixelSize) + 
-		                   PlacementOffset;
+		newItem.Position = _newItemPosition * CellPixelSizeRef + 
+		                   new Vector2I(0, CellPixelSizeRef) + 
+		                   PlacementOffsetRef;
 
-		newItem.Position += PlacementOffset; //offset a second time to account for the large wall's largeness'
+		newItem.Position += PlacementOffsetRef; //offset a second time to account for the large wall's largeness'
 		LargeWallNodes.Add(newItem);
 		LargeWallsData.Add(_newItemPosition);
 		}
@@ -311,9 +300,9 @@ public partial class ItemManager : Node
 		{
 			List<Vector2I> available = FindAvailableSpots(smallArea);
 			_newItemPosition = RandomPlacement(available);
-			newItem.Position = _newItemPosition * CellPixelSize + 
-			                   new Vector2I(0, CellPixelSize) + 
-			                   PlacementOffset;
+			newItem.Position = _newItemPosition * CellPixelSizeRef + 
+			                   new Vector2I(0, CellPixelSizeRef) + 
+			                   PlacementOffsetRef;
 			
 			ItemNodes.Add(newItem);
 			ItemsData.Add(_newItemPosition);
@@ -323,9 +312,9 @@ public partial class ItemManager : Node
 
 	private List<Vector2I> FindAvailableSpots(Vector2I area)
 	{
-		List<Vector2I> available = new List<Vector2I>();
+		List<Vector2I> available = [];
 		
-		HashSet<Vector2I> occupiedPositions = new HashSet<Vector2I>(_snake.SnakeData) { EggPosition };
+		HashSet<Vector2I> occupiedPositions = [.._snake.SnakeData, EggPosition];
 		occupiedPositions.UnionWith(ItemsData);
 		occupiedPositions.UnionWith(WallsData);
 		occupiedPositions.UnionWith(LargeWallsData);
@@ -335,9 +324,9 @@ public partial class ItemManager : Node
 		int height = area.Y + 1;
 	
 		// Iterate through all possible starting positions
-		for (int x = 0; x <= BoardCellSize - width; x++)
+		for (int x = 0; x <= BoardCellSizeRef - width; x++)
 		{
-			for (int y = 0; y <= BoardCellSize - height; y++)
+			for (int y = 0; y <= BoardCellSizeRef - height; y++)
 			{
 				Vector2I position = new Vector2I(x, y);
 			
@@ -401,77 +390,65 @@ public partial class ItemManager : Node
 		if (sceneFilePath == _freshEggPath)
 		{
 			//Modify X during Combo
-			if (isInCombo)
-			{
-				EmitSignal(SignalName.ComboPointsYChanged, 2, true);
-			}
-			else
-			{
-				EmitSignal(SignalName.ScoreChanged, 2, true);
-			}
-			
+			EmitSignal(isInCombo ? SignalName.ComboPointsYChanged : SignalName.ScoreChanged, 2, true);
 			_snake.AddSegment(_snake.OldData[^1]);
+			EmitSignal(SignalName.SpecialEggEaten, isInCombo);
 		}
 		if (sceneFilePath == _ripeEggPath)
 		{
 			//Modify Y during Combo
 			if (isInCombo)
 			{
-				EmitSignal(SignalName.ComboPointsYChanged, CurrentComboPointsY * 1.5, false);
+				EmitSignal(SignalName.ComboPointsYChanged, CurrentComboPointsYRef * 1.5, false);
 			}
 			else
 			{
 				EmitSignal(SignalName.ScoreChanged, 3, true);	
 			}
 			_snake.AddSegment(_snake.OldData[^1]);
+			EmitSignal(SignalName.SpecialEggEaten, isInCombo);
 		}
-
 		if (sceneFilePath == _shinyEggPath)
 		{
 			//Modify Y during Combo
 			if (isInCombo)
 			{
-				EmitSignal(SignalName.ComboPointsYChanged, CurrentComboPointsY * 2, false);
+				EmitSignal(SignalName.ComboPointsYChanged, CurrentComboPointsYRef * 2, false);
 			}
 			else
 			{
 				EmitSignal(SignalName.ScoreChanged, 5, true);
 			}
-			
-
 			_snake.AddSegment(_snake.OldData[^1]);
+			EmitSignal(SignalName.SpecialEggEaten, isInCombo);
 		}
-
 		if (sceneFilePath == _alienEggPath)
 		{
 			//Modify Y during Combo
 			if (isInCombo)
 			{
-				EmitSignal(SignalName.ComboPointsYChanged, CurrentComboPointsY * 5, false);
+				EmitSignal(SignalName.ComboPointsYChanged, CurrentComboPointsYRef * 5, false);
 			}
 			else
 			{
 				EmitSignal(SignalName.ScoreChanged, 8, true);
 			}
-			
-
 			_snake.AddSegment(_snake.OldData[^1]);
+			EmitSignal(SignalName.SpecialEggEaten, isInCombo);
 		}
-
 		if (sceneFilePath == _discoEggPath)
 		{
 			//Modify Y during Combo
 			if (isInCombo)
 			{
-				EmitSignal(SignalName.ComboPointsYChanged, CurrentComboPointsY * Math.Sqrt(Math.Abs(CurrentScore)), false);
+				EmitSignal(SignalName.ComboPointsYChanged, CurrentComboPointsYRef * Math.Sqrt(Math.Abs(CurrentScoreRef)), false);
 			}
 			else
 			{
 				EmitSignal(SignalName.ScoreChanged, 13, true);
 			}
-			
-			
 			_snake.AddSegment(_snake.OldData[^1]);
+			EmitSignal(SignalName.SpecialEggEaten, isInCombo);
 		}
 		//Bad eggs
 		if (sceneFilePath == _rottenEggPath)
@@ -479,30 +456,30 @@ public partial class ItemManager : Node
 			//End Combo, Modify X
 			if (isInCombo)
 			{
-				EmitSignal(SignalName.ComboPointsXChanged, -Math.Max(10, CurrentScore * 0.25), true);
+				EmitSignal(SignalName.ComboPointsXChanged, -Math.Max(10, CurrentScoreRef * 0.25), true);
+				EmitSignal(SignalName.ComboEnded);
 			}
 			else
 			{
-				EmitSignal(SignalName.ScoreChanged, -Math.Max(10, CurrentScore * 0.10), true);
+				EmitSignal(SignalName.ScoreChanged, -Math.Max(10, CurrentScoreRef * 0.10), true);
 			}
-			
-			EmitSignal(SignalName.ComboEnded);
 			_snake.AddSegment(_snake.OldData[^1]);
+			EmitSignal(SignalName.BadFoodEaten);
 		}
 		if(sceneFilePath == _lavaEggPath)
 		{
 			//End Combo, Modify Y
 			if (isInCombo)
 			{			
-				EmitSignal(SignalName.ComboPointsYChanged, CurrentComboPointsY * 0.25, false);
+				EmitSignal(SignalName.ComboPointsYChanged, CurrentComboPointsYRef * 0.25, false);
+				EmitSignal(SignalName.ComboEnded);
 			}
 			else
 			{
-				EmitSignal(SignalName.ScoreChanged, -Math.Max(75, CurrentScore * 0.75), true);
+				EmitSignal(SignalName.ScoreChanged, -Math.Max(75, CurrentScoreRef * 0.75), true);
 			}
-			
-			EmitSignal(SignalName.ComboEnded);
 			_snake.AddSegment(_snake.OldData[^1]);
+			EmitSignal(SignalName.BadFoodEaten);
 		}
 		if (sceneFilePath == _iceEggPath)
 		{
@@ -513,9 +490,10 @@ public partial class ItemManager : Node
 			}
 			else
 			{
-				EmitSignal(SignalName.ScoreChanged, Math.Min(CurrentScore - 10000, Math.Sqrt(Math.Abs(CurrentScore))), false);
+				EmitSignal(SignalName.ScoreChanged, Math.Min(CurrentScoreRef - 10000, Math.Sqrt(Math.Abs(CurrentScoreRef))), false);
 			}
 			_snake.AddSegment(_snake.OldData[^1]);
+			EmitSignal(SignalName.BadFoodEaten);
 		}
 		//Complex Scorers
 		if (sceneFilePath == _mushroomPath)
@@ -523,28 +501,29 @@ public partial class ItemManager : Node
 			//Start Combo, Modify X
 			if (isInCombo)
 			{
-				EmitSignal(SignalName.ComboPointsXChanged, CurrentComboPointsX * 1.25, false);
+				EmitSignal(SignalName.ComboPointsXChanged, CurrentComboPointsXRef * 1.25, false);
 			}
 			else
 			{
 				// If the score is negative, set it to a fixed value of -1.
 				// Otherwise, apply a slight exponential increase (power of 1.05) to the absolute value of the score.
-				EmitSignal(SignalName.ScoreChanged, (CurrentScore < 0) ? (-1) : Math.Pow(Math.Abs(CurrentScore), 1.05), false);
+				EmitSignal(SignalName.ScoreChanged, (CurrentScoreRef < 0) ? (-1) : Math.Pow(Math.Abs(CurrentScoreRef), 1.05), false);
 				EmitSignal(SignalName.ComboStarted);	
 			}
+			EmitSignal(SignalName.HighChimeRequested);
 		}
 		if (sceneFilePath == _dewDropPath)
 		{
 			//End Combo, No Combo Score Change
 			if (isInCombo)
 			{
-				EmitSignal(SignalName.ComboPointsXChanged, Math.Abs(CurrentComboPointsX), false);
-				EmitSignal(SignalName.ComboPointsYChanged, Math.Abs(CurrentComboPointsY), false);
+				EmitSignal(SignalName.ComboPointsXChanged, Math.Abs(CurrentComboPointsXRef), false);
+				EmitSignal(SignalName.ComboPointsYChanged, Math.Abs(CurrentComboPointsYRef), false);
 				EmitSignal(SignalName.ComboEnded);
 			}
 			else
 			{
-				EmitSignal(SignalName.ScoreChanged, Math.Abs(CurrentScore), false);
+				EmitSignal(SignalName.ScoreChanged, Math.Abs(CurrentScoreRef), false);
 			}
 			// Set the score to its absolute value, effectively removing any negative sign.
 		}
@@ -553,34 +532,37 @@ public partial class ItemManager : Node
 			//Start Combo, Modify Y
 			if (isInCombo)
 			{
-				EmitSignal(SignalName.ComboPointsYChanged, CurrentComboPointsY * 3, false);
+				EmitSignal(SignalName.ComboPointsYChanged, CurrentComboPointsYRef * 3, false);
 			}
 			else
 			{
 				// If the score is negative, reduce it further by subtracting an exponential value (power of 1.15).
 				// If the score is positive, apply an exponential increase (power of 1.15).
-				EmitSignal(SignalName.ScoreChanged, (CurrentScore < 0) ? (Math.Abs(CurrentScore) - Math.Pow(Math.Abs(CurrentScore), 1.15)) 
-					: Math.Pow(Math.Abs(CurrentScore), 1.15), false);
+				EmitSignal(SignalName.ScoreChanged, (CurrentScoreRef < 0) ? (Math.Abs(CurrentScoreRef) - Math.Pow(Math.Abs(CurrentScoreRef), 1.15)) 
+					: Math.Pow(Math.Abs(CurrentScoreRef), 1.15), false);
 				EmitSignal(SignalName.ComboStarted);
 			}
+			EmitSignal(SignalName.HighChimeRequested);
 		}
 		if (sceneFilePath == _pillItemPath)
 		{
 			//Start Combo, Modify X & Y
 			if (isInCombo)
 			{
-				EmitSignal(SignalName.ComboPointsXChanged, CurrentComboPointsX * 8, false);
-				EmitSignal(SignalName.ComboPointsYChanged, CurrentComboPointsY * 8, false);
+				EmitSignal(SignalName.ComboPointsXChanged, CurrentComboPointsXRef * 8, false);
+				EmitSignal(SignalName.ComboPointsYChanged, CurrentComboPointsYRef * 8, false);
 			}
 			else
 			{
 				// If the score is negative, apply a larger exponential reduction (power of 1.5) to the absolute value.
 				// If the score is positive, apply an exponential increase (power of 1.5).
-				EmitSignal(SignalName.ScoreChanged, (CurrentScore < 0) ? (0 - Math.Pow(Math.Abs(CurrentScore), 1.5)) 
-					: Math.Pow(Math.Abs(CurrentScore), 1.5), false);
+				EmitSignal(SignalName.ScoreChanged, (CurrentScoreRef < 0) ? (0 - Math.Pow(Math.Abs(CurrentScoreRef), 1.5)) 
+					: Math.Pow(Math.Abs(CurrentScoreRef), 1.5), false);
 				EmitSignal(SignalName.ComboStarted);	
 			}
+			EmitSignal(SignalName.HighChimeRequested);
 		}
+		// ReSharper disable once InvertIf
 		if (sceneFilePath == _skullPath)
 		{
 			//Tally = 0;
@@ -600,13 +582,13 @@ public partial class ItemManager : Node
 					EmitSignal(SignalName.ScoreChanged, -9999, false);
 					break;
 				case 1:
-					EmitSignal(SignalName.ScoreChanged, CurrentScore + 9999, false); // Wait, score -= -9999 is score += 9999
+					EmitSignal(SignalName.ScoreChanged, CurrentScoreRef + 9999, false); // Wait, score -= -9999 is score += 9999
 					break;
 				case 3:
 					EmitSignal(SignalName.ScoreChanged, 0, false);
 					break;
 				case 5:
-					EmitSignal(SignalName.ScoreChanged, CurrentScore - 9999, false);
+					EmitSignal(SignalName.ScoreChanged, CurrentScoreRef - 9999, false);
 					break;
 				default:
 					EmitSignal(SignalName.ScoreChanged, 9999, false);
@@ -659,42 +641,72 @@ public partial class ItemManager : Node
 		Tally = 0;
 		if (ItemNodes != null)
 		{
-			foreach (Node2D node in ItemNodes)
+			foreach (var node in ItemNodes.Where(GodotObject.IsInstanceValid))
 			{
-				if (GodotObject.IsInstanceValid(node)) node.Free(); 
-				//node.QueueFree();
+				node.Free();
 			}
 			ItemNodes.Clear();
 			ItemsData.Clear();
 		}
 		if (WallNodes != null)
 		{
-			foreach (Node2D node in WallNodes)
+			foreach (var node in WallNodes.Where(GodotObject.IsInstanceValid))
 			{
-				if (GodotObject.IsInstanceValid(node)) node.Free(); 
-				//node.QueueFree();
+				node.Free();
 			}
 			WallNodes.Clear();
 			WallsData.Clear();
 		}
 		if (LargeWallNodes != null)
 		{
-			foreach (Node2D node in LargeWallNodes)
+			foreach (var node in LargeWallNodes.Where(GodotObject.IsInstanceValid))
 			{
-				if (GodotObject.IsInstanceValid(node)) node.Free(); 
-				//node.QueueFree();
+				node.Free();
 			}
 			LargeWallNodes.Clear();
 			LargeWallsData.Clear();
 		}
 		//MEMO: avoids unnecessary null checks. Useful since we hash available positions.
+		// ReSharper disable once UseCollectionExpression
 		ItemNodes = new List<Node2D>();
+		// ReSharper disable once UseCollectionExpression
 		ItemsData = new List<Vector2I>();
+		// ReSharper disable once UseCollectionExpression
 		WallNodes = new List<Node2D>();
+		// ReSharper disable once UseCollectionExpression
 		WallsData = new List<Vector2I>();
+		// ReSharper disable once UseCollectionExpression
 		LargeWallNodes = new List<Node2D>();
+		// ReSharper disable once UseCollectionExpression
 		LargeWallsData = new List<Vector2I>();
 		
 		MoveEgg();
+	}
+
+	public void UpdateScoreReferences(double score, double comboX, double comboY)
+	{
+		CurrentScoreRef = score;
+		CurrentComboPointsXRef = comboX;
+		CurrentComboPointsYRef = comboY;
+	}
+
+	public void SetCellPixelSizeRef(int boardCellPixelSize)
+	{
+		CellPixelSizeRef = boardCellPixelSize;
+	}
+
+	public void SetBoardCellSizeRef(int boardBoardCellSize)
+	{
+		BoardCellSizeRef = boardBoardCellSize;
+	}
+
+	public void SetPlacementOffset(Vector2I vector2I)
+	{
+		PlacementOffsetRef = vector2I;
+	}
+
+	public void InitializeEggNode(Node2D getNode)
+	{
+		EggNode	= getNode;
 	}
 }

@@ -19,7 +19,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 The author can be contacted at pan.i.githubcontact@gmail.com
 */
 
-using System;
 using System.Diagnostics;
 using Godot;
 
@@ -28,6 +27,9 @@ namespace Snake.Scripts.Domain.Managers;
 public partial class ScoreManager : GodotObject
 {
     [Signal] public delegate void ScoreChangedEventHandler(double score, double comboX, double comboY, bool isInCombo);
+    [Signal] public delegate void ComboStartedEventHandler();
+    [Signal] public delegate void ComboEndedEventHandler();
+    [Signal] public delegate void ComboCancelledEventHandler();
 
     public double Score { get; private set; }
     public double ComboPointsX { get; set; }
@@ -58,6 +60,11 @@ public partial class ScoreManager : GodotObject
         Score = Math.Round(Score, 0);
         EmitScoreChanged();
     }
+    
+    public void IncrementComboTally()
+    {
+        ComboTally++;
+    }
 
     public void StartCombo()
     {
@@ -69,6 +76,7 @@ public partial class ScoreManager : GodotObject
         ComboPointsX = Math.Max(1, ComboTally);
         ComboPointsY = 1;
         Debug.Print("Combo Started!");
+        EmitComboStarted();
         EmitScoreChanged();
     }
 
@@ -86,6 +94,7 @@ public partial class ScoreManager : GodotObject
         ComboTally = 0;
         ComboPointsX = 0;
         ComboPointsY = 0;
+        EmitComboEnded();
         EmitScoreChanged();
     }
 
@@ -95,11 +104,39 @@ public partial class ScoreManager : GodotObject
         IsInCombo = false;
         ComboPointsX = 0;
         ComboPointsY = 0;
+        EmitComboCancelled();
+        EmitScoreChanged();
+    }
+    
+    public void UpdateComboPointsX(double amount)
+    {
+        ComboPointsX = amount;
+        EmitScoreChanged();
+    }
+    
+    public void UpdateComboPointsY(double amount)
+    {
+        ComboPointsY = amount;
         EmitScoreChanged();
     }
 
     private void EmitScoreChanged()
     {
         EmitSignal(SignalName.ScoreChanged, Score, ComboPointsX, ComboPointsY, IsInCombo);
+    }
+
+    private void EmitComboStarted()
+    {
+        EmitSignal(SignalName.ComboStarted, null);
+    }
+    
+    private void EmitComboEnded()
+    {
+        EmitSignal(SignalName.ComboEnded, null);
+    }
+    
+    private void EmitComboCancelled()
+    {
+        EmitSignal(SignalName.ComboCancelled, null);
     }
 }

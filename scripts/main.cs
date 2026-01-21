@@ -25,8 +25,9 @@ using HealthManager = Snake.Scripts.Domain.Managers.HealthManager;
 using ScoreManager = Snake.Scripts.Domain.Managers.ScoreManager;
 using SnakeManager = Snake.Scripts.Domain.Managers.SnakeManager;
 using TimeManager = Snake.Scripts.Domain.Managers.TimeManager;
-using UiManager = Snake.Scripts.Domain.Managers.UiManager;
 using ItemManager = Snake.Scripts.Domain.Managers.ItemManager;
+using AudioManager = Snake.Scripts.Domain.Managers.AudioManager;
+using UiManager = Snake.Scripts.Domain.Managers.UiManager;
 using Timer = Godot.Timer;
 
 namespace Snake.Scripts;
@@ -36,6 +37,7 @@ public partial class Main : Node
 {
 	#region Exports, Fields, Objects, and Properties
 	[Export] public PackedScene SnakeSegmentPs {get; set;}
+	[Export] public Node AudioGroupRoot {get; set;}
 	[Signal] public delegate void HudFlashRequestedEventHandler(int type);
 	private SnakeManager Snake { get; }
 	private ItemManager Items { get; }
@@ -43,6 +45,7 @@ public partial class Main : Node
 	private ScoreManager Score { get; }
 	private HealthManager Health { get; }
 	private TimeManager Time { get; }
+	private AudioManager Audio { get; }
 	// ReSharper disable once InconsistentNaming
 	private UiManager UI { get; }
 
@@ -61,6 +64,7 @@ public partial class Main : Node
 		Score = new ScoreManager();
 		Health = new HealthManager();
 		Time = new TimeManager();
+		Audio = new AudioManager();
 		UI = new UiManager();
 	}
 
@@ -86,17 +90,19 @@ public partial class Main : Node
 		);
 
 		Board.Initialize(GetNode<AnimatedSprite2D>("Background").Position);
-
-		Snake.SnakeSegmentPs = SnakeSegmentPs;
-		Snake.CellPixelSize = Board.CellPixelSize;
+		
+		Snake.SetSnakeSegmentPs(SnakeSegmentPs);
+		Snake.SetCellPixelSizeRef(Board.CellPixelSize);
 		Snake.MapDirections();
 
-		Items.CellPixelSize = Board.CellPixelSize;
-		Items.BoardCellSize = Board.BoardCellSize;
-		Items.PlacementOffset = new Vector2I(Board.CellPixelSize/2, Board.CellPixelSize/2);
-		Items.EggNode = GetNode<Node2D>("Egg");
+		Items.SetCellPixelSizeRef(Board.CellPixelSize);
+		Items.SetBoardCellSizeRef(Board.BoardCellSize);
+		Items.SetPlacementOffset(new Vector2I(Board.CellPixelSize/2, Board.CellPixelSize/2));
+		Items.InitializeEggNode(GetNode<Node2D>("Egg"));
 		Items.LoadItems(GetNode("ItemManager"));
 		Items.SetItemRates();
+		
+		Audio.Initialize(AudioGroupRoot);
 	}
 
 	private void ConnectSignals()
@@ -115,8 +121,7 @@ public partial class Main : Node
 		Snake.DirectionChanged += (direction, action) =>
 		{
 			_moveDirection = direction;
-			Snake.SnakeMoveData[0] = action;
-			Snake.MoveDirection = direction;
+			Snake.SetMoveData(action, direction);
 		};
 
 		// Items
@@ -129,13 +134,19 @@ public partial class Main : Node
 		};
 		Items.ComboPointsXChanged += (amount, isDelta) =>
 		{
-			if (isDelta) Score.ComboPointsX += amount;
-			else Score.ComboPointsX = amount;
+			double newValue = Score.ComboPointsX;
+			
+			if (isDelta) newValue += amount;
+			else newValue = amount;
+			Score.UpdateComboPointsX(newValue);
 		};
 		Items.ComboPointsYChanged += (amount, isDelta) =>
 		{
-			if (isDelta) Score.ComboPointsY += amount;
-			else Score.ComboPointsY = amount;
+			double newValue = Score.ComboPointsY;
+			
+			if (isDelta) newValue += amount;
+			else newValue = amount;
+			Score.UpdateComboPointsY(newValue);
 		};
 		Items.ComboStarted += () => Score.StartCombo();
 		Items.ComboEnded += () => Score.EndCombo();
@@ -145,13 +156,30 @@ public partial class Main : Node
 		{
 			EmitSignal(SignalName.HudFlashRequested, type);
 		};
+		Items.EggMoved += () => Audio.PlayProgressSfx();
+		Items.BadFoodEaten += () => Audio.PlayBadFoodSfx();
+		Items.SpecialEggEaten += (inCombo) => Audio.PlaySpecialEggSfx(inCombo);
+		Items.HighChimeRequested += () => Audio.PlayHighChimeSfx();
 
 		// Score
 		Score.ScoreChanged += (s, cx, cy, inCombo) => {
 			UI.UpdateScore(s, cx, cy, inCombo);
-			Items.CurrentScore = s;
-			Items.CurrentComboPointsX = cx;
-			Items.CurrentComboPointsY = cy;
+			Items.UpdateScoreReferences(s, cx, cy);
+		};
+		Score.ComboStarted += () =>
+		{
+			Audio.PlayPowerUpSfx();
+			UpdateMusic();
+		};
+		Score.ComboEnded += () =>
+		{
+			Audio.PlayPowerDownSfx();
+			UpdateMusic();
+		};
+		Score.ComboCancelled += () =>
+		{
+			Audio.PlayPowerDownSfx();
+			UpdateMusic();
 		};
 
 		// Health
@@ -162,6 +190,7 @@ public partial class Main : Node
 			UI.UpdateWindowDressing(Health.Lives <= 2);
 			Time.StartHealthTimer();
 			Score.EndCombo();
+			Audio.PlayHurtSfx();
 		};
 		Health.GameOverRequested += EndGame;
 	}
@@ -188,9 +217,34 @@ public partial class Main : Node
 		} 
 	}
 	
+	private void UpdateMusic()
+	{
+		if (!_gameStarted)
+		{
+			Audio.PlayLobbyMusic();
+			return;
+		}
+
+		if (Score.IsInCombo)
+		{
+			Audio.PlayComboMusic();
+			return;
+		}
+		var time = Time.GetMoveTimerWaitTime();
+		if (time < 0.5)
+		{
+			Audio.PlayBaseMusic();
+		}
+		else
+		{
+			Audio.PlaySpaceMusic();
+		}
+	}
+
 	#region Gameplay Logic
 	private void NewGame()
 	{
+		_gameStarted = false;
 		Time.SetMoveTimerWaitTime(0.5);
 		GetTree().Paused = false;
 		GetTree().CallGroup("snake", "queue_free");
@@ -199,6 +253,7 @@ public partial class Main : Node
 		UI.HideGameOver();
 		UI.SetBackgroundVisible(false);
 		UI.UpdateWindowDressing(false);
+		UI.ResetHudPanels();
 		
 		_moveDirection = SnakeManager.UpMove;
 		Snake.MoveDirection = _moveDirection;
@@ -210,6 +265,7 @@ public partial class Main : Node
 			Board.CellPixelSize,
 			SnakeSegmentPs
 		);
+		Audio.NewGame();
 	}
 
 	private void StartGame()
@@ -218,6 +274,7 @@ public partial class Main : Node
 		
 		_gameStarted = true;
 		Time.StartMoveTimer();
+		UpdateMusic();
 	}
 
 	private void EndGame()
@@ -240,6 +297,8 @@ public partial class Main : Node
 		_gameStarted = false;
 		Time.StopMoveTimer();
 		UI.ShowGameOver(Score.Score);
+		
+		Audio.GameOver();
 	}
 
 	private void CheckSelfEaten()
@@ -262,7 +321,7 @@ public partial class Main : Node
 		Items.EggEaten();
 		Snake.AddSegment(Snake.OldData[^1]);
 		UI.SetBackgroundVisible(true);
-		Score.ComboTally++;
+		Score.IncrementComboTally();
 
 		UI.UpdateComboMeter(Score.ComboTally, Score.IsInCombo);
 		EmitSignal(SignalName.HudFlashRequested, 0);
@@ -279,7 +338,7 @@ public partial class Main : Node
 			UpdateBackgroundInCombo();
 			Score.ComboPointsX += 2;
 		}
-
+		UpdateMusic();
 		return true;
 	}
 

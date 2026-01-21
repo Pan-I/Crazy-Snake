@@ -19,9 +19,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 The author can be contacted at pan.i.githubcontact@gmail.com
 */
 
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Godot;
 using Snake.Scripts.Domain.Utilities;
 using Snake.Scripts.Interfaces;
@@ -64,19 +62,20 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 	internal List<string> OldSnakeMoveData;
 	private readonly Vector2I _startPosition = new (14, 16);
 	//internal bool CanMove;
-	
-	public SnakeManager()
-	{
-	}
 
 	internal void GenerateSnake()
 	{
-		//Dispose();
+		// ReSharper disable once UseCollectionExpression
 		OldData = new List<Vector2I>();
+		// ReSharper disable once UseCollectionExpression
 		SnakeData = new List<Vector2I>();
+		// ReSharper disable once UseCollectionExpression
 		OldSnakeStates = new List<SnakeVisualState>();
+		// ReSharper disable once UseCollectionExpression
 		SnakeNodes = new List<Node2D>();
+		// ReSharper disable once UseCollectionExpression
 		SnakeMoveData = new List<string>();
+		// ReSharper disable once UseCollectionExpression
 		OldSnakeMoveData = new List<string>();
 
 		for (int i = 0; i < 3; i++)
@@ -90,11 +89,11 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 		// Clear out all those orphaned clones
 		if (SnakeNodes != null)
 		{
-			foreach (var node in SnakeNodes)
+			foreach (var node in SnakeNodes.Where(GodotObject.IsInstanceValid))
 			{
-				if (GodotObject.IsInstanceValid(node)) node.Free();
-				//node.QueueFree();
+				node.Free();
 			}
+
 			SnakeNodes.Clear();
 		}
 		
@@ -166,10 +165,10 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 		OldSnakeMoveData = SnakeMoveData.ToList();
 
 		// Save current visual states before moving
+		// ReSharper disable once UseCollectionExpression
 		OldSnakeStates = new List<SnakeVisualState>();
-		for (int i = 0; i < SnakeNodes.Count; i++)
+		foreach (var sprite in SnakeNodes.Cast<AnimatedSprite2D>())
 		{
-			var sprite = (AnimatedSprite2D)SnakeNodes[i];
 			OldSnakeStates.Add(new SnakeVisualState 
 			{
 				Frame = sprite.Frame,
@@ -482,5 +481,21 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 		copy.Autoplay = original.Autoplay;
 
 		return copy;
+	}
+
+	public void SetMoveData(string action, Vector2I direction)
+	{
+		SnakeMoveData[0] = action;
+		MoveDirection = direction;
+	}
+
+	public void SetSnakeSegmentPs(PackedScene snakeSegmentPs)
+	{
+		SnakeSegmentPs = snakeSegmentPs;
+	}
+
+	public void SetCellPixelSizeRef(int boardCellPixelSize)
+	{
+		CellPixelSize = boardCellPixelSize;
 	}
 }

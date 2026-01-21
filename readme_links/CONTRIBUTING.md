@@ -18,17 +18,15 @@ The project utilizes both **.NET 8.0** and **.NET 10.0** (as specified in the de
 If you generate new types of files or folder structures intended only for your local build and not for the repository, please update the `.gitignore` accordingly.
 
 **⚠️ CRITICAL: Do not remove the following from `.gitignore`:**
-- `assets/`
 - `builds/`
 - `/working_files`
 
 ### 📦 Assets Management
 
 - **Assets Folder Content**: The `assets/` folder is reserved for game sprites, audio, and other resources. It is **not** intended for scene files (`.tscn`) or script files (`.cs`).
-- **Re-zipping Assets**: If your PR requires changes to assets, you must re-zip your sub-folders into `assets.zip`.
-- **🚀 IMPORTANT**: **Do not zip the `assets/` folder itself.** Zip only the contents within it. Zipping the folder itself breaks file paths in Godot (e.g., `res://assets/...`) and complicates the extraction process.
+- **🚀 IMPORTANT**: Ensure you do not accidentally move or delete files within `assets/` unless intended, as they are now tracked by the repository.
 
-*The `assets.zip` rules are in place for repository size management. Any external contributions that include changes to the `.zip` file will be subject to extra scrutiny.*
+*External contributions that include changes to assets will be subject to extra scrutiny.*
 
 ### 📝 Asset Attributions
 
