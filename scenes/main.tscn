@@ -1,7 +1,7 @@
-[gd_scene load_steps=17 format=3 uid="uid://dwuicj4fifd38"]
+[gd_scene load_steps=38 format=3 uid="uid://dwuicj4fifd38"]
 
-[ext_resource type="Script" uid="uid://ce0lqywlaoy1x" path="res://Scripts/Main.cs" id="1_a8y0u"]
-[ext_resource type="PackedScene" uid="uid://srvuytqmi2cm" path="res://scenes/snake_segments.tscn" id="2_vh6ou"]
+[ext_resource type="Script" uid="uid://d7wbx1vf1y4y" path="res://scripts/Main.cs" id="1_j8jky"]
+[ext_resource type="PackedScene" uid="uid://srvuytqmi2cm" path="res://scenes/snake_segments.tscn" id="2_kmb1v"]
 [ext_resource type="PackedScene" uid="uid://c04wsqka0wuf" path="res://scenes/hud.tscn" id="3_4f2l8"]
 [ext_resource type="Texture2D" uid="uid://3jtxkhgn0m2s" path="res://assets/sprites/Grid 1.png" id="3_5e3uk"]
 [ext_resource type="Texture2D" uid="uid://dfxovxxgki7mp" path="res://assets/sprites/Grid 2a.png" id="4_boxj3"]
@@ -14,7 +14,28 @@
 [ext_resource type="Texture2D" uid="uid://ddgxakiqqtujg" path="res://assets/sprites/Grid 5.png" id="9_tx5c6"]
 [ext_resource type="Texture2D" uid="uid://bmcfcelfxfhpu" path="res://assets/sprites/Grid 7.png" id="10_n40xh"]
 [ext_resource type="Texture2D" uid="uid://do0gk6cgqsvfq" path="res://assets/sprites/Grid 9.png" id="11_mchle"]
+[ext_resource type="AudioStream" uid="uid://ckds015np6hcx" path="res://assets/audio/music/sergequadrado__space-lullaby-loop.mp3" id="16_tel4y"]
 [ext_resource type="PackedScene" uid="uid://bus8ubbqf6t8f" path="res://scenes/item_manager.tscn" id="16_xuxgj"]
+[ext_resource type="AudioStream" uid="uid://d0bdw0r2e6rcw" path="res://assets/audio/music/aquasupreme__character-selection.wav" id="17_qkpxi"]
+[ext_resource type="AudioStream" uid="uid://d0hl30tkqeh3j" path="res://assets/audio/sfx/bad_food_chipTone.wav" id="18_5q0nq"]
+[ext_resource type="AudioStream" uid="uid://bcv1fotn0ph70" path="res://assets/audio/music/sergequadrado__disco-pop-loop.wav" id="18_kmb1v"]
+[ext_resource type="AudioStream" uid="uid://cq3if5jbf7p56" path="res://assets/audio/sfx/blip_chipTone.wav" id="19_dgi5k"]
+[ext_resource type="AudioStream" uid="uid://kw0lwgomcwo2" path="res://assets/audio/music/bloodpixelhero__alien-landing.wav" id="19_fuf3a"]
+[ext_resource type="AudioStream" uid="uid://b20t8ef4upssl" path="res://assets/audio/sfx/boom_chipTone.wav" id="20_j8jky"]
+[ext_resource type="AudioStream" uid="uid://cxf0osukfaqy3" path="res://assets/audio/music/cyntrix__arcade-ambiance-pinball.wav" id="20_pibwh"]
+[ext_resource type="AudioStream" uid="uid://dmh57gvvveu21" path="res://assets/audio/music/bloodpixelhero__dance-to-infinity.wav" id="21_c6pm6"]
+[ext_resource type="AudioStream" uid="uid://dytxsvrrrcoct" path="res://assets/audio/sfx/bright_ring_chipTone.wav" id="21_kmb1v"]
+[ext_resource type="AudioStream" uid="uid://sstcdegbn1p6" path="res://assets/audio/music/seth_makes_sounds__hard-game-music.wav" id="22_5he1u"]
+[ext_resource type="AudioStream" uid="uid://cf0ysaax207hm" path="res://assets/audio/sfx/dim_ring_chipTone.wav" id="22_fuf3a"]
+[ext_resource type="AudioStream" uid="uid://btnboc23rc06d" path="res://assets/audio/sfx/game_over_chipTone.wav" id="23_pibwh"]
+[ext_resource type="AudioStream" uid="uid://4xm311ytwevn" path="res://assets/audio/sfx/health_up_chipTone.wav" id="24_c6pm6"]
+[ext_resource type="AudioStream" uid="uid://dvo4ajp8kj0wp" path="res://assets/audio/sfx/high_chime_chipTone.wav" id="25_5he1u"]
+[ext_resource type="AudioStream" uid="uid://behxpjjyv8pb" path="res://assets/audio/sfx/hurt_chipTone.wav" id="26_5poiv"]
+[ext_resource type="AudioStream" uid="uid://budvheprtwgtc" path="res://assets/audio/sfx/power_down_chipTone.wav" id="27_2cjbq"]
+[ext_resource type="AudioStream" uid="uid://dhhm8bgqg0ctx" path="res://assets/audio/sfx/power_up_chipTone.wav" id="28_chjal"]
+[ext_resource type="AudioStream" uid="uid://br8h2v0s8e41q" path="res://assets/audio/sfx/progress_chime_chipTone.wav" id="29_cjqg0"]
+[ext_resource type="AudioStream" uid="uid://blmvsh1ctgiob" path="res://assets/audio/sfx/scratch_echo_chipTone.wav" id="30_vchkt"]
+[ext_resource type="AudioStream" uid="uid://gw6ap7mmcmtl" path="res://assets/audio/sfx/teleport_chipTone.wav" id="31_txyw0"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_tp2o2"]
 animations = [{
@@ -51,9 +72,10 @@ animations = [{
 "speed": 0.0
 }]
 
-[node name="Main" type="Node"]
-script = ExtResource("1_a8y0u")
-SnakeSegmentPs = ExtResource("2_vh6ou")
+[node name="Main" type="Node" node_paths=PackedStringArray("AudioGroupRoot")]
+script = ExtResource("1_j8jky")
+SnakeSegmentPs = ExtResource("2_kmb1v")
+AudioGroupRoot = NodePath("AudioNodeGroup")
 
 [node name="Background" type="AnimatedSprite2D" parent="."]
 position = Vector2(480, 540)
@@ -84,6 +106,75 @@ wait_time = 0.2
 
 [node name="HudFlashTimer" type="Timer" parent="."]
 wait_time = 0.2
+
+[node name="AudioNodeGroup" type="Node" parent="."]
+
+[node name="Music" type="Node" parent="AudioNodeGroup"]
+
+[node name="SpaceMusic" type="AudioStreamPlayer" parent="AudioNodeGroup/Music"]
+stream = ExtResource("16_tel4y")
+
+[node name="LobbyMusic" type="AudioStreamPlayer" parent="AudioNodeGroup/Music"]
+stream = ExtResource("17_qkpxi")
+
+[node name="ComboMusic" type="AudioStreamPlayer" parent="AudioNodeGroup/Music"]
+stream = ExtResource("18_kmb1v")
+
+[node name="AlienMusic" type="AudioStreamPlayer" parent="AudioNodeGroup/Music"]
+stream = ExtResource("19_fuf3a")
+
+[node name="AmbientBGAudio" type="AudioStreamPlayer" parent="AudioNodeGroup/Music"]
+stream = ExtResource("20_pibwh")
+
+[node name="BaseGameplayMusic" type="AudioStreamPlayer" parent="AudioNodeGroup/Music"]
+stream = ExtResource("21_c6pm6")
+
+[node name="GameOverMusic" type="AudioStreamPlayer" parent="AudioNodeGroup/Music"]
+stream = ExtResource("22_5he1u")
+
+[node name="SFX" type="Node" parent="AudioNodeGroup"]
+
+[node name="BadFoodSFX" type="AudioStreamPlayer" parent="AudioNodeGroup/SFX"]
+stream = ExtResource("18_5q0nq")
+
+[node name="BlipSFX" type="AudioStreamPlayer" parent="AudioNodeGroup/SFX"]
+stream = ExtResource("19_dgi5k")
+
+[node name="BoomSFX" type="AudioStreamPlayer" parent="AudioNodeGroup/SFX"]
+stream = ExtResource("20_j8jky")
+
+[node name="BrightRingSFX" type="AudioStreamPlayer" parent="AudioNodeGroup/SFX"]
+stream = ExtResource("21_kmb1v")
+
+[node name="DimRingSFX" type="AudioStreamPlayer" parent="AudioNodeGroup/SFX"]
+stream = ExtResource("22_fuf3a")
+
+[node name="GameOverSFX" type="AudioStreamPlayer" parent="AudioNodeGroup/SFX"]
+stream = ExtResource("23_pibwh")
+
+[node name="HealthUpSFX" type="AudioStreamPlayer" parent="AudioNodeGroup/SFX"]
+stream = ExtResource("24_c6pm6")
+
+[node name="HighChimeSFX" type="AudioStreamPlayer" parent="AudioNodeGroup/SFX"]
+stream = ExtResource("25_5he1u")
+
+[node name="HurtSFX" type="AudioStreamPlayer" parent="AudioNodeGroup/SFX"]
+stream = ExtResource("26_5poiv")
+
+[node name="PowerDownSFX" type="AudioStreamPlayer" parent="AudioNodeGroup/SFX"]
+stream = ExtResource("27_2cjbq")
+
+[node name="PowerUpSFX" type="AudioStreamPlayer" parent="AudioNodeGroup/SFX"]
+stream = ExtResource("28_chjal")
+
+[node name="ProgressSFX" type="AudioStreamPlayer" parent="AudioNodeGroup/SFX"]
+stream = ExtResource("29_cjqg0")
+
+[node name="ScratchEchoSFX" type="AudioStreamPlayer" parent="AudioNodeGroup/SFX"]
+stream = ExtResource("30_vchkt")
+
+[node name="TeleportSFX" type="AudioStreamPlayer" parent="AudioNodeGroup/SFX"]
+stream = ExtResource("31_txyw0")
 
 [connection signal="timeout" from="MoveTimer" to="." method="_on_move_timer_timeout"]
 [connection signal="Restart" from="GameOverMenu" to="." method="_on_game_over_menu_restart"]

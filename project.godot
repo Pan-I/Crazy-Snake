@@ -14,7 +14,7 @@ config/name="Crazy Snake"
 config/description="Snake as a Godot project. Written in C#. Game includes ...
 
 Ian Pommer (2025)"
-config/version="0.3.0"
+config/version="0.3.3"
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 config/icon="res://icon.svg"

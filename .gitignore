@@ -1,20 +1,21 @@
-#assets are ignored to keep file size down. Always compress saved assets before pushing to capture your changes in your commit
-assets/
-
-.idea/
-*.cfg
-*.import
-*.sln
-*.exe
+# Local Notes
+LOCAL TO-DO.md
 .obsidian/
 /working_files
-/builds
 
+# JetBrains Rider
+*.sln
+*.sln.iml
+.idea/
+*.cfg
+*.exe
+/builds
 
 # Godot 4+ specific ignores
 .godot/
 
 # Godot-specific ignores
+*.import
 .import/
 export.cfg
 export_presets.cfg
@@ -425,9 +426,3 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
-
-# JetBrains Rider
-*.sln.iml
-
-# Local Notes
-LOCAL TO-DO.md

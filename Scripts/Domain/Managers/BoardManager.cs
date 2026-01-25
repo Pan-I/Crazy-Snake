@@ -23,15 +23,34 @@ using Godot;
 
 namespace Snake.Scripts.Domain.Managers;
 
+/// <summary>
+/// Manages the board for the game, including its dimensions and functionality for checking board boundaries.
+/// </summary>
 public partial class BoardManager : GodotObject
 {
-    public int BoardCellSize { get; set; } = 30;
-    public int CellPixelSize { get; set; } = 30;
-    public float BoardLeft { get; private set; }
-    public float BoardTop { get; private set; }
-    public float BoardRight { get; private set; }
-    public float BoardBottom { get; private set; }
+    #region Properties
+    /// <summary>
+    /// The size of each cell on the board, in grid units (squares, columns, rows, etc.).
+    /// </summary>
+    public int BoardCellSize { get; private set; } = 30;
+    /// <summary>
+    /// The size of each cell on the board, in pixels.
+    /// </summary>
+    public int CellPixelSize { get; private set; } = 30;
+    #endregion
 
+    #region Private Boundaries
+    private float BoardLeft { get; set; }
+    private float BoardTop { get; set; }
+    private float BoardRight { get; set; }
+    private float BoardBottom { get; set; }
+    #endregion
+
+    #region Initialization
+    /// <summary>
+    /// Initializes the board manager with the specified board position.
+    /// </summary>
+    /// <param name="boardPosition"></param>
     public void Initialize(Vector2 boardPosition)
     {
         BoardLeft = boardPosition.X - ((BoardCellSize * CellPixelSize) / 2);
@@ -39,7 +58,14 @@ public partial class BoardManager : GodotObject
         BoardTop = boardPosition.Y - ((BoardCellSize * CellPixelSize) / 2);
         BoardBottom = boardPosition.Y + ((BoardCellSize * CellPixelSize) / 2);
     }
+    #endregion
 
+    #region Boundary Checks
+    /// <summary>
+    /// Checks if the specified position is outside the bounds of the board.
+    /// </summary>
+    /// <param name="position"></param>
+    /// <returns></returns>
     public bool IsOutOfBounds(Vector2I position)
     {
         return (position.X * CellPixelSize) < BoardLeft || 
@@ -47,4 +73,5 @@ public partial class BoardManager : GodotObject
                ((position.Y + 1) * CellPixelSize) < BoardTop || 
                ((position.Y + 4) * CellPixelSize) > BoardBottom;
     }
+    #endregion
 }

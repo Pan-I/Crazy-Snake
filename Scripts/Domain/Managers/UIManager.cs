@@ -23,12 +23,28 @@ using Godot;
 
 namespace Snake.Scripts.Domain.Managers;
 
+/// <summary>
+/// Manages the user interface (UI) elements of the game, including the HUD, game over menu, and background animations.
+/// Provides functionality to update, display, and reset various UI components in response to game events.
+/// </summary>
 public partial class UiManager : GodotObject
 {
+    #region Fields
+
     private CanvasLayer _hud;
     private CanvasLayer _gameOverMenu;
     private AnimatedSprite2D _background;
 
+    #endregion
+
+    #region Initialization
+
+    /// <summary>
+    /// Initializes the UIManager with the specified HUD, game over menu, and background components.
+    /// </summary>
+    /// <param name="hud">The CanvasLayer representing the HUD.</param>
+    /// <param name="gameOverMenu">The CanvasLayer representing the game over menu.</param>
+    /// <param name="background">The AnimatedSprite2D representing the background.</param>
     public void Initialize(CanvasLayer hud, CanvasLayer gameOverMenu, AnimatedSprite2D background)
     {
         _hud = hud;
@@ -36,18 +52,35 @@ public partial class UiManager : GodotObject
         _background = background;
     }
 
+    #endregion
+
+    #region HUD Updates
+
+    /// <summary>
+    /// Updates the score display on the HUD, including the current score, combo multipliers,
+    /// and the visibility of combo-related elements.
+    /// </summary>
+    /// <param name="score">The current score to be displayed on the HUD.</param>
+    /// <param name="comboX">The first combo multiplier value contributing to the score.</param>
+    /// <param name="comboY">The second combo multiplier value contributing to the score.</param>
+    /// <param name="isInCombo">Indicates whether the player is currently in a combo sequence.</param>
     public void UpdateScore(double score, double comboX, double comboY, bool isInCombo)
     {
         _hud.GetNode<Panel>("ScorePanel").GetNode<Label>("ScoreLabel").Text = $"Score: {score} ";
         _hud.GetNode<Panel>("ComboPanel").GetNode<Label>("ComboLabel").Text = $"CRRAAAZZY Combo: {comboX} * {comboY}";
         _hud.GetNode<Panel>("ComboPanel").GetNode<Label>("ComboLabel").Visible = isInCombo;
-        
+
         if (!isInCombo)
         {
             _hud.GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter").Visible = false;
         }
     }
 
+    /// <summary>
+    /// Updates the combo meter display based on the current combo tally and combo state.
+    /// </summary>
+    /// <param name="comboTally">The number of items collected in the current combo sequence.</param>
+    /// <param name="isInCombo">Indicates whether the player is actively in a combo state.</param>
     public void UpdateComboMeter(int comboTally, bool isInCombo)
     {
         var comboMeter = _hud.GetNode<Panel>("ComboPanel").GetNode<Control>("ComboMeter");
@@ -59,6 +92,14 @@ public partial class UiManager : GodotObject
         }
     }
 
+    #endregion
+
+    #region Game Over
+
+    /// <summary>
+    /// Displays the game over menu and updates its text with the final score.
+    /// </summary>
+    /// <param name="score">The final score to be displayed in the game over menu.</param>
     public void ShowGameOver(double score)
     {
         _gameOverMenu.Visible = true;
@@ -66,14 +107,39 @@ public partial class UiManager : GodotObject
         _gameOverMenu.GetNode<Panel>("GameOverPanel").GetNode<Label>("GameOverLabel").Text = message;
     }
 
+    /// <summary>
+    /// Hides the game over menu, making it no longer visible in the UI.
+    /// </summary>
     public void HideGameOver()
     {
         _gameOverMenu.Visible = false;
     }
 
+    #endregion
+
+    #region Background Control
+
+    /// <summary>
+    /// Sets the visibility of the background element in the UI.
+    /// </summary>
+    /// <param name="visible">A boolean indicating whether the background should be visible (true) or hidden (false).</param>
     public void SetBackgroundVisible(bool visible) => _background.Visible = visible;
+
+    /// <summary>
+    /// Sets the frame of the animated background sprite to the specified frame index.
+    /// </summary>
+    /// <param name="frame">The index of the frame to display for the animated background.</param>
     public void SetBackgroundFrame(int frame) => _background.Frame = frame;
 
+    #endregion
+
+    #region Visual Effects
+
+    /// <summary>
+    /// Applies a visual flash effect to the HUD panels based on the specified event type.
+    /// </summary>
+    /// <param name="type">An integer representing the type of event causing the flash:
+    /// 0 for a regular egg consumption, 1 for health deduction, or 2 for other item consumption.</param>
     public void HudFlash(int type)
     {
         StyleBoxFlat styleBox = new StyleBoxFlat();
@@ -96,6 +162,9 @@ public partial class UiManager : GodotObject
         ApplyStyleToPanels(styleBox);
     }
 
+    /// <summary>
+    /// Resets the HUD panels by applying a default style to refresh their appearance.
+    /// </summary>
     public void ResetHudPanels()
     {
         StyleBoxFlat styleBox = new StyleBoxFlat();
@@ -105,6 +174,10 @@ public partial class UiManager : GodotObject
         ApplyStyleToPanels(styleBox);
     }
 
+    /// <summary>
+    /// Applies the specified StyleBox to the panels within the HUD.
+    /// </summary>
+    /// <param name="styleBox">The StyleBox containing the style properties to apply to the panels.</param>
     private void ApplyStyleToPanels(StyleBox styleBox)
     {
         foreach (string panelName in new[] { "RightPanel", "BottomPanel" })
@@ -120,6 +193,11 @@ public partial class UiManager : GodotObject
         }
     }
 
+    /// <summary>
+    /// Updates the appearance of the window dressing panel based on the game's health and game-over state.
+    /// </summary>
+    /// <param name="lowHealth">Indicates whether the player's health is low.</param>
+    /// <param name="isGameOver">Indicates whether the game is in a game-over state. Defaults to false.</param>
     public void UpdateWindowDressing(bool lowHealth, bool isGameOver = false)
     {
         var panel = _hud.GetNode<Panel>("WindowDressingPanel");
@@ -139,4 +217,6 @@ public partial class UiManager : GodotObject
         styleBox.SetBorderWidthAll(10);
         panel.AddThemeStyleboxOverride("panel", styleBox);
     }
+
+    #endregion
 }

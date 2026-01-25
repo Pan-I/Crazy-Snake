@@ -4,9 +4,9 @@ This document provides solutions for common issues encountered during setup and 
 
 ## Common Issues
 
-### 1. Assets Folder Not Found
+### 1. Missing Assets
 **Symptoms:** Game starts with missing textures or sounds.
-**Solution:** Ensure you have unzipped the `assets.zip` file into the root directory. The directory structure should be `assets/sprites/` etc.
+**Solution:** Verify that the `assets/` folder was correctly downloaded with the repository. If it's missing, you may need to re-clone or pull from the main branch. The directory structure should be `assets/sprites/` and `assets/audio/` etc.
 
 ### 2. C# Solution Not Found
 **Symptoms:** Godot reports errors about missing .sln file or can't build.

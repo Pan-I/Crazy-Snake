@@ -9,19 +9,18 @@ This document provides project-specific information for developers working on th
 *   **Building**:
     *   Use `dotnet build` from the root directory.
     *   If you encounter "Duplicate attribute" errors (e.g., `AssemblyCompanyAttribute`), run `dotnet clean` before building or testing. This often happens due to Godot's temporary file generation in `.godot/mono/temp/obj/`.
-*   **Assets**: Ensure `assets.zip` is extracted into the `assets/` folder in the project root.
 
 #### 2. Testing Information
 
 *   **Framework**: [NUnit 4](https://nunit.org/) is used for unit testing.
-*   **Test Project**: Located in the `SnakeTest/` directory.
+*   **Test Project**: Located in the `snake_test/` directory.
 *   **Running Tests**:
     ```bash
     dotnet test SnakeTest\SnakeTest.csproj
     ```
     *Note: Running `dotnet test` from the root may fail if it attempts to build both projects simultaneously without proper isolation or if there are stale artifacts.*
 *   **Adding New Tests**:
-    1.  Create a new `.cs` file in the `SnakeTest/` folder.
+    1.  Create a new `.cs` file in the `snake_test/` folder.
     2.  Use the `[TestFixture]` and `[Test]` attributes.
     3.  Follow the existing pattern of using `MockObjects.cs` for mocking game components like `ISnakeManager`.
 *   **Test Example**:
@@ -51,11 +50,13 @@ This document provides project-specific information for developers working on th
 *   **Architecture**:
     *   **Manager-based**: Core logic is orchestrated by `Main.cs`, which delegates to specialized managers (e.g., `SnakeManager`, `ItemManager`, `ScoreManager`).
     *   **Signal-driven**: Communication between managers and the UI is primarily handled via Godot Signals to maintain decoupling.
-    *   **Interfaces**: Use interfaces defined in `Scripts/Interfaces/` (e.g., `ISnakeManager`) to facilitate testing and mocking.
+    *   **Setter Methods**: Use setter methods to enforce immutability of Manager properties and avoid direct modification of game state.
+    *   **Interfaces**: Use interfaces defined in `scripts/interfaces/` (e.g., `ISnakeManager`) to facilitate testing and mocking.
 *   **Code Style**:
     *   Follow standard C# naming conventions (PascalCase for classes/methods, camelCase for local variables).
     *   Use file-scoped namespaces (C# 10+ feature).
     *   Utilize modern C# features (e.g., pattern matching, switch expressions) where appropriate.
+    *   Ensure `Main.cs` is always capitalized; any references to `Main.cs` should be maintained accordingly, references may be case-insensitive.
 *   **Godot Integration**:
     *   The project uses `Godot.NET.Sdk`. Be aware that some Godot-specific source generators might require the project to be opened in the Godot Editor to correctly resolve paths like `res://`.
     *   Avoid direct logic in `_Process` or `_Input` inside managers; instead, use methods that can be called by `Main.cs` or triggered by signals.
