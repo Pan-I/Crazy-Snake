@@ -46,6 +46,7 @@ public struct SnakeVisualState
 /// </summary>
 public partial class SnakeManager : GodotObject, ISnakeManager
 {
+	#region Signals
 	/// <summary>
 	/// Handles the event triggered to request the start of the game.
 	/// </summary>
@@ -93,16 +94,16 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 	/// </remarks>
 	[Signal]
 	public delegate void SegmentRemovedEventHandler(Node2D node);
+	#endregion
 
-	// Directions
-	
+	#region Properties & Fields
 	/// <summary>
 	/// Represents the movement vector for the snake's upward direction.
 	/// </summary>
 	/// <remarks>
 	/// This constant defines a unit vector used to move the snake one step upward
 	/// within the game grid. It ensures consistency in controlling upward movement
-	/// and is utilized throughout the game logic for directional calculations.
+	/// and is used throughout the game logic for directional calculations.
 	/// Modifying this value impacts all upward movements executed by the snake.
 	/// </remarks>
 	public static readonly Vector2I UpMove = new(0, -1);
@@ -199,7 +200,7 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 	/// </summary>
 	/// <remarks>
 	/// This property holds the list of positions for all segments of the snake, with each segment represented
-	/// as a <see cref="Vector2I"/>. The first entry denotes the head of the snake, while subsequent entries
+	/// as a <see cref="Vector2I"/>. The first entry denotes the head of the snake, while further entries
 	/// represent the body segments in the order of their connection. It is used to manage the snake's layout
 	/// during gameplay and is updated whenever the snake moves or gains a new segment.
 	/// </remarks>
@@ -210,7 +211,9 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 	internal List<string> SnakeMoveData;
 	internal List<string> OldSnakeMoveData;
 	private readonly Vector2I _startPosition = new (14, 16);
-
+	#endregion
+	
+	#region Initialization & Disposal
 	/// <summary>
 	/// Initializes the data structures and visual components needed for the snake's functionality
 	/// and appearance in the game. This method clears any existing state, resets collections
@@ -259,8 +262,9 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 		
 		base.Dispose();
 	}
+	#endregion
 
-
+	#region Segment Management
 	/// <summary>
 	/// Adds a new segment to the snake at the specified position.
 	/// The segment is visually created and appended to the snake's existing nodes,
@@ -292,6 +296,46 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 		
 	}
 
+	/// <summary>
+	/// Removes the first segment of the snake's body, effectively shortening it from the head.
+	/// </summary>
+	/// <remarks>
+	/// This method updates both the internal data representation and visual state of the snake.
+	/// It emits a signal for the removed segment, enabling external actions such as cleanup or effects.
+	/// </remarks>
+	public void RemoveHead()
+	{
+		if (SnakeNodes.Count <= 0) return;
+		var node = SnakeNodes[0];
+		SnakeData.RemoveAt(0);
+		SnakeNodes.RemoveAt(0);
+		EmitSignal(SignalName.SegmentRemoved, node);
+	}
+
+	/// <summary>
+	/// Removes a portion of the snake's body starting from a specified index, effectively shortening the snake.
+	/// </summary>
+	/// <remarks>
+	/// This method ensures the snake's data and visual states remain consistent when segments are removed.
+	/// It emits a signal for each removed segment, allowing additional actions or updates to occur externally.
+	/// </remarks>
+	/// <param name="index">The zero-based index from which tail segments should be removed.</param>
+	public void RemoveTailFrom(int index)
+	{
+		for (int j = SnakeData.Count - 1; j > index; j--)
+		{
+			var node = SnakeNodes[j];
+			SnakeData.RemoveAt(j);
+			OldData.RemoveAt(j);
+			SnakeNodes.RemoveAt(j);
+			SnakeMoveData.RemoveAt(j);
+			OldSnakeMoveData.RemoveAt(j);
+			EmitSignal(SignalName.SegmentRemoved, node);
+		}
+	}
+	#endregion
+
+	#region Movement & State Updates
 	/// <summary>
 	/// Processes player input for directional movement of the snake during gameplay.
 	/// This method listens for key presses or input actions mapped to snake movement
@@ -390,7 +434,9 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 			}
 		}
 	}
+	#endregion
 
+	#region Visuals & Animations
 	/// <summary>
 	/// Updates the visual state and properties of specific tail segments of the snake based on their
 	/// position and direction, ensuring proper orientation, frame selection, and alignment during gameplay.
@@ -622,64 +668,6 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 	}
 
 	/// <summary>
-	/// Removes the first segment of the snake's body, effectively shortening it from the head.
-	/// </summary>
-	/// <remarks>
-	/// This method updates both the internal data representation and visual state of the snake.
-	/// It emits a signal for the removed segment, enabling external actions such as cleanup or effects.
-	/// </remarks>
-	public void RemoveHead()
-	{
-		if (SnakeNodes.Count <= 0) return;
-		var node = SnakeNodes[0];
-		SnakeData.RemoveAt(0);
-		SnakeNodes.RemoveAt(0);
-		EmitSignal(SignalName.SegmentRemoved, node);
-	}
-
-	/// <summary>
-	/// Removes a portion of the snake's body starting from a specified index, effectively shortening the snake.
-	/// </summary>
-	/// <remarks>
-	/// This method ensures the snake's data and visual states remain consistent when segments are removed.
-	/// It emits a signal for each removed segment, allowing additional actions or updates to occur externally.
-	/// </remarks>
-	/// <param name="index">The zero-based index from which tail segments should be removed.</param>
-	public void RemoveTailFrom(int index)
-	{
-		for (int j = SnakeData.Count - 1; j > index; j--)
-		{
-			var node = SnakeNodes[j];
-			SnakeData.RemoveAt(j);
-			OldData.RemoveAt(j);
-			SnakeNodes.RemoveAt(j);
-			SnakeMoveData.RemoveAt(j);
-			OldSnakeMoveData.RemoveAt(j);
-			EmitSignal(SignalName.SegmentRemoved, node);
-		}
-	}
-
-	/// <summary>
-	/// Maps input actions to corresponding movement directions, visual settings, and head directions for the snake.
-	/// </summary>
-	/// <remarks>
-	/// This method associates specific input actions with their corresponding direction vectors, rotations,
-	/// and visual adjustments like flipping and offsets. It serves as the core configuration for determining how
-	/// the snake responds to user input during gameplay.
-	/// </remarks>
-	public void MapDirections()
-	{
-		// Map input actions to movement directions and settings
-		_headDirection = new Dictionary<string, (Vector2 offset, float rotation, bool flipV, bool flipH, Vector2 direction)>
-		{
-			{ "move_down",  (new Vector2(15, -15), 1.5708f, false, false, DownMove) },
-			{ "move_up",    (new Vector2(-15, 15), 4.7183f, false, false, UpMove) },
-			{ "move_left",  (new Vector2(-15, -15), 3.1416f, true, false, LeftMove) },
-			{ "move_right", (new Vector2(15, 15), 0f, false, false, RightMove) }
-		};
-	}
-
-	/// <summary>
 	/// Creates a deep copy of the specified AnimatedSprite2D instance by replicating its properties and configuration.
 	/// </summary>
 	/// <param name="original">The AnimatedSprite2D instance to be cloned.</param>
@@ -704,6 +692,28 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 		copy.Autoplay = original.Autoplay;
 
 		return copy;
+	}
+	#endregion
+
+	#region Mapping & Configuration
+	/// <summary>
+	/// Maps input actions to corresponding movement directions, visual settings, and head directions for the snake.
+	/// </summary>
+	/// <remarks>
+	/// This method associates specific input actions with their corresponding direction vectors, rotations,
+	/// and visual adjustments like flipping and offsets. It serves as the core configuration for determining how
+	/// the snake responds to user input during gameplay.
+	/// </remarks>
+	public void MapDirections()
+	{
+		// Map input actions to movement directions and settings
+		_headDirection = new Dictionary<string, (Vector2 offset, float rotation, bool flipV, bool flipH, Vector2 direction)>
+		{
+			{ "move_down",  (new Vector2(15, -15), 1.5708f, false, false, DownMove) },
+			{ "move_up",    (new Vector2(-15, 15), 4.7183f, false, false, UpMove) },
+			{ "move_left",  (new Vector2(-15, -15), 3.1416f, true, false, LeftMove) },
+			{ "move_right", (new Vector2(15, 15), 0f, false, false, RightMove) }
+		};
 	}
 
 	/// <summary>
@@ -734,4 +744,5 @@ public partial class SnakeManager : GodotObject, ISnakeManager
 	{
 		CellPixelSize = boardCellPixelSize;
 	}
+	#endregion
 }

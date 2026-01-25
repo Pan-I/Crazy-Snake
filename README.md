@@ -1,4 +1,4 @@
-#  🐍🎮 Crazy Snake 👾🪩 - v0.3.2.0
+#  🐍🎮 Crazy Snake 👾🪩 - v0.3.3.0
 
 <img src="https://raw.githubusercontent.com/Pan-I/Crazy-Snake/refs/heads/main/readme_links/Banner%20Image.png" alt="game banner" width="900"/>
 
@@ -25,7 +25,7 @@
 
 A remake of Snake, with some twists, as a Godot project. Written entirely in C#. Game includes a long list of items that have a wide range of effects on the game and game play, as well as a complex and high-scoring point system.
 
-#### Current Major Update Set (v0.3.2)
+#### Current Major Update Set (v0.3.3)
 
 |                                                               *Where v0.3.x is now*                                                               |
 | :-----------------------------------------------------------------------------------------------------------------------------------------------: |
@@ -38,6 +38,7 @@ The current version (v0.3.x) focuses on:
 - Combo scoring system
 - Ouroboros mechanics
 - Speed changes
+- Audio Implementation
 - Architecture Refactoring
 - Documentation
 
@@ -72,14 +73,14 @@ The project follows a **Manager-based architecture** orchestrated by `Main.cs`. 
 .
 ├── assets/             # Game sprites, audio, and resources
 ├── scenes/             # Godot Scene files (.tscn)
-├── Scripts/            # C# Source Code
-│   ├── Domain/
-│   │   ├── Managers/   # Game logic orchestrators (Snake, Score, Items, etc.)
-│   │   └── Utilities/  # Pure logic helpers
-│   ├── GUI Scripts/    # UI-specific behavior
-│   ├── Interfaces/     # Decoupling abstractions
+├── scripts/            # C# Source Code
+│   ├── domain/
+│   │   ├── managers/   # Game logic orchestrators (Snake, Score, Items, etc.)
+│   │   └── utilities/  # Pure logic helpers
+│   ├── gui_scripts/    # UI-specific behavior
+│   ├── interfaces/     # Decoupling abstractions
 │   └── Main.cs         # Main Entry Point / Game Controller
-├── SnakeTest/          # NUnit Test Project
+├── snake_test/          # NUnit Test Project
 ├── project.godot       # Godot Project File
 └── Snake.sln           # C# Solution
 ```
@@ -125,7 +126,7 @@ The project uses **NUnit** for unit testing core domain logic.
   ```bash
   dotnet test
   ```
-- **Test Location**: `SnakeTest/`
+- **Test Location**: `snake_test/`
 
 ---
 ## 🐛 Issues & Troubleshooting

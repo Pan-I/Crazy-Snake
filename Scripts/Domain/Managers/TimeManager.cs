@@ -29,9 +29,15 @@ namespace Snake.Scripts.Domain.Managers;
 /// </summary>
 public partial class TimeManager : GodotObject
 {
+    #region Fields
+
     private Timer _moveTimer;
     private Timer _hudFlashTimer;
     private Timer _healthTimer;
+
+    #endregion
+
+    #region Initialization
 
     /// <summary>
     /// Initializes the TimeManager by setting the provided timer instances for movement, HUD flashing, and health updates.
@@ -45,6 +51,10 @@ public partial class TimeManager : GodotObject
         _hudFlashTimer = hudFlashTimer;
         _healthTimer = healthTimer;
     }
+
+    #endregion
+
+    #region Move Timer
 
     /// <summary>
     /// Starts the move timer, enabling periodic movement updates in the game logic.
@@ -69,6 +79,10 @@ public partial class TimeManager : GodotObject
     /// <returns>The wait time interval of the move timer in seconds.</returns>
     public double GetMoveTimerWaitTime() => _moveTimer.WaitTime;
 
+    #endregion
+
+    #region HUD Flash Timer
+
     /// <summary>
     /// Initiates the HUD flash timer, activating time-based flashing functionality
     /// associated with it. Use this to enable recurring HUD flash effects
@@ -83,6 +97,10 @@ public partial class TimeManager : GodotObject
     /// </summary>
     public void StopHudFlashTimer() => _hudFlashTimer.Stop();
 
+    #endregion
+
+    #region Health Timer
+
     /// <summary>
     /// Starts the health timer, enabling time-based logic or updates associated with health.
     /// Use this to initiate recurring health-related events driven by the timer.
@@ -94,4 +112,6 @@ public partial class TimeManager : GodotObject
     /// This can be used to halt health-related updates or logic tied to the timer.
     /// </summary>
     public void StopHealthTimer() => _healthTimer.Stop();
+
+    #endregion
 }

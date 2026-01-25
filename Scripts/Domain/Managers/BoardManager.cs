@@ -28,6 +28,7 @@ namespace Snake.Scripts.Domain.Managers;
 /// </summary>
 public partial class BoardManager : GodotObject
 {
+    #region Properties
     /// <summary>
     /// The size of each cell on the board, in grid units (squares, columns, rows, etc.).
     /// </summary>
@@ -36,11 +37,16 @@ public partial class BoardManager : GodotObject
     /// The size of each cell on the board, in pixels.
     /// </summary>
     public int CellPixelSize { get; private set; } = 30;
+    #endregion
+
+    #region Private Boundaries
     private float BoardLeft { get; set; }
     private float BoardTop { get; set; }
     private float BoardRight { get; set; }
     private float BoardBottom { get; set; }
+    #endregion
 
+    #region Initialization
     /// <summary>
     /// Initializes the board manager with the specified board position.
     /// </summary>
@@ -52,7 +58,9 @@ public partial class BoardManager : GodotObject
         BoardTop = boardPosition.Y - ((BoardCellSize * CellPixelSize) / 2);
         BoardBottom = boardPosition.Y + ((BoardCellSize * CellPixelSize) / 2);
     }
+    #endregion
 
+    #region Boundary Checks
     /// <summary>
     /// Checks if the specified position is outside the bounds of the board.
     /// </summary>
@@ -65,4 +73,5 @@ public partial class BoardManager : GodotObject
                ((position.Y + 1) * CellPixelSize) < BoardTop || 
                ((position.Y + 4) * CellPixelSize) > BoardBottom;
     }
+    #endregion
 }

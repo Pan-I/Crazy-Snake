@@ -31,6 +31,7 @@ namespace Snake.Scripts.Domain.Managers;
 /// </summary>
 public partial class ScoreManager : GodotObject
 {
+    #region Signals
     /// <summary>
     /// Represents the delegate for handling the event triggered when the score is updated.
     /// </summary>
@@ -58,7 +59,9 @@ public partial class ScoreManager : GodotObject
     /// </summary>
     [Signal]
     public delegate void ComboCanceledEventHandler();
-
+    #endregion
+    
+    #region Properties
     /// <summary>
     /// Gets the player's current score in the game.
     /// </summary>
@@ -128,7 +131,9 @@ public partial class ScoreManager : GodotObject
     /// The value is read-only for external access and can only be modified internally.
     /// </value>
     public bool IsInCombo { get; private set; }
-
+    #endregion
+    
+    #region Score Management
     /// <summary>
     /// Resets the score manager's state to its initial values.
     /// This includes setting the Score, ComboPointsX, ComboPointsY, and ComboTally
@@ -167,7 +172,9 @@ public partial class ScoreManager : GodotObject
         Score = Math.Round(Score, 0);
         EmitScoreChanged();
     }
+    #endregion
 
+    #region Combo Management
     /// <summary>
     /// Increments the tally of consecutive actions performed within the current combo.
     /// This method increases the ComboTally value by one, typically reflecting an update
@@ -259,7 +266,9 @@ public partial class ScoreManager : GodotObject
         ComboPointsY = amount;
         EmitScoreChanged();
     }
-
+    #endregion
+    
+    #region Signal Emitting
     /// <summary>
     /// Emits the ScoreChanged signal with the current score, combo X points, combo Y points,
     /// and combo status. This is used to notify listeners of any updates to the score or
@@ -297,4 +306,5 @@ public partial class ScoreManager : GodotObject
     {
         EmitSignal(SignalName.ComboCanceled, null);
     }
+    #endregion
 }

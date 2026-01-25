@@ -57,7 +57,7 @@ public partial class Main : Node
 	/// Represents the root node for organizing audio-related functionality in the game.
 	/// </summary>
 	/// <remarks>
-	/// This property is utilized to manage and initialize the audio system of the game. It serves
+	/// This property is used to manage and initialize the audio system of the game. It serves
 	/// as a reference point for the <c>Audio.Initialize</c> method, allowing the system to access
 	/// and control various audio resources and groups.
 	/// </remarks>
@@ -293,38 +293,6 @@ public partial class Main : Node
 		} 
 	}
 
-	/// <summary>
-	/// Manages the game's background music by determining the appropriate track
-	/// to play based on the current game state. When the game is not started,
-	/// it plays the lobby music. If the player is in a combo, it switches to the
-	/// combo music. Otherwise, it selects different tracks based on the current
-	/// move timer's wait time, either playing faster-paced or space-themed music
-	/// to match the gameplay intensity.
-	/// </summary>
-	private void UpdateMusic()
-	{
-		if (!_gameStarted)
-		{
-			Audio.PlayLobbyMusic();
-			return;
-		}
-
-		if (Score.IsInCombo)
-		{
-			Audio.PlayComboMusic();
-			return;
-		}
-		double time = Time.GetMoveTimerWaitTime();
-		if (time < 0.5)
-		{
-			Audio.PlayBaseMusic();
-		}
-		else
-		{
-			Audio.PlaySpaceMusic();
-		}
-	}
-
 	#region Gameplay Logic
 
 	/// <summary>
@@ -376,7 +344,7 @@ public partial class Main : Node
 	/// <summary>
 	/// Ends the current game session and performs all necessary cleanup and state updates.
 	/// This includes resetting the player's health, stopping timers, pausing the game,
-	/// finalizing the score, and updating the UI to display the game-over state.
+	/// finalizing the score, and updating the UI to display the game over state.
 	/// </summary>
 	private void EndGame()
 	{
@@ -427,7 +395,7 @@ public partial class Main : Node
 	/// updating the game state, extending the snake's length, updating the score,
 	/// manipulating the combo system, and adjusting gameplay elements like background visuals and timers.
 	/// </summary>
-	/// <returns>True if an egg has been eaten by the snake; otherwise, false.</returns>
+	/// <returns>True if the snake has eaten an egg; otherwise, false.</returns>
 	private bool CheckEggEaten()
 	{
 		if (Items.EggPosition != Snake.SnakeData[0]) return false;
@@ -525,6 +493,38 @@ public partial class Main : Node
 		}
 	}
 	
+	/// <summary>
+	/// Manages the game's background music by determining the appropriate track
+	/// to play based on the current game state. When the game is not started,
+	/// it plays the lobby music. If the player is in a combo, it switches to the
+	/// combo music. Otherwise, it selects different tracks based on the current
+	/// move timer's wait time, either playing faster-paced or space-themed music
+	/// to match the gameplay intensity.
+	/// </summary>
+	private void UpdateMusic()
+	{
+		if (!_gameStarted)
+		{
+			Audio.PlayLobbyMusic();
+			return;
+		}
+
+		if (Score.IsInCombo)
+		{
+			Audio.PlayComboMusic();
+			return;
+		}
+		double time = Time.GetMoveTimerWaitTime();
+		if (time < 0.5)
+		{
+			Audio.PlayBaseMusic();
+		}
+		else
+		{
+			Audio.PlaySpaceMusic();
+		}
+	}
+	
 	#endregion
 	
 	#region Input Handling & Signals
@@ -560,7 +560,7 @@ public partial class Main : Node
 	/// and user interface are ready for a fresh start.
 	/// The following operations are performed:
 	/// 1. Resets the gameplay state and move timer using <see cref="NewGame"/>.
-	/// 2. Fully reinitializes the score, health, and other gameplay components.
+	/// 2. Fully reinitialized the score, health, and other gameplay components.
 	/// 3. Clears the existing game entities and creates a new snake.
 	/// 4. Ensures the UI hides the game over screen and displays a new game setup.
 	/// </summary>

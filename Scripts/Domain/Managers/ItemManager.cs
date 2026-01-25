@@ -31,6 +31,7 @@ namespace Snake.Scripts.Domain.Managers;
 /// </summary>
 public partial class ItemManager : Node
 {
+	#region Signals
 	/// <summary>
 	/// Represents the delegate for handling events triggered when a health deduction is requested.
 	/// This signal communicates the details of the health deduction process.
@@ -133,9 +134,9 @@ public partial class ItemManager : Node
 	/// </summary>
 	[Signal]
 	public delegate void HighChimeRequestedEventHandler();
+	#endregion
 	
-	private readonly ISnakeManager _snake;
-
+	#region Properties
 	/// <summary>
 	/// Represents the size of a cell in pixels.
 	/// This property is used to define the pixel dimensions of an individual cell
@@ -181,7 +182,9 @@ public partial class ItemManager : Node
 	/// of the combo points within the system.
 	/// </summary>
 	public double CurrentComboPointsYRef { get; set; }
+	#endregion
 
+	#region Private Boundaries & Fields
 	internal Node2D WallNode;
 	internal Vector2I EggPosition;
 	internal int Tally;
@@ -225,7 +228,10 @@ public partial class ItemManager : Node
 	private double _eggPulseTime;
 	private double _itemPulseTime;
 	private Vector2I _offset;
+	private readonly ISnakeManager _snake;
+	#endregion
 
+	#region Initialization & Cleanup
 	/// <summary>
 	/// Manages the operations and logic related to items within the game, including their placement,
 	/// effects, and interactions. This class handles item spawning, item effects, and interactions
@@ -286,7 +292,102 @@ public partial class ItemManager : Node
 
 		_effectLogic = new ItemEffectLogic(_snake, _rottenEggPath, _dewDropPath);
 	}
+	
+	/// <summary>
+	/// Sets the cell pixel size reference, defining the size of each cell
+	/// in pixels for accurate positioning on the game board.
+	/// </summary>
+	/// <param name="boardCellPixelSize">The size of a single cell in pixels, specified as an integer.</param>
+	public void SetCellPixelSizeRef(int boardCellPixelSize)
+	{
+		CellPixelSizeRef = boardCellPixelSize;
+	}
 
+	/// <summary>
+	/// Sets the board cell size reference, which determines the size of each cell
+	/// on the game board in logically defined units.
+	/// </summary>
+	/// <param name="boardBoardCellSize">The size of a single logical cell on the board, specified as an integer.</param>
+	public void SetBoardCellSizeRef(int boardBoardCellSize)
+	{
+		BoardCellSizeRef = boardBoardCellSize;
+	}
+
+	/// <summary>
+	/// Sets the placement offset for item placement operations,
+	/// which determines the reference point for positioning items on the game board.
+	/// </summary>
+	/// <param name="vector2I">The offset in pixels specified as a Vector2I value.</param>
+	public void SetPlacementOffset(Vector2I vector2I)
+	{
+		PlacementOffsetRef = vector2I;
+	}
+
+	/// <summary>
+	/// Initializes the EggNode with the specified Node2D instance,
+	/// allowing it to be used for egg-related operations within the item management system.
+	/// </summary>
+	/// <param name="getNode">The Node2D instance to assign as the EggNode.</param>
+	public void InitializeEggNode(Node2D getNode)
+	{
+		EggNode = getNode;
+	}
+	
+	/// <summary>
+	/// Releases all resources used by the item manager, including clearing all
+	/// item and wall-related data, freeing all associated nodes, and resetting
+	/// the necessary collections to their initial states. Additionally, updates
+	/// the egg's position after resource disposal.
+	/// </summary>
+	public new void Dispose()
+	{
+		Tally = 0;
+		if (ItemNodes != null)
+		{
+			foreach (var node in ItemNodes.Where(GodotObject.IsInstanceValid))
+			{
+				node.Free();
+			}
+			ItemNodes.Clear();
+			ItemsData.Clear();
+		}
+		if (WallNodes != null)
+		{
+			foreach (var node in WallNodes.Where(GodotObject.IsInstanceValid))
+			{
+				node.Free();
+			}
+			WallNodes.Clear();
+			WallsData.Clear();
+		}
+		if (LargeWallNodes != null)
+		{
+			foreach (var node in LargeWallNodes.Where(GodotObject.IsInstanceValid))
+			{
+				node.Free();
+			}
+			LargeWallNodes.Clear();
+			LargeWallsData.Clear();
+		}
+		//MEMO: avoids unnecessary null checks. Useful since we hash available positions.
+		// ReSharper disable once UseCollectionExpression
+		ItemNodes = new List<Node2D>();
+		// ReSharper disable once UseCollectionExpression
+		ItemsData = new List<Vector2I>();
+		// ReSharper disable once UseCollectionExpression
+		WallNodes = new List<Node2D>();
+		// ReSharper disable once UseCollectionExpression
+		WallsData = new List<Vector2I>();
+		// ReSharper disable once UseCollectionExpression
+		LargeWallNodes = new List<Node2D>();
+		// ReSharper disable once UseCollectionExpression
+		LargeWallsData = new List<Vector2I>();
+		
+		MoveEgg();
+	}
+	#endregion
+	
+	#region Item Rates & Rules
 	/// <summary>
 	/// Configures item spawn rates by mapping item categories to their respective node representations.
 	/// This method initializes a dictionary where each key represents a spawn frequency, and its corresponding value
@@ -313,255 +414,7 @@ public partial class ItemManager : Node
 			{ 377, [_discoEggNode] }
 		};
 	}
-
-
-	/// <summary>
-	/// Randomly repositions the egg to a new valid spot on the game board, ensuring it is not trapped by walls.
-	/// This method identifies all available positions on the board and selects one at random.
-	/// It verifies that the chosen position does not result in a wall trap. If a trap is detected,
-	/// it continues to select new positions until a valid one is found. Once the egg's new position
-	/// is determined, its visual representation is updated accordingly.
-	/// </summary>
-	internal void MoveEgg()
-	{
-		EmitSignal(SignalName.EggMoved);
-		List<Vector2I> available = FindAvailableSpots(Vector2I.Zero);
-		
-		do { EggPosition = RandomPlacement(available); }
-		while ( CheckWallTrap() );
-		if (EggNode != null)
-		{
-			EggNode.Position = EggPosition * CellPixelSizeRef + 
-			                   new Vector2I(0, CellPixelSizeRef) + 
-			                   PlacementOffsetRef;
-			EggNode.ZIndex = 999;
-			_eggPulseTime = 0;
-			EggNode.Scale = Vector2.One;
-		}
-	}
-
-	/// <summary>
-	/// Checks if the current egg position is completely surrounded by walls, forming a trap.
-	/// Specifically, this method evaluates whether the North, East, South, and West neighboring cells
-	/// relative to the egg's position are all occupied by walls. If all these neighboring cells contain walls,
-	/// the position is considered trapped and unsuitable for the egg's placement.
-	/// </summary>
-	/// <returns>
-	/// Returns <c>true</c> if the egg's position is fully enclosed by walls in all four cardinal directions,
-	/// indicating a wall trap. Otherwise, returns <c>false</c>.
-	/// </returns>
-	private bool CheckWallTrap()
-	{
-		var eggPosNord = new Vector2I(EggPosition.X, EggPosition.Y - 1);
-		var eggPosEas = new Vector2I(EggPosition.X + 1, EggPosition.Y);
-		var eggPosSud = new Vector2I(EggPosition.X, EggPosition.Y + 1);
-		var eggPosWes = new Vector2I(EggPosition.X - 1, EggPosition.Y);
-		// ReSharper disable once ConvertIfStatementToReturnStatement
-		if (WallsData.Contains(eggPosNord) && WallsData.Contains(eggPosEas) && WallsData.Contains(eggPosSud) &&
-		    WallsData.Contains(eggPosWes))
-		{
-			return true;
-		}
-		return false;
-	}
-
-	/// <summary>
-	/// Randomly selects a valid position for item placement on the board.
-	/// The method ensures that the selected position complies with several constraints, such as avoiding
-	/// collisions with existing items, large items, or the snake's body, and maintaining a specified minimum
-	/// distance from the snake's head and a certain proximity to the snake's tail.
-	/// </summary>
-	/// <param name="available">A list of available positions on the board where items can potentially be placed.</param>
-	/// <returns>Returns a <c>Vector2I</c> object representing the valid randomly-selected position for placement.</returns>
-	private Vector2I RandomPlacement(List<Vector2I> available)
-	{
-		Random rndm = new Random();
-
-		int tryCounter = 0;
-		
-		Vector2I itemPlacement;
-		do
-		{
-			//generate a new coordinate spot
-			tryCounter++;
-			if (tryCounter == 90000) //if there have been this many attempts to place the item, something is wrong.
-			{
-				EmitSignal(SignalName.GameOverRequested);
-			}
-			itemPlacement = new Vector2I(rndm.Next(1, BoardCellSizeRef + 1), rndm.Next(3, BoardCellSizeRef - 4)); 
-			
-		} while ((!available.Contains(itemPlacement) || //Don't place on an occupied position.
-				  CheckLargeItemHit(itemPlacement) || //Don't place on large 
-				  IsWithinRadius(itemPlacement, _snake.SnakeData[0], 3) || //Don't place too close to the snake head.
-				  CheckWithinRadius(itemPlacement, _snake.SnakeData, 1) || //Don't place directly next to the entire body.
-				  !IsWithinRadius(itemPlacement, _snake.SnakeData[^1], 20) //Place around the tail. Temporary rule? I kind of like it.
-				 ));
-
-		return itemPlacement;
-		
-		bool CheckWithinRadius(Vector2I newItemPlacement, List<Vector2I> listCoords, int radius)
-		{
-			return listCoords.Any(spot => IsWithinRadius(newItemPlacement, spot, radius));
-		}
-
-		// Helper function to check if a position is within a given radius
-		bool IsWithinRadius(Vector2I position, Vector2I center, int radius)
-		{
-			int dx = Math.Abs(position.X - center.X);
-			int dy = Math.Abs(position.Y - center.Y);
-			return dx <= radius && dy <= radius;
-		}
-	}
-
-	/// <summary>
-	/// Checks if the given position intersects with any part of a large item on the board.
-	/// A large item is represented as a cluster of cells forming a square.
-	/// The method verifies if the position matches the top-left corner of the cluster or
-	/// any of its adjacent cells (right, bottom, or bottom-right).
-	/// </summary>
-	/// <param name="position">The position on the board to check for a collision with a large item.</param>
-	/// <returns>Returns true if the position overlaps any part of a large item; otherwise, false.</returns>
-	internal bool CheckLargeItemHit(Vector2I position)
-	{
-		bool hit = false;
-		for (int i = 0; i < LargeWallsData.Count; i++)
-		{
-			Vector2I q2 = new Vector2I(x: LargeWallsData[i].X, y: LargeWallsData[i].Y + 1);
-			Vector2I q3 = new Vector2I(x: LargeWallsData[i].X + 1, y: LargeWallsData[i].Y + 1);
-			Vector2I q4 = new Vector2I(x: LargeWallsData[i].X + 1, y: LargeWallsData[i].Y);
-
-			if (position == LargeWallsData[i] || position == q2 || position == q3 || position == q4 )
-			{
-				hit = true;
-			}
-		}
-
-		return hit;
-	}
-
-	/// <summary>
-	/// Generates new items based on the current tally and predefined item rate rules.
-	/// For each rate rule, items are spawned if the tally satisfies the rule's condition.
-	/// New items are created by duplicating existing item templates and are placed
-	/// on the game board in valid positions.
-	/// </summary>
-	internal void GenerateFromItemLookup()
-	{
-		// ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-		foreach (KeyValuePair<int, List<Node2D>> rule in _itemRates)
-		{
-			if (Tally % rule.Key != 0) continue;
-			foreach (var newItem in rule.Value.Select(itemNode => (Node2D)itemNode.Duplicate()))
-			{
-				SpawnItem(newItem);
-			}
-		}
-	}
-
-	/// <summary>
-	/// Places the specified item on the game board in a valid position based
-	/// on its type, ensuring it does not overlap with existing items, walls, or other occupied areas.
-	/// </summary>
-	/// <param name="newItem">The item to be placed on the game board, represented as a Node2D object.</param>
-	private void SpawnItem(Node2D newItem)
-	{
-		newItem.Visible = true;
-		
-		Vector2I smallArea = new Vector2I(0, 0); //a single spot on the grid
-		Vector2I largeArea = new Vector2I(1, 1); //a 2X2 area on the grid
-		//Vector2I veryLargeArea = new Vector2I(2, 2); //a 3X3 area on the grid; nothing takes up that size yet.
-		
-		if (newItem.SceneFilePath == WallNode.SceneFilePath)
-		{
-			List<Vector2I> available = FindAvailableSpots(smallArea);
-			_newItemPosition = RandomPlacement(available);
-			newItem.Position = _newItemPosition * CellPixelSizeRef + 
-			                   new Vector2I(0, CellPixelSizeRef) + 
-			                   PlacementOffsetRef;
-			
-			WallNodes.Add(newItem);
-			WallsData.Add(_newItemPosition);
-		}
-		else if (newItem.SceneFilePath == LargeWallNode.SceneFilePath)
-		{
-		 List<Vector2I> available = FindAvailableSpots(largeArea);
-		_newItemPosition = RandomPlacement(available);
-		newItem.Position = _newItemPosition * CellPixelSizeRef + 
-		                   new Vector2I(0, CellPixelSizeRef) + 
-		                   PlacementOffsetRef;
-
-		newItem.Position += PlacementOffsetRef; //offset a second time to account for the large wall's largeness'
-		LargeWallNodes.Add(newItem);
-		LargeWallsData.Add(_newItemPosition);
-		}
-		else
-		{
-			List<Vector2I> available = FindAvailableSpots(smallArea);
-			_newItemPosition = RandomPlacement(available);
-			newItem.Position = _newItemPosition * CellPixelSizeRef + 
-			                   new Vector2I(0, CellPixelSizeRef) + 
-			                   PlacementOffsetRef;
-			
-			ItemNodes.Add(newItem);
-			ItemsData.Add(_newItemPosition);
-		}
-		EmitSignal(SignalName.ItemSpawned, newItem);
-	}
-
-	/// <summary>
-	/// Identifies and returns all available positions on the game board where items can be placed,
-	/// ensuring that the specified area does not overlap with existing snake segments, items, walls,
-	/// or other occupied positions.
-	/// </summary>
-	/// <param name="area">The size of the area to check for availability, represented as a Vector2I
-	/// where X and Y define the width and height of the area respectively.</param>
-	/// <returns>A list of Vector2I positions representing the top-left corners of all available
-	/// spots on the game board that can accommodate the specified area.</returns>
-	private List<Vector2I> FindAvailableSpots(Vector2I area)
-	{
-		List<Vector2I> available = [];
-		
-		HashSet<Vector2I> occupiedPositions = [.._snake.SnakeData, EggPosition];
-		occupiedPositions.UnionWith(ItemsData);
-		occupiedPositions.UnionWith(WallsData);
-		occupiedPositions.UnionWith(LargeWallsData);
-		
-		// Calculate the actual size needed (area + 1 since Vector2I(0,0) = 1x1)
-		int width = area.X + 1;
-		int height = area.Y + 1;
 	
-		// Iterate through all possible starting positions
-		for (int x = 0; x <= BoardCellSizeRef - width; x++)
-		{
-			for (int y = 0; y <= BoardCellSizeRef - height; y++)
-			{
-				Vector2I position = new Vector2I(x, y);
-			
-				// Check if all positions in the area are free
-				bool areaIsFree = true;
-				for (int dx = 0; dx < width; dx++)
-				{
-					for (int dy = 0; dy < height; dy++)
-					{
-						if (occupiedPositions.Contains(new Vector2I(x + dx, y + dy)))
-						{
-							areaIsFree = false;
-							break;
-						}
-					}
-					if (!areaIsFree) break;
-				}
-			
-				if (areaIsFree)
-				{
-					available.Add(position);
-				}
-			}
-		}
-		
-		return available;
-	}
-
 	/// <summary>
 	/// Processes the result of an item interaction, handling its removal, triggering signals,
 	/// and applying its effects based on the item's type and whether it is part of a combo.
@@ -588,14 +441,14 @@ public partial class ItemManager : Node
 		}
 
 		if (item.SceneFilePath == WallNode.SceneFilePath 
-			|| item.SceneFilePath == LargeWallNode.SceneFilePath)
+		    || item.SceneFilePath == LargeWallNode.SceneFilePath)
 		{
 			EmitSignal(SignalName.HealthDeductedRequested);
 		}
 
 		ApplyItemEffect(item.SceneFilePath, isInCombo);
 	}
-
+	
 	/// <summary>
 	/// Applies the effect of the specified item based on its type and whether it is part of a combo.
 	/// Depending on the item's properties, this may modify the snake's attributes, update the score,
@@ -817,7 +670,10 @@ public partial class ItemManager : Node
 			}
 		}
 	}
+	
+	#endregion
 
+	#region Item Management
 	/// <summary>
 	/// Handles the logic executed when the egg is eaten by the snake. This includes updating the tally of eaten eggs,
 	/// repositioning the egg on the game board, and generating a new set of items at randomized locations.
@@ -828,7 +684,259 @@ public partial class ItemManager : Node
 		MoveEgg();
 		GenerateFromItemLookup();
 	}
+	
+	/// <summary>
+	/// Randomly repositions the egg to a new valid spot on the game board, ensuring it is not trapped by walls.
+	/// This method identifies all available positions on the board and selects one at random.
+	/// It verifies that the chosen position does not result in a wall trap. If a trap is detected,
+	/// it continues to select new positions until a valid one is found. Once the egg's new position
+	/// is determined, its visual representation is updated accordingly.
+	/// </summary>
+	internal void MoveEgg()
+	{
+		EmitSignal(SignalName.EggMoved);
+		List<Vector2I> available = FindAvailableSpots(Vector2I.Zero);
+		
+		do { EggPosition = RandomPlacement(available); }
+		while ( CheckWallTrap() );
+		if (EggNode != null)
+		{
+			EggNode.Position = EggPosition * CellPixelSizeRef + 
+			                   new Vector2I(0, CellPixelSizeRef) + 
+			                   PlacementOffsetRef;
+			EggNode.ZIndex = 999;
+			_eggPulseTime = 0;
+			EggNode.Scale = Vector2.One;
+		}
+	}
 
+	/// <summary>
+	/// Randomly selects a valid position for item placement on the board.
+	/// The method ensures that the selected position complies with several constraints, such as avoiding
+	/// collisions with existing items, large items, or the snake's body, and maintaining a specified minimum
+	/// distance from the snake's head and a certain proximity to the snake's tail.
+	/// </summary>
+	/// <param name="available">A list of available positions on the board where items can potentially be placed.</param>
+	/// <returns>Returns a <c>Vector2I</c> object representing the valid randomly-selected position for placement.</returns>
+	private Vector2I RandomPlacement(List<Vector2I> available)
+	{
+		Random rndm = new Random();
+
+		int tryCounter = 0;
+		
+		Vector2I itemPlacement;
+		do
+		{
+			//generate a new coordinate spot
+			tryCounter++;
+			if (tryCounter == 90000) //if there have been this many attempts to place the item, something is wrong.
+			{
+				EmitSignal(SignalName.GameOverRequested);
+			}
+			itemPlacement = new Vector2I(rndm.Next(1, BoardCellSizeRef + 1), rndm.Next(3, BoardCellSizeRef - 4)); 
+			
+		} while ((!available.Contains(itemPlacement) || //Don't place on an occupied position.
+				  CheckLargeItemHit(itemPlacement) || //Don't place on large 
+				  IsWithinRadius(itemPlacement, _snake.SnakeData[0], 3) || //Don't place too close to the snake head.
+				  CheckWithinRadius(itemPlacement, _snake.SnakeData, 1) || //Don't place directly next to the entire body.
+				  !IsWithinRadius(itemPlacement, _snake.SnakeData[^1], 20) //Place around the tail. Temporary rule? I kind of like it.
+				 ));
+
+		return itemPlacement;
+		
+		bool CheckWithinRadius(Vector2I newItemPlacement, List<Vector2I> listCoords, int radius)
+		{
+			return listCoords.Any(spot => IsWithinRadius(newItemPlacement, spot, radius));
+		}
+
+		// Helper function to check if a position is within a given radius
+		bool IsWithinRadius(Vector2I position, Vector2I center, int radius)
+		{
+			int dx = Math.Abs(position.X - center.X);
+			int dy = Math.Abs(position.Y - center.Y);
+			return dx <= radius && dy <= radius;
+		}
+	}
+	
+	/// <summary>
+	/// Generates new items based on the current tally and predefined item rate rules.
+	/// For each rate rule, items are spawned if the tally satisfies the rule's condition.
+	/// New items are created by duplicating existing item templates and are placed
+	/// on the game board in valid positions.
+	/// </summary>
+	internal void GenerateFromItemLookup()
+	{
+		// ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+		foreach (KeyValuePair<int, List<Node2D>> rule in _itemRates)
+		{
+			if (Tally % rule.Key != 0) continue;
+			foreach (var newItem in rule.Value.Select(itemNode => (Node2D)itemNode.Duplicate()))
+			{
+				SpawnItem(newItem);
+			}
+		}
+	}
+
+	/// <summary>
+	/// Places the specified item on the game board in a valid position based
+	/// on its type, ensuring it does not overlap with existing items, walls, or other occupied areas.
+	/// </summary>
+	/// <param name="newItem">The item to be placed on the game board, represented as a Node2D object.</param>
+	private void SpawnItem(Node2D newItem)
+	{
+		newItem.Visible = true;
+		
+		Vector2I smallArea = new Vector2I(0, 0); //a single spot on the grid
+		Vector2I largeArea = new Vector2I(1, 1); //a 2X2 area on the grid
+		//Vector2I veryLargeArea = new Vector2I(2, 2); //a 3X3 area on the grid; nothing takes up that size yet.
+		
+		if (newItem.SceneFilePath == WallNode.SceneFilePath)
+		{
+			List<Vector2I> available = FindAvailableSpots(smallArea);
+			_newItemPosition = RandomPlacement(available);
+			newItem.Position = _newItemPosition * CellPixelSizeRef + 
+			                   new Vector2I(0, CellPixelSizeRef) + 
+			                   PlacementOffsetRef;
+			
+			WallNodes.Add(newItem);
+			WallsData.Add(_newItemPosition);
+		}
+		else if (newItem.SceneFilePath == LargeWallNode.SceneFilePath)
+		{
+		 List<Vector2I> available = FindAvailableSpots(largeArea);
+		_newItemPosition = RandomPlacement(available);
+		newItem.Position = _newItemPosition * CellPixelSizeRef + 
+		                   new Vector2I(0, CellPixelSizeRef) + 
+		                   PlacementOffsetRef;
+
+		newItem.Position += PlacementOffsetRef; //offset a second time to account for the large wall's largeness'
+		LargeWallNodes.Add(newItem);
+		LargeWallsData.Add(_newItemPosition);
+		}
+		else
+		{
+			List<Vector2I> available = FindAvailableSpots(smallArea);
+			_newItemPosition = RandomPlacement(available);
+			newItem.Position = _newItemPosition * CellPixelSizeRef + 
+			                   new Vector2I(0, CellPixelSizeRef) + 
+			                   PlacementOffsetRef;
+			
+			ItemNodes.Add(newItem);
+			ItemsData.Add(_newItemPosition);
+		}
+		EmitSignal(SignalName.ItemSpawned, newItem);
+	}
+	
+	#endregion
+	
+	#region Item Interaction Checks
+	/// <summary>
+	/// Checks if the current egg position is completely surrounded by walls, forming a trap.
+	/// Specifically, this method evaluates whether the North, East, South, and West neighboring cells
+	/// relative to the egg's position are all occupied by walls. If all these neighboring cells contain walls,
+	/// the position is considered trapped and unsuitable for the egg's placement.
+	/// </summary>
+	/// <returns>
+	/// Returns <c>true</c> if the egg's position is fully enclosed by walls in all four cardinal directions,
+	/// indicating a wall trap. Otherwise, returns <c>false</c>.
+	/// </returns>
+	private bool CheckWallTrap()
+	{
+		var eggPosNord = new Vector2I(EggPosition.X, EggPosition.Y - 1);
+		var eggPosEas = new Vector2I(EggPosition.X + 1, EggPosition.Y);
+		var eggPosSud = new Vector2I(EggPosition.X, EggPosition.Y + 1);
+		var eggPosWes = new Vector2I(EggPosition.X - 1, EggPosition.Y);
+		// ReSharper disable once ConvertIfStatementToReturnStatement
+		if (WallsData.Contains(eggPosNord) && WallsData.Contains(eggPosEas) && WallsData.Contains(eggPosSud) &&
+		    WallsData.Contains(eggPosWes))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	/// <summary>
+	/// Checks if the given position intersects with any part of a large item on the board.
+	/// A large item is represented as a cluster of cells forming a square.
+	/// The method verifies if the position matches the top-left corner of the cluster or
+	/// any of its adjacent cells (right, bottom, or bottom-right).
+	/// </summary>
+	/// <param name="position">The position on the board to check for a collision with a large item.</param>
+	/// <returns>Returns true if the position overlaps any part of a large item; otherwise, false.</returns>
+	internal bool CheckLargeItemHit(Vector2I position)
+	{
+		bool hit = false;
+		for (int i = 0; i < LargeWallsData.Count; i++)
+		{
+			Vector2I q2 = new Vector2I(x: LargeWallsData[i].X, y: LargeWallsData[i].Y + 1);
+			Vector2I q3 = new Vector2I(x: LargeWallsData[i].X + 1, y: LargeWallsData[i].Y + 1);
+			Vector2I q4 = new Vector2I(x: LargeWallsData[i].X + 1, y: LargeWallsData[i].Y);
+
+			if (position == LargeWallsData[i] || position == q2 || position == q3 || position == q4 )
+			{
+				hit = true;
+			}
+		}
+
+		return hit;
+	}
+	
+	/// <summary>
+	/// Identifies and returns all available positions on the game board where items can be placed,
+	/// ensuring that the specified area does not overlap with existing snake segments, items, walls,
+	/// or other occupied positions.
+	/// </summary>
+	/// <param name="area">The size of the area to check for availability, represented as a Vector2I
+	/// where X and Y define the width and height of the area respectively.</param>
+	/// <returns>A list of Vector2I positions representing the top-left corners of all available
+	/// spots on the game board that can accommodate the specified area.</returns>
+	private List<Vector2I> FindAvailableSpots(Vector2I area)
+	{
+		List<Vector2I> available = [];
+		
+		HashSet<Vector2I> occupiedPositions = [.._snake.SnakeData, EggPosition];
+		occupiedPositions.UnionWith(ItemsData);
+		occupiedPositions.UnionWith(WallsData);
+		occupiedPositions.UnionWith(LargeWallsData);
+		
+		// Calculate the actual size needed (area + 1 since Vector2I(0,0) = 1x1)
+		int width = area.X + 1;
+		int height = area.Y + 1;
+	
+		// Iterate through all possible starting positions
+		for (int x = 0; x <= BoardCellSizeRef - width; x++)
+		{
+			for (int y = 0; y <= BoardCellSizeRef - height; y++)
+			{
+				Vector2I position = new Vector2I(x, y);
+			
+				// Check if all positions in the area are free
+				bool areaIsFree = true;
+				for (int dx = 0; dx < width; dx++)
+				{
+					for (int dy = 0; dy < height; dy++)
+					{
+						if (occupiedPositions.Contains(new Vector2I(x + dx, y + dy)))
+						{
+							areaIsFree = false;
+							break;
+						}
+					}
+					if (!areaIsFree) break;
+				}
+			
+				if (areaIsFree)
+				{
+					available.Add(position);
+				}
+			}
+		}
+		
+		return available;
+	}
+	#endregion
+
+	#region Update Helper Methods
 	/// <summary>
 	/// Updates the pulse animation and rotation for the egg. The pulse effect modifies the egg's
 	/// scale based on a sinusoidal pattern, creating a growing and shrinking effect. Additionally,
@@ -877,59 +985,6 @@ public partial class ItemManager : Node
 	}
 
 	/// <summary>
-	/// Releases all resources used by the item manager, including clearing all
-	/// item and wall-related data, freeing all associated nodes, and resetting
-	/// the necessary collections to their initial states. Additionally, updates
-	/// the egg's position after resource disposal.
-	/// </summary>
-	public new void Dispose()
-	{
-		Tally = 0;
-		if (ItemNodes != null)
-		{
-			foreach (var node in ItemNodes.Where(GodotObject.IsInstanceValid))
-			{
-				node.Free();
-			}
-			ItemNodes.Clear();
-			ItemsData.Clear();
-		}
-		if (WallNodes != null)
-		{
-			foreach (var node in WallNodes.Where(GodotObject.IsInstanceValid))
-			{
-				node.Free();
-			}
-			WallNodes.Clear();
-			WallsData.Clear();
-		}
-		if (LargeWallNodes != null)
-		{
-			foreach (var node in LargeWallNodes.Where(GodotObject.IsInstanceValid))
-			{
-				node.Free();
-			}
-			LargeWallNodes.Clear();
-			LargeWallsData.Clear();
-		}
-		//MEMO: avoids unnecessary null checks. Useful since we hash available positions.
-		// ReSharper disable once UseCollectionExpression
-		ItemNodes = new List<Node2D>();
-		// ReSharper disable once UseCollectionExpression
-		ItemsData = new List<Vector2I>();
-		// ReSharper disable once UseCollectionExpression
-		WallNodes = new List<Node2D>();
-		// ReSharper disable once UseCollectionExpression
-		WallsData = new List<Vector2I>();
-		// ReSharper disable once UseCollectionExpression
-		LargeWallNodes = new List<Node2D>();
-		// ReSharper disable once UseCollectionExpression
-		LargeWallsData = new List<Vector2I>();
-		
-		MoveEgg();
-	}
-
-	/// <summary>
 	/// Updates the score and combo point references used to track the player's progress
 	/// in the game. These values are updated based on the current state of the gameplay.
 	/// </summary>
@@ -942,44 +997,5 @@ public partial class ItemManager : Node
 		CurrentComboPointsXRef = comboX;
 		CurrentComboPointsYRef = comboY;
 	}
-
-	/// <summary>
-	/// Sets the cell pixel size reference, defining the size of each cell
-	/// in pixels for accurate positioning on the game board.
-	/// </summary>
-	/// <param name="boardCellPixelSize">The size of a single cell in pixels, specified as an integer.</param>
-	public void SetCellPixelSizeRef(int boardCellPixelSize)
-	{
-		CellPixelSizeRef = boardCellPixelSize;
-	}
-
-	/// <summary>
-	/// Sets the board cell size reference, which determines the size of each cell
-	/// on the game board in logically defined units.
-	/// </summary>
-	/// <param name="boardBoardCellSize">The size of a single logical cell on the board, specified as an integer.</param>
-	public void SetBoardCellSizeRef(int boardBoardCellSize)
-	{
-		BoardCellSizeRef = boardBoardCellSize;
-	}
-
-	/// <summary>
-	/// Sets the placement offset for item placement operations,
-	/// which determines the reference point for positioning items on the game board.
-	/// </summary>
-	/// <param name="vector2I">The offset in pixels specified as a Vector2I value.</param>
-	public void SetPlacementOffset(Vector2I vector2I)
-	{
-		PlacementOffsetRef = vector2I;
-	}
-
-	/// <summary>
-	/// Initializes the EggNode with the specified Node2D instance,
-	/// allowing it to be used for egg-related operations within the item management system.
-	/// </summary>
-	/// <param name="getNode">The Node2D instance to assign as the EggNode.</param>
-	public void InitializeEggNode(Node2D getNode)
-	{
-		EggNode = getNode;
-	}
+	#endregion
 }

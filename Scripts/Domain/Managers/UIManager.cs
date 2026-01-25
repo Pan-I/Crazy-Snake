@@ -29,9 +29,15 @@ namespace Snake.Scripts.Domain.Managers;
 /// </summary>
 public partial class UiManager : GodotObject
 {
+    #region Fields
+
     private CanvasLayer _hud;
     private CanvasLayer _gameOverMenu;
     private AnimatedSprite2D _background;
+
+    #endregion
+
+    #region Initialization
 
     /// <summary>
     /// Initializes the UIManager with the specified HUD, game over menu, and background components.
@@ -45,6 +51,10 @@ public partial class UiManager : GodotObject
         _gameOverMenu = gameOverMenu;
         _background = background;
     }
+
+    #endregion
+
+    #region HUD Updates
 
     /// <summary>
     /// Updates the score display on the HUD, including the current score, combo multipliers,
@@ -82,6 +92,10 @@ public partial class UiManager : GodotObject
         }
     }
 
+    #endregion
+
+    #region Game Over
+
     /// <summary>
     /// Displays the game over menu and updates its text with the final score.
     /// </summary>
@@ -101,6 +115,10 @@ public partial class UiManager : GodotObject
         _gameOverMenu.Visible = false;
     }
 
+    #endregion
+
+    #region Background Control
+
     /// <summary>
     /// Sets the visibility of the background element in the UI.
     /// </summary>
@@ -112,6 +130,10 @@ public partial class UiManager : GodotObject
     /// </summary>
     /// <param name="frame">The index of the frame to display for the animated background.</param>
     public void SetBackgroundFrame(int frame) => _background.Frame = frame;
+
+    #endregion
+
+    #region Visual Effects
 
     /// <summary>
     /// Applies a visual flash effect to the HUD panels based on the specified event type.
@@ -195,4 +217,6 @@ public partial class UiManager : GodotObject
         styleBox.SetBorderWidthAll(10);
         panel.AddThemeStyleboxOverride("panel", styleBox);
     }
+
+    #endregion
 }

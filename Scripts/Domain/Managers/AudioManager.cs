@@ -8,6 +8,7 @@ namespace Snake.Scripts.Domain.Managers;
 /// </summary>
 public partial class AudioManager : GodotObject
 {
+	#region Fields
 	private Node _audioGroupRoot;
 	private Node _sfxGroupRoot;
 	private Node _musicGroupRoot;
@@ -32,7 +33,9 @@ public partial class AudioManager : GodotObject
 	private AudioStreamPlayer _blipSfx;
 
 	private AudioStreamPlayer _currentMusic;
+	#endregion
 
+	#region Initialization
 	/// <summary>
 	/// Initializes the audio manager by configuring the root nodes for audio groups and
 	/// assigning the corresponding AudioStreamPlayer instances for music and sound effects.
@@ -61,7 +64,9 @@ public partial class AudioManager : GodotObject
 		_highChimeSfx = _sfxGroupRoot.GetNode<AudioStreamPlayer>("HighChimeSFX");
 		_blipSfx = _sfxGroupRoot.GetNode<AudioStreamPlayer>("BlipSFX");
 	}
+	#endregion
 
+	#region Music Methods
 	/// <summary>
 	/// Plays the specified music using the provided AudioStreamPlayer instance.
 	/// Stops any currently playing music before starting the new one.
@@ -95,6 +100,9 @@ public partial class AudioManager : GodotObject
 	/// Plays the 'Combo' music to indicate a successful collection of a special egg.
 	/// </summary>
 	public void PlayComboMusic() => PlayMusic(_comboMusic);
+	#endregion
+
+	#region SFX Methods
 	/// <summary>
 	/// Plays the 'Progress' sound effect to indicate a positive in-game event.
 	/// </summary>
@@ -159,7 +167,9 @@ public partial class AudioManager : GodotObject
 	/// Plays the 'Blip' sound effect to indicate a positive in-game event.
 	/// </summary>
 	private void PlayBlipSfx() => _blipSfx.Play();
+	#endregion
 
+	#region Lifecycle
 	/// <summary>
 	/// Plays the 'Game Over' sound effect and music to indicate the end of the game.
 	/// </summary>
@@ -168,4 +178,5 @@ public partial class AudioManager : GodotObject
 		PlayGameOverMusic();
 		PlayGameOverSfx();
 	}
+	#endregion
 }

@@ -29,6 +29,7 @@ namespace Snake.Scripts.Domain.Managers;
 /// </summary>
 public partial class HealthManager : GodotObject
 {
+    #region Signals
     /// <summary>
     /// Signal triggered when a deduction in the player's health occurs.
     /// </summary>
@@ -76,7 +77,9 @@ public partial class HealthManager : GodotObject
     /// </remarks>
     [Signal]
     public delegate void HealthSegmentRemovedEventHandler(Node2D node);
+    #endregion
 
+    #region Properties
     /// <summary>
     /// Represents the current number of lives available to the player in the game.
     /// </summary>
@@ -116,7 +119,9 @@ public partial class HealthManager : GodotObject
     {
         Capacity = HealthCapacity
     };
+    #endregion
 
+    #region Public Methods
     /// <summary>
     /// Resets the health system by clearing all health nodes and health data.
     /// </summary>
@@ -149,32 +154,6 @@ public partial class HealthManager : GodotObject
             AddHealthSegment(test + new Vector2I((int)(i * cellPixelSize * 1.5), 0), snakeSegmentPs);
         }
         Lives = HealthNodes.Count;
-    }
-
-    /// <summary>
-    /// Adds a new health segment at the specified position using the provided scene instance.
-    /// Emits a signal to notify that a health segment has been added.
-    /// </summary>
-    /// <remarks>
-    /// The method updates the health data and node lists with the new health segment.
-    /// The position and scale of the instantiated segment are set based on the given parameters.
-    /// If the number of health nodes reaches six, the frame of the segment is adjusted accordingly.
-    /// </remarks>
-    /// <param name="position">The position where the new health segment will be placed.</param>
-    /// <param name="snakeSegmentPs">The preloaded scene used to create the health segment.</param>
-    private void AddHealthSegment(Vector2I position, PackedScene snakeSegmentPs)
-    {
-        HealthData.Add(position);
-        var healthSegment = snakeSegmentPs.Instantiate<AnimatedSprite2D>();
-        healthSegment.Position = position;
-        healthSegment.Scale = new Vector2((float)1.5, (float)1.5);
-        
-        HealthNodes.Add(healthSegment);
-        if (HealthNodes.Count == HealthCapacity)
-        {
-            healthSegment.Frame = 1;
-        }
-        EmitSignal(SignalName.HealthSegmentAdded, healthSegment);
     }
 
     /// <summary>
@@ -213,4 +192,33 @@ public partial class HealthManager : GodotObject
             EmitSignal(SignalName.GameOverRequested);
         }
     }
+    #endregion
+
+    #region Private Methods
+    /// <summary>
+    /// Adds a new health segment at the specified position using the provided scene instance.
+    /// Emits a signal to notify that a health segment has been added.
+    /// </summary>
+    /// <remarks>
+    /// The method updates the health data and node lists with the new health segment.
+    /// The position and scale of the instantiated segment are set based on the given parameters.
+    /// If the number of health nodes reaches six, the frame of the segment is adjusted accordingly.
+    /// </remarks>
+    /// <param name="position">The position where the new health segment will be placed.</param>
+    /// <param name="snakeSegmentPs">The preloaded scene used to create the health segment.</param>
+    private void AddHealthSegment(Vector2I position, PackedScene snakeSegmentPs)
+    {
+        HealthData.Add(position);
+        var healthSegment = snakeSegmentPs.Instantiate<AnimatedSprite2D>();
+        healthSegment.Position = position;
+        healthSegment.Scale = new Vector2((float)1.5, (float)1.5);
+        
+        HealthNodes.Add(healthSegment);
+        if (HealthNodes.Count == HealthCapacity)
+        {
+            healthSegment.Frame = 1;
+        }
+        EmitSignal(SignalName.HealthSegmentAdded, healthSegment);
+    }
+    #endregion
 }
