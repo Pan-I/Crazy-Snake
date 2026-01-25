@@ -23,15 +23,28 @@ using Godot;
 
 namespace Snake.Scripts.Domain.Managers;
 
+/// <summary>
+/// Manages the board for the game, including its dimensions and functionality for checking board boundaries.
+/// </summary>
 public partial class BoardManager : GodotObject
 {
+    /// <summary>
+    /// The size of each cell on the board, in grid units (squares, columns, rows, etc.).
+    /// </summary>
     public int BoardCellSize { get; private set; } = 30;
+    /// <summary>
+    /// The size of each cell on the board, in pixels.
+    /// </summary>
     public int CellPixelSize { get; private set; } = 30;
     private float BoardLeft { get; set; }
     private float BoardTop { get; set; }
     private float BoardRight { get; set; }
     private float BoardBottom { get; set; }
 
+    /// <summary>
+    /// Initializes the board manager with the specified board position.
+    /// </summary>
+    /// <param name="boardPosition"></param>
     public void Initialize(Vector2 boardPosition)
     {
         BoardLeft = boardPosition.X - ((BoardCellSize * CellPixelSize) / 2);
@@ -40,6 +53,11 @@ public partial class BoardManager : GodotObject
         BoardBottom = boardPosition.Y + ((BoardCellSize * CellPixelSize) / 2);
     }
 
+    /// <summary>
+    /// Checks if the specified position is outside the bounds of the board.
+    /// </summary>
+    /// <param name="position"></param>
+    /// <returns></returns>
     public bool IsOutOfBounds(Vector2I position)
     {
         return (position.X * CellPixelSize) < BoardLeft || 

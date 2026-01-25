@@ -1,7 +1,7 @@
 [gd_scene load_steps=38 format=3 uid="uid://dwuicj4fifd38"]
 
-[ext_resource type="Script" uid="uid://dbb7dkxkc53ph" path="res://scripts/Main.cs" id="1_a8y0u"]
-[ext_resource type="PackedScene" uid="uid://srvuytqmi2cm" path="res://scenes/snake_segments.tscn" id="2_jkv2x"]
+[ext_resource type="Script" uid="uid://d7wbx1vf1y4y" path="res://scripts/Main.cs" id="1_j8jky"]
+[ext_resource type="PackedScene" uid="uid://srvuytqmi2cm" path="res://scenes/snake_segments.tscn" id="2_kmb1v"]
 [ext_resource type="PackedScene" uid="uid://c04wsqka0wuf" path="res://scenes/hud.tscn" id="3_4f2l8"]
 [ext_resource type="Texture2D" uid="uid://3jtxkhgn0m2s" path="res://assets/sprites/Grid 1.png" id="3_5e3uk"]
 [ext_resource type="Texture2D" uid="uid://dfxovxxgki7mp" path="res://assets/sprites/Grid 2a.png" id="4_boxj3"]
@@ -73,8 +73,8 @@ animations = [{
 }]
 
 [node name="Main" type="Node" node_paths=PackedStringArray("AudioGroupRoot")]
-script = ExtResource("1_a8y0u")
-SnakeSegmentPs = ExtResource("2_jkv2x")
+script = ExtResource("1_j8jky")
+SnakeSegmentPs = ExtResource("2_kmb1v")
 AudioGroupRoot = NodePath("AudioNodeGroup")
 
 [node name="Background" type="AnimatedSprite2D" parent="."]
