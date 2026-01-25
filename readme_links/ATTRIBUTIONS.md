@@ -1,7 +1,3 @@
-# SFX: 
-
-All SFX were made using ChipTone -- https://sfbgames.itch.io/chiptone -- License: Creative Commons 0
-
 # MUSIC:
 
 ## SergeQuadrado:
@@ -27,6 +23,13 @@ Hard Game Music [115bpm] by Seth_Makes_Sounds -- https://freesound.org/s/713123/
 character selection by aquasupreme -- https://freesound.org/s/838740/ -- License: Attribution 4.0
 
 -------
+
+# SFX:
+
+All SFX were made using ChipTone -- https://sfbgames.itch.io/chiptone -- License: Creative Commons 0
+
+-------
+
 
 # Godot Game Engine:
 
