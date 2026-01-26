@@ -152,6 +152,7 @@
     <Content Include="readme_links\ATTRIBUTIONS.md" />
     <Content Include="readme_links\Banner Image.png" />
     <Content Include="readme_links\Banner Image.png.import" />
+    <Content Include="readme_links\CHANGE_LOG.md" />
     <Content Include="readme_links\CONTRIBUTING.md" />
     <Content Include="readme_links\SETUP_ISSUES.md" />
     <Content Include="readme_links\v0.1 Gameplay.gif" />

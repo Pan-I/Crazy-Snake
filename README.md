@@ -25,6 +25,8 @@
 
 A remake of Snake, with some twists, as a Godot project. Written entirely in C#. Game includes a long list of items that have a wide range of effects on the game and game play, as well as a complex and high-scoring point system.
 
+A extensive change log summary can be found in [CHANGE_LOG.md](readme_links/CHANGE_LOG.md).
+
 #### Current Major Update Set (v0.3.3)
 
 |                                                               *Where v0.3.x is now*                                                               |

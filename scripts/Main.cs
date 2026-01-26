@@ -209,12 +209,10 @@ public partial class Main : Node
 		};
 		Items.ComboStarted += () =>
 		{
-			Time.SetMoveTimerWaitTime(.075);
 			Score.StartCombo();
 		};
 		Items.ComboEnded += () =>
 		{
-			Time.SetMoveTimerWaitTime(0.1);
 			Score.EndCombo();
 		};
 		Items.ComboCancelled += () => Score.CancelCombo();
@@ -236,16 +234,19 @@ public partial class Main : Node
 		Score.ComboStarted += () =>
 		{
 			Audio.PlayPowerUpSfx();
+			Time.SetMoveTimerWaitTime(.05);
 			UpdateMusic();
 		};
 		Score.ComboEnded += () =>
 		{
 			Audio.PlayPowerDownSfx();
+			Time.SetMoveTimerWaitTime(0.1);
 			UpdateMusic();
 		};
 		Score.ComboCanceled += () =>
 		{
 			Audio.PlayPowerDownSfx();
+			Time.SetMoveTimerWaitTime(0.1);
 			UpdateMusic();
 		};
 
@@ -417,7 +418,6 @@ public partial class Main : Node
 		}
 		else
 		{
-			Time.SetMoveTimerWaitTime(.05);
 			UpdateBackgroundInCombo();
 			Score.ComboPointsX += 2;
 		}

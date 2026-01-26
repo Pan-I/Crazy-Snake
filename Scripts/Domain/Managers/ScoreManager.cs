@@ -200,7 +200,6 @@ public partial class ScoreManager : GodotObject
         IsInCombo = true;
         ComboPointsX = Math.Max(1, ComboTally);
         ComboPointsY = 1;
-        Debug.Print("Combo Started!");
         EmitComboStarted();
         EmitScoreChanged();
     }
@@ -217,7 +216,6 @@ public partial class ScoreManager : GodotObject
         if (IsInCombo)
         {
             double comboPoints = (ComboPointsX * ComboPointsY);
-            Debug.Print("Combo Ended with Score: " + ComboPointsX + " x " + ComboPointsY + " = " + comboPoints);
             Score += comboPoints > 0 ? comboPoints : Math.Min(ComboPointsX, ComboPointsY);
             Score = Math.Round(Score, 0);
         }
@@ -237,7 +235,6 @@ public partial class ScoreManager : GodotObject
     /// </summary>
     public void CancelCombo()
     {
-        Debug.Print("Combo Cancelled!");
         IsInCombo = false;
         ComboPointsX = 0;
         ComboPointsY = 0;
