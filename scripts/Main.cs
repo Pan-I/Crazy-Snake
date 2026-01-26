@@ -240,24 +240,34 @@ public partial class Main : Node
 		Score.ComboEnded += () =>
 		{
 			Audio.PlayPowerDownSfx();
-			Time.SetMoveTimerWaitTime(0.1);
+			Time.SetMoveTimerWaitTime(Snake.SnakeNodes.Count < 6 ? 0.25 : 0.1);
 			UpdateMusic();
 		};
 		Score.ComboCanceled += () =>
 		{
 			Audio.PlayPowerDownSfx();
-			Time.SetMoveTimerWaitTime(0.1);
+			Time.SetMoveTimerWaitTime(Snake.SnakeNodes.Count < 6 ? 0.25 : 0.1);
 			UpdateMusic();
 		};
 
 		// Health
-		Health.HealthSegmentAdded += (node) => GetNode<CanvasLayer>("Hud").AddChild(node);
+		Health.HealthSegmentAdded += (node) =>
+		{
+			if (Health.Lives >= 3)
+			{
+				UI.UpdateWindowDressing(false);
+				Time.SetHudFlashMode(false);
+			}
+
+			GetNode<CanvasLayer>("Hud").AddChild(node);
+		};
 		Health.HealthSegmentRemoved += (node) => node.QueueFree();
 		Health.HealthDeducted += () => {
 			EmitSignal(SignalName.HudFlashRequested, 1);
-			//TODO: Should be included in change for low health flashing.
-			UI.UpdateWindowDressing(Health.Lives <= 2);
-			Time.StartHealthTimer();
+			if (Health.Lives <= 2)
+			{
+				Time.SetHudFlashMode(true);
+			}
 			Score.EndCombo();
 			Audio.PlayHurtSfx();
 		};
@@ -349,8 +359,9 @@ public partial class Main : Node
 	/// </summary>
 	private void EndGame()
 	{
+		Time.SetHudFlashMode(false);
 		UI.UpdateWindowDressing(false, true);
-		Time.StartHealthTimer();
+		//Time.StartHealthTimer(); Does this do anything?
 		
 		// Remove health segments
 		foreach (var node in Health.HealthNodes) {
@@ -549,8 +560,30 @@ public partial class Main : Node
 	/// </summary>
 	private void _on_health_timer_timeout()
 	{
-		UI.UpdateWindowDressing(Health.Lives <= 2);
-		Time.StopHealthTimer();
+		//The Time cycle field represents whether the flash should be active.
+		bool flashMode = Time.GetHudFlashMode();
+		//The UI cycleSwitchState field represents whether the UI rendering is flashing on or off.
+		bool flashRenderState = UI.GetWindowFlashRenderState();
+		if (flashMode)
+		{
+			if (flashRenderState)
+			{
+				UI.SetWindowFlashRenderState(false);
+				UI.UpdateWindowDressing(false);
+			}
+			else
+			{
+				UI.SetWindowFlashRenderState(true);
+				UI.UpdateWindowDressing(true);
+				Audio.PlayHurtSfx();
+			}
+		}
+		else
+		{
+			Time.StopHealthTimer();
+			UI.SetWindowFlashRenderState(false);
+			UI.UpdateWindowDressing(false);
+		}
 	}
 
 	/// <summary>

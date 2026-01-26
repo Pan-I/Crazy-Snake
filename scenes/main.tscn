@@ -102,7 +102,7 @@ process_mode = 2
 wait_time = 0.5
 
 [node name="HealthTimer" type="Timer" parent="."]
-wait_time = 0.2
+wait_time = 0.5
 
 [node name="HudFlashTimer" type="Timer" parent="."]
 wait_time = 0.2

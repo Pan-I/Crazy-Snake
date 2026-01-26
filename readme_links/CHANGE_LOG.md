@@ -10,7 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Change log; this file!
 
 ### Changed
- 
+- HUD now flashes on and off with low-health status. 
+
+### Fixed
+ - Speed update bug.
+ - Animation popping.
 
 ## [0.3.3] - 2026-01-25
 ### Added
