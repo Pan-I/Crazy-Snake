@@ -22,6 +22,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Snake.csproj" />
+      <ProjectReference Include="..\snake\Snake.csproj" />
     </ItemGroup>
 
 </Project>
