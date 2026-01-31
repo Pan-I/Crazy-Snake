@@ -1,4 +1,4 @@
-#  🐍🎮 Crazy Snake 👾🪩 - v0.3.3.0
+#  🐍🎮 Crazy Snake 👾🪩 - v0.3.3.1
 
 <img src="https://raw.githubusercontent.com/Pan-I/Crazy-Snake/refs/heads/main/readme_links/Banner%20Image.png" alt="game banner" width="900"/>
 
@@ -24,6 +24,8 @@
 ## 🎉 Introduction & Update News 📣
 
 A remake of Snake, with some twists, as a Godot project. Written entirely in C#. Game includes a long list of items that have a wide range of effects on the game and game play, as well as a complex and high-scoring point system.
+
+A extensive change log summary can be found in [CHANGE_LOG.md](readme_links/CHANGE_LOG.md).
 
 #### Current Major Update Set (v0.3.3)
 

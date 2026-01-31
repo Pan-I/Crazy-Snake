@@ -1,11 +1,6 @@
-﻿using NUnit.Framework;
-using Snake.Scripts;
-using Godot;
-using System.Collections.Generic;
-using Snake.Scripts.Domain;
-using Snake.Scripts.Domain.Utilities;
+﻿using Snake.Scripts.Domain.Utilities;
 
-namespace Snake.Tests;
+namespace SnakeTest;
 
 [TestFixture]
 public class SnakeControlTests
@@ -39,12 +34,12 @@ public class SnakeControlTests
 		Assert.That(InputLogic.GetEffectiveAction("move_down", false), Is.EqualTo("move_down"));
 	}
 
-	// [Test]
-	// public void TestReversedInput()
-	// {
-	// 	Assert.That(InputLogic.GetEffectiveAction("move_up", true), Is.EqualTo("move_down"));
-	// 	Assert.That(InputLogic.GetEffectiveAction("move_down", true), Is.EqualTo("move_up"));
-	// 	Assert.That(InputLogic.GetEffectiveAction("move_left", true), Is.EqualTo("move_right"));
-	// 	Assert.That(InputLogic.GetEffectiveAction("move_right", true), Is.EqualTo("move_left"));
-	// }
+	[Test]
+	public void TestReversedInput()
+	{
+		Assert.That(InputLogic.GetEffectiveAction("move_up", true), Is.EqualTo("move_down"));
+		Assert.That(InputLogic.GetEffectiveAction("move_down", true), Is.EqualTo("move_up"));
+		Assert.That(InputLogic.GetEffectiveAction("move_left", true), Is.EqualTo("move_right"));
+		Assert.That(InputLogic.GetEffectiveAction("move_right", true), Is.EqualTo("move_left"));
+	}
 }

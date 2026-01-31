@@ -19,7 +19,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 The author can be contacted at pan.i.githubcontact@gmail.com
 */
 
-using System.Diagnostics;
+using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using Snake.Scripts.Domain.Utilities;
 using Snake.Scripts.Interfaces;

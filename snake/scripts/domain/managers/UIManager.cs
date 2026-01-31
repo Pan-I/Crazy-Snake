@@ -34,6 +34,7 @@ public partial class UiManager : GodotObject
     private CanvasLayer _hud;
     private CanvasLayer _gameOverMenu;
     private AnimatedSprite2D _background;
+    private bool _hudFlashRenderState;
 
     #endregion
 
@@ -134,12 +135,22 @@ public partial class UiManager : GodotObject
     #endregion
 
     #region Visual Effects
+    
+    public bool GetWindowFlashRenderState()
+    {
+        return _hudFlashRenderState;
+    }
 
+    public void SetWindowFlashRenderState(bool b)
+    {
+        _hudFlashRenderState = b;
+    }
+    
     /// <summary>
     /// Applies a visual flash effect to the HUD panels based on the specified event type.
     /// </summary>
     /// <param name="type">An integer representing the type of event causing the flash:
-    /// 0 for a regular egg consumption, 1 for health deduction, or 2 for other item consumption.</param>
+    /// 0 for regular egg consumption, 1 for health deduction, or 2 for other item consumption.</param>
     public void HudFlash(int type)
     {
         StyleBoxFlat styleBox = new StyleBoxFlat();

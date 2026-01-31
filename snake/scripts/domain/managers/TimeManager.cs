@@ -34,6 +34,7 @@ public partial class TimeManager : GodotObject
     private Timer _moveTimer;
     private Timer _hudFlashTimer;
     private Timer _healthTimer;
+    private bool _cycle;
 
     #endregion
 
@@ -97,6 +98,29 @@ public partial class TimeManager : GodotObject
     /// </summary>
     public void StopHudFlashTimer() => _hudFlashTimer.Stop();
 
+    /// <summary>
+    /// Sets the HUD flash cycle status, enabling or disabling periodic health updates based on the specified value.
+    /// </summary>
+    /// <param name="b">A boolean value indicating whether the HUD flash cycle should be active (true) or inactive (false).</param>
+    public void SetHudFlashMode(bool b)
+    {
+        _cycle = b;
+        if (_cycle)
+        {
+            StartHealthTimer();
+        }
+        else
+        {
+            StopHealthTimer();
+        }
+    }
+
+    /// <summary>
+    /// Retrieves the current state of the cycle flag, which indicates whether a specific cycle-related condition is active.
+    /// </summary>
+    /// <returns>A boolean value representing the current state of the cycle flag.</returns>
+    public bool GetHudFlashMode() => _cycle;
+    
     #endregion
 
     #region Health Timer
