@@ -1,4 +1,4 @@
-#  🐍🎮 Crazy Snake 👾🪩 - v0.3.3.0
+#  🐍🎮 Crazy Snake 👾🪩 - v0.3.3.1
 
 <img src="https://raw.githubusercontent.com/Pan-I/Crazy-Snake/refs/heads/main/readme_links/Banner%20Image.png" alt="game banner" width="900"/>
 
