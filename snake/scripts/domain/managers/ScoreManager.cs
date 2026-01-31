@@ -19,8 +19,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 The author can be contacted at pan.i.githubcontact@gmail.com
 */
 
-using System.Diagnostics;
+using System;
 using Godot;
+using Snake.Scripts.Interfaces;
 
 namespace Snake.Scripts.Domain.Managers;
 
@@ -29,7 +30,7 @@ namespace Snake.Scripts.Domain.Managers;
 /// This includes tracking the player's score, managing combo points,
 /// and handling the state of the combo system.
 /// </summary>
-public partial class ScoreManager : GodotObject
+public partial class ScoreManager : GodotObject, IScoreManager
 {
     #region Signals
     /// <summary>
@@ -157,7 +158,7 @@ public partial class ScoreManager : GodotObject
     public void AddScore(double amount)
     {
         Score += amount;
-        Score = Math.Round(Score, 0);
+        Score = Math.Round(Score, 0, MidpointRounding.AwayFromZero);
         EmitScoreChanged();
     }
 
@@ -169,7 +170,7 @@ public partial class ScoreManager : GodotObject
     public void SetScore(double amount)
     {
         Score = amount;
-        Score = Math.Round(Score, 0);
+        Score = Math.Round(Score, 0, MidpointRounding.AwayFromZero);
         EmitScoreChanged();
     }
     #endregion
@@ -200,7 +201,6 @@ public partial class ScoreManager : GodotObject
         IsInCombo = true;
         ComboPointsX = Math.Max(1, ComboTally);
         ComboPointsY = 1;
-        Debug.Print("Combo Started!");
         EmitComboStarted();
         EmitScoreChanged();
     }
@@ -217,9 +217,8 @@ public partial class ScoreManager : GodotObject
         if (IsInCombo)
         {
             double comboPoints = (ComboPointsX * ComboPointsY);
-            Debug.Print("Combo Ended with Score: " + ComboPointsX + " x " + ComboPointsY + " = " + comboPoints);
             Score += comboPoints > 0 ? comboPoints : Math.Min(ComboPointsX, ComboPointsY);
-            Score = Math.Round(Score, 0);
+            Score = Math.Round(Score, 0, MidpointRounding.AwayFromZero);
         }
         
         IsInCombo = false;
@@ -237,7 +236,6 @@ public partial class ScoreManager : GodotObject
     /// </summary>
     public void CancelCombo()
     {
-        Debug.Print("Combo Cancelled!");
         IsInCombo = false;
         ComboPointsX = 0;
         ComboPointsY = 0;
