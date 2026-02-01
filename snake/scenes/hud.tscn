@@ -1,10 +1,11 @@
-[gd_scene load_steps=11 format=3 uid="uid://c04wsqka0wuf"]
+[gd_scene load_steps=13 format=3 uid="uid://c04wsqka0wuf"]
 
 [ext_resource type="StyleBox" uid="uid://bk3osegj8et2i" path="res://scenes/healthbox_style_flat.tres" id="2_0i724"]
 [ext_resource type="StyleBox" uid="uid://bo3cjcdcolywe" path="res://scenes/retroDigital_style_flat.tres" id="2_1vtuo"]
 [ext_resource type="PackedScene" uid="uid://crx46ynm1y1wq" path="res://scenes/combo_meter.tscn" id="2_5njtd"]
 [ext_resource type="StyleBox" uid="uid://c57kmp4ubiyu0" path="res://scenes/new_style_box_flat.tres" id="3_8bf8i"]
 [ext_resource type="StyleBox" uid="uid://c3fqstchosrkb" path="res://scenes/window_panel_style.tres" id="4_a80yt"]
+[ext_resource type="Shader" uid="uid://ymk6r4wpv4rc" path="res://shaders/rollingText.gdshader" id="5_047uy"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d5do4"]
 bg_color = Color(0.447059, 0.415686, 0.776471, 1)
@@ -20,6 +21,12 @@ border_color = Color(0.117647, 0.207843, 0.32549, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pa66y"]
 bg_color = Color(0.447059, 0.415686, 0.776471, 0)
 corner_detail = 1
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5pdws"]
+shader = ExtResource("5_047uy")
+shader_parameter/height = 5.0
+shader_parameter/frequency = 20.0
+shader_parameter/speed = 5.0
 
 [sub_resource type="FontVariation" id="FontVariation_wv1dd"]
 variation_embolden = 2.0
@@ -472,6 +479,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_pa66y")
 
 [node name="ComboLabel" type="Label" parent="ComboPanel"]
 visible = false
+material = SubResource("ShaderMaterial_5pdws")
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -494,6 +502,7 @@ vertical_alignment = 1
 
 [node name="ComboMeter" parent="ComboPanel" instance=ExtResource("2_5njtd")]
 visible = false
+layout_mode = 0
 offset_left = 790.0
 offset_top = -159.0
 offset_right = 790.0
