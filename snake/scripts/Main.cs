@@ -20,6 +20,8 @@ The author can be contacted at pan.i.githubcontact@gmail.com
 */
 
 using Godot;
+using Snake.Scripts.Domain.Managers;
+using Snake.Scripts.Utilities;
 using BoardManager = Snake.Scripts.Domain.Managers.BoardManager;
 using HealthManager = Snake.Scripts.Domain.Managers.HealthManager;
 using ScoreManager = Snake.Scripts.Domain.Managers.ScoreManager;
@@ -27,7 +29,6 @@ using SnakeManager = Snake.Scripts.Domain.Managers.SnakeManager;
 using TimeManager = Snake.Scripts.Domain.Managers.TimeManager;
 using ItemManager = Snake.Scripts.Domain.Managers.ItemManager;
 using AudioManager = Snake.Scripts.Domain.Managers.AudioManager;
-using UiManager = Snake.Scripts.Domain.Managers.UiManager;
 using Timer = Godot.Timer;
 
 namespace Snake.Scripts;
@@ -58,7 +59,7 @@ public partial class Main : Node
 	/// </summary>
 	/// <remarks>
 	/// This property is used to manage and initialize the audio system of the game. It serves
-	/// as a reference point for the <c>Audio.Initialize</c> method, allowing the system to access
+	/// as a reference point for the <c>Audio.GetAudioFiles</c> method, allowing the system to access
 	/// and control various audio resources and groups.
 	/// </remarks>
 	[Export]
@@ -72,6 +73,7 @@ public partial class Main : Node
 	/// of the flash request. Typically used to differentiate various HUD flash actions.</param>
 	[Signal]
 	public delegate void HudFlashRequestedEventHandler(int type);
+	//Managers
 	private SnakeManager Snake { get; }
 	private ItemManager Items { get; }
 	private BoardManager Board { get; }
@@ -79,15 +81,18 @@ public partial class Main : Node
 	private HealthManager Health { get; }
 	private TimeManager Time { get; }
 	private AudioManager Audio { get; }
+	private HighScoreManager HighScore { get; }
 	// ReSharper disable once InconsistentNaming
-	private UiManager UI { get; }
-
+	private GuiManager GUI { get; }
+	//Utilities
+	private ConfigUtility Config { get; } 
+	
 	private bool _gameStarted;
 	private bool _pause;
 	private Vector2I _moveDirection;
 	#endregion
 
-	#region GameController Setup
+	#region Orchestration Setup
 
 	/// <summary>
 	/// Represents the entry point and primary controller for the game.
@@ -99,13 +104,15 @@ public partial class Main : Node
 	public Main()
 	{
 		Snake = new SnakeManager();
-		Items = new ItemManager(Snake);
+		Items = new ItemManager(Snake); //Todo: Can these be decoupled?
 		Board = new BoardManager();
 		Score = new ScoreManager();
 		Health = new HealthManager();
 		Time = new TimeManager();
 		Audio = new AudioManager();
-		UI = new UiManager();
+		GUI = new GuiManager();
+		Config = new ConfigUtility();
+		HighScore = new HighScoreManager(Config);
 	}
 
 	/// <summary>
@@ -123,7 +130,7 @@ public partial class Main : Node
 
 	/// <summary>
 	/// Initializes and configures all game managers required for core gameplay functionality.
-	/// This includes setting up the TimeManager, UiManager, BoardManager, SnakeManager,
+	/// This includes setting up the TimeManager, GuiManager, BoardManager, SnakeManager,
 	/// ItemManager, and AudioManager. Each manager is provided with the necessary references
 	/// to nodes, resources, and configuration details to ensure proper operation and
 	/// seamless coordination between game systems.
@@ -136,13 +143,13 @@ public partial class Main : Node
 			GetNode<Timer>("HealthTimer")
 		);
 		
-		UI.Initialize(
+		GUI.SetPrimaryGuiNodes(
 			GetNode<CanvasLayer>("Hud"), 
 			GetNode<CanvasLayer>("GameOverMenu"), 
 			GetNode<AnimatedSprite2D>("Background")
 		);
 
-		Board.Initialize(GetNode<AnimatedSprite2D>("Background").Position);
+		Board.SetBoardBoundaries(GetNode<AnimatedSprite2D>("Background").Position);
 		
 		Snake.SetSnakeSegmentPs(SnakeSegmentPs);
 		Snake.SetCellPixelSizeRef(Board.CellPixelSize);
@@ -151,11 +158,12 @@ public partial class Main : Node
 		Items.SetCellPixelSizeRef(Board.CellPixelSize);
 		Items.SetBoardCellSizeRef(Board.BoardCellSize);
 		Items.SetPlacementOffset(new Vector2I(Board.CellPixelSize/2, Board.CellPixelSize/2));
-		Items.InitializeEggNode(GetNode<Node2D>("Egg"));
+		Items.SetEggNode(GetNode<Node2D>("Egg"));
+		
 		Items.LoadItems(GetNode("ItemManager"));
 		Items.SetItemRates();
 		
-		Audio.Initialize(AudioGroupRoot);
+		Audio.GetAudioFiles(AudioGroupRoot);
 	}
 
 	/// <summary>
@@ -169,7 +177,7 @@ public partial class Main : Node
 		// Main
 		HudFlashRequested += type =>
 		{
-			UI.HudFlash(type);
+			GUI.HudFlash(type);
 			Time.StartHudFlashTimer();
 		};
 		
@@ -228,7 +236,7 @@ public partial class Main : Node
 
 		// Score
 		Score.ScoreChanged += (s, cx, cy, inCombo) => {
-			UI.UpdateScore(s, cx, cy, inCombo);
+			GUI.UpdateScore(s, cx, cy, inCombo);
 			Items.UpdateScoreReferences(s, cx, cy);
 		};
 		Score.ComboStarted += () =>
@@ -255,7 +263,7 @@ public partial class Main : Node
 		{
 			if (Health.Lives >= 3)
 			{
-				UI.UpdateWindowDressing(false);
+				GUI.UpdateWindowDressing(false);
 				Time.SetHudFlashMode(false);
 			}
 
@@ -288,6 +296,7 @@ public partial class Main : Node
 	{
 		Items.UpdateItemPulse(delta, Score.IsInCombo);
 		Items.UpdateEggPulse(delta, Score.IsInCombo);
+		GUI.UpdateComboTextEffects(delta, Score.ComboTally, Score.IsInCombo);
 		
 		
 		if (Input.IsActionPressed("escape"))
@@ -322,10 +331,10 @@ public partial class Main : Node
 		GetTree().CallGroup("snake", "queue_free");
 		
 		Score.Reset();
-		UI.HideGameOver();
-		UI.SetBackgroundVisible(false);
-		UI.UpdateWindowDressing(false);
-		UI.ResetHudPanels();
+		GUI.HideGameOver();
+		GUI.SetBackgroundVisible(false);
+		GUI.UpdateWindowDressing(false);
+		GUI.ResetHudPanels();
 		
 		_moveDirection = SnakeManager.UpMove;
 		Snake.MoveDirection = _moveDirection;
@@ -357,12 +366,12 @@ public partial class Main : Node
 	/// <summary>
 	/// Ends the current game session and performs all necessary cleanup and state updates.
 	/// This includes resetting the player's health, stopping timers, pausing the game,
-	/// finalizing the score, and updating the UI to display the game over state.
+	/// finalizing the score, and updating the GUI to display the game over state.
 	/// </summary>
 	private void EndGame()
 	{
 		Time.SetHudFlashMode(false);
-		UI.UpdateWindowDressing(false, true);
+		GUI.UpdateWindowDressing(false, true);
 		//Time.StartHealthTimer(); Does this do anything?
 		
 		// Remove health segments
@@ -371,7 +380,7 @@ public partial class Main : Node
 		}
 		Health.Reset();
 
-		UI.HudFlash(1);
+		GUI.HudFlash(1);
 		Score.EndCombo();
 		Snake.DeadSnake();
 		Snake.RemoveHead();
@@ -379,7 +388,7 @@ public partial class Main : Node
 		GetTree().Paused = true;
 		_gameStarted = false;
 		Time.StopMoveTimer();
-		UI.ShowGameOver(Score.Score);
+		GUI.ShowGameOver(Score.Score);
 		
 		Audio.GameOver();
 	}
@@ -416,10 +425,10 @@ public partial class Main : Node
 		
 		Items.EggEaten();
 		Snake.AddSegment(Snake.OldData[^1]);
-		UI.SetBackgroundVisible(true);
+		GUI.SetBackgroundVisible(true);
 		Score.IncrementComboTally();
 
-		UI.UpdateComboMeter(Score.ComboTally, Score.IsInCombo);
+		GUI.UpdateComboMeter(Score.ComboTally, Score.IsInCombo);
 		EmitSignal(SignalName.HudFlashRequested, 0);
 
 		if (!Score.IsInCombo)
@@ -448,7 +457,7 @@ public partial class Main : Node
 	{
 		if (Score.ComboTally > 3)
 		{
-			UI.SetBackgroundFrame(Score.ComboTally % 2 == 0 ? 1 : 2);
+			GUI.SetBackgroundFrame(Score.ComboTally % 2 == 0 ? 1 : 2);
 		}
 	}
 
@@ -460,9 +469,9 @@ public partial class Main : Node
 	/// </summary>
 	private void UpdateBackgroundInCombo()
 	{
-		if (Score.ComboTally % 2 == 0) UI.SetBackgroundFrame(4);
-		else if (Score.ComboTally % 3 == 0) UI.SetBackgroundFrame(5);
-		else UI.SetBackgroundFrame(3);
+		if (Score.ComboTally % 2 == 0) GUI.SetBackgroundFrame(4);
+		else if (Score.ComboTally % 3 == 0) GUI.SetBackgroundFrame(5);
+		else GUI.SetBackgroundFrame(3);
 	}
 
 	/// <summary>
@@ -550,7 +559,7 @@ public partial class Main : Node
 	/// </summary>
 	private void _on_hud_flash_timer_timeout()
 	{
-		UI.ResetHudPanels();
+		GUI.ResetHudPanels();
 		Time.StopHudFlashTimer();
 	}
 
@@ -564,27 +573,27 @@ public partial class Main : Node
 	{
 		//The Time cycle field represents whether the flash should be active.
 		bool flashMode = Time.GetHudFlashMode();
-		//The UI cycleSwitchState field represents whether the UI rendering is flashing on or off.
-		bool flashRenderState = UI.GetWindowFlashRenderState();
+		//The GUI cycleSwitchState field represents whether the GUI rendering is flashing on or off.
+		bool flashRenderState = GUI.GetWindowFlashRenderState();
 		if (flashMode)
 		{
 			if (flashRenderState)
 			{
-				UI.SetWindowFlashRenderState(false);
-				UI.UpdateWindowDressing(false);
+				GUI.SetWindowFlashRenderState(false);
+				GUI.UpdateWindowDressing(false);
 			}
 			else
 			{
-				UI.SetWindowFlashRenderState(true);
-				UI.UpdateWindowDressing(true);
+				GUI.SetWindowFlashRenderState(true);
+				GUI.UpdateWindowDressing(true);
 				Audio.PlayHurtSfx();
 			}
 		}
 		else
 		{
 			Time.StopHealthTimer();
-			UI.SetWindowFlashRenderState(false);
-			UI.UpdateWindowDressing(false);
+			GUI.SetWindowFlashRenderState(false);
+			GUI.UpdateWindowDressing(false);
 		}
 	}
 
@@ -597,7 +606,7 @@ public partial class Main : Node
 	/// 1. Resets the gameplay state and move timer using <see cref="NewGame"/>.
 	/// 2. Fully reinitialized the score, health, and other gameplay components.
 	/// 3. Clears the existing game entities and creates a new snake.
-	/// 4. Ensures the UI hides the game over screen and displays a new game setup.
+	/// 4. Ensures the GUI hides the game over screen and displays a new game setup.
 	/// </summary>
 	private void _on_game_over_menu_restart()
 	{

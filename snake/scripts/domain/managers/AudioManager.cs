@@ -41,7 +41,7 @@ public partial class AudioManager : GodotObject
 	/// assigning the corresponding AudioStreamPlayer instances for music and sound effects.
 	/// </summary>
 	/// <param name="root">The root node of the audio group hierarchy containing music and SFX nodes.</param>
-	public void Initialize(Node root)
+	public void GetAudioFiles(Node root)
 	{
 		_audioGroupRoot = root;
 		_musicGroupRoot = _audioGroupRoot.GetNode<Node>("Music");

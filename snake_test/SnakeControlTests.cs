@@ -1,4 +1,4 @@
-﻿using Snake.Scripts.Domain.Utilities;
+﻿using Snake.Scripts.Domain.Processors;
 
 namespace SnakeTest;
 

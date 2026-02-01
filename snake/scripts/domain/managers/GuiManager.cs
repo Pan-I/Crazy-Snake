@@ -27,7 +27,7 @@ namespace Snake.Scripts.Domain.Managers;
 /// Manages the user interface (UI) elements of the game, including the HUD, game over menu, and background animations.
 /// Provides functionality to update, display, and reset various UI components in response to game events.
 /// </summary>
-public partial class UiManager : GodotObject
+public partial class GuiManager : GodotObject
 {
     #region Fields
 
@@ -35,6 +35,7 @@ public partial class UiManager : GodotObject
     private CanvasLayer _gameOverMenu;
     private AnimatedSprite2D _background;
     private bool _hudFlashRenderState;
+    private double _comboPulseTime;
 
     #endregion
 
@@ -46,7 +47,7 @@ public partial class UiManager : GodotObject
     /// <param name="hud">The CanvasLayer representing the HUD.</param>
     /// <param name="gameOverMenu">The CanvasLayer representing the game over menu.</param>
     /// <param name="background">The AnimatedSprite2D representing the background.</param>
-    public void Initialize(CanvasLayer hud, CanvasLayer gameOverMenu, AnimatedSprite2D background)
+    public void SetPrimaryGuiNodes(CanvasLayer hud, CanvasLayer gameOverMenu, AnimatedSprite2D background)
     {
         _hud = hud;
         _gameOverMenu = gameOverMenu;
@@ -136,6 +137,45 @@ public partial class UiManager : GodotObject
 
     #region Visual Effects
     
+    /// <summary>
+    /// Updates dynamic GUI animations, such as the scaling and flashing of the combo text.
+    /// </summary>
+    /// <param name="delta">The time elapsed since the last frame.</param>
+    /// <param name="comboTally">The current number of consecutive items collected.</param>
+    /// <param name="isInCombo">Indicates whether the combo state is active.</param>
+    public void UpdateComboTextEffects(double delta, int comboTally, bool isInCombo)
+    {
+        var comboLabel = _hud.GetNode<Panel>("ComboPanel").GetNode<Label>("ComboLabel");
+        if (!isInCombo && comboTally < 2)
+        {
+            comboLabel.Scale = Vector2.One;
+            comboLabel.Modulate = new Color(1, 1, 1, 1);
+            return;
+        }
+
+        _comboPulseTime += delta;
+        
+        // Scaling effect based on combo tally
+        float baseScale = 1.0f + (Mathf.Min(comboTally, 50) / 100.0f);
+        float pulseSpeed = isInCombo ? 10.0f : 5.0f;
+        float pulseAmount = isInCombo ? 0.2f : 0.1f;
+        float pulse = 1.0f + pulseAmount * Mathf.Sin((float)_comboPulseTime * pulseSpeed);
+        
+        comboLabel.PivotOffset = comboLabel.Size / 2;
+        comboLabel.Scale = new Vector2(baseScale * pulse, baseScale * pulse);
+
+        // Flashing effect when in combo
+        if (isInCombo)
+        {
+            float flash = 0.7f + 0.3f * Mathf.Sin((float)_comboPulseTime * 20.0f);
+            comboLabel.Modulate = new Color(1, flash, flash, 1); // Flash red-ish
+        }
+        else
+        {
+            comboLabel.Modulate = new Color(1, 1, 1, 1);
+        }
+    }
+
     public bool GetWindowFlashRenderState()
     {
         return _hudFlashRenderState;

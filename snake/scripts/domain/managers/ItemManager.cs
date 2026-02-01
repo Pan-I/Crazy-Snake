@@ -23,7 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using Snake.Scripts.Domain.Utilities;
+using Snake.Scripts.Domain.Processors;
 using Snake.Scripts.Interfaces;
 
 namespace Snake.Scripts.Domain.Managers;
@@ -331,7 +331,7 @@ public partial class ItemManager : Node
 	/// allowing it to be used for egg-related operations within the item management system.
 	/// </summary>
 	/// <param name="getNode">The Node2D instance to assign as the EggNode.</param>
-	public void InitializeEggNode(Node2D getNode)
+	public void SetEggNode(Node2D getNode)
 	{
 		EggNode = getNode;
 	}

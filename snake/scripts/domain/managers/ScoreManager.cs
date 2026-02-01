@@ -75,7 +75,6 @@ public partial class ScoreManager : GodotObject, IScoreManager
     /// A <c>double</c> representing the player's score. The value is read-only for external access.
     /// </value>
     public double Score { get; private set; }
-
     /// <summary>
     /// Gets or sets the multiplier for combo points accumulated during a combo sequence.
     /// </summary>
@@ -89,7 +88,6 @@ public partial class ScoreManager : GodotObject, IScoreManager
     /// The value is updated during gameplay and contributes directly to the final score during a combo.
     /// </value>
     public double ComboPointsX { get; set; }
-
     /// <summary>
     /// Gets or sets the multiplier value for calculating score during a combo event.
     /// </summary>
@@ -103,7 +101,6 @@ public partial class ScoreManager : GodotObject, IScoreManager
     /// This value is writable and impacts the final score when the combo ends.
     /// </value>
     public double ComboPointsY { get; set; }
-
     /// <summary>
     /// Gets or sets the total number of combos executed by the player.
     /// </summary>
@@ -116,7 +113,6 @@ public partial class ScoreManager : GodotObject, IScoreManager
     /// An <c>int</c> representing the total number of combos. The value is mutable and can be updated during gameplay.
     /// </value>
     public int ComboTally { get; set; }
-
     /// <summary>
     /// Indicates whether the player is currently in a combo state.
     /// </summary>

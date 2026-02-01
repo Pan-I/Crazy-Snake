@@ -37,7 +37,7 @@ public partial class HealthManager : GodotObject, IHealthManager
 	/// </summary>
 	/// <remarks>
 	/// This delegate defines an event emitted whenever the player's health is reduced as a response to in-game events such as collisions or penalties.
-	/// Subscribers to this signal can implement logic for updating UI elements, sound effects, or other health-related feedback mechanisms.
+	/// Subscribers to this signal can implement logic for updating GUI elements, sound effects, or other health-related feedback mechanisms.
 	/// It enables modular handling of health deductions, supporting a flexible and easily maintainable game architecture.
 	/// Common use cases include decrementing health icons or triggering visual cues indicating damage taken.
 	/// </remarks>
@@ -49,7 +49,7 @@ public partial class HealthManager : GodotObject, IHealthManager
 	/// </summary>
 	/// <remarks>
 	/// This delegate defines an event invoked when the game state reaches a condition requiring termination.
-	/// It is used to notify subscribers, such as UI controllers or game state managers, to handle game-over logic.
+	/// It is used to notify subscribers, such as GUI controllers or game state managers, to handle game-over logic.
 	/// Typical scenarios for emitting this signal include player health depletion or other defined failure states.
 	/// Subscribing to this signal allows for implementing custom cleanup, logging, or user notifications.
 	/// </remarks>

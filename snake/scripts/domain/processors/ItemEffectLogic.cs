@@ -1,6 +1,6 @@
 ﻿using Snake.Scripts.Interfaces;
 
-namespace Snake.Scripts.Domain.Utilities;
+namespace Snake.Scripts.Domain.Processors;
 
 public class ItemEffectLogic
 {

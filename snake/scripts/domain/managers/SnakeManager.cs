@@ -22,7 +22,7 @@ The author can be contacted at pan.i.githubcontact@gmail.com
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using Snake.Scripts.Domain.Utilities;
+using Snake.Scripts.Domain.Processors;
 using Snake.Scripts.Interfaces;
 
 namespace Snake.Scripts.Domain.Managers;

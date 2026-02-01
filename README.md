@@ -4,7 +4,6 @@
 
 ## 📖 Table of Contents
 - [Introduction & Updates](#-introduction--update-news-)
-- [AI Agent Instructions](readme_links/AGENTS.md)
 - [Architecture](readme_links/ARCHITECTURE.md)
 - [Features](#-features-)
 - [Stack & Tech](#-stack--tech-)
@@ -14,7 +13,7 @@
 - [Requirements/Environment](#-requirements-environment-)
 - [Scripts & Development](#-scripts--development-)
 - [Testing](#-testing-)
-- [AI Agent Instructions](readme_links/AGENTS.md)
+- [AI Agent Navigation](#-ai-agent-navigation-)
 - [Issues, Enhancements & Progress](#-issues-enhancements--progress-)
 - [Contributing](#-contributing-)
 - [Attributions](#-attributions-)
@@ -129,6 +128,12 @@ The project uses **NUnit** for unit testing core domain logic.
   dotnet test
   ```
 - **Test Location**: `snake_test/`
+
+---
+## 🤖 AI Agent Navigation 🚀
+This project includes specific instructions and rules to assist AI agents (like Cline, Cursor, or Copilot) in navigating the codebase:
+- **[AI Agent Instructions](readme_links/AGENTS.md)**: Detailed overview of architecture and Godot-specific logic.
+- **`.clinerules` / `.cursorrules`**: Root-level rule files for immediate agent context.
 
 ---
 ## 🐛 Issues & Troubleshooting

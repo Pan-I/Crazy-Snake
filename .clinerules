@@ -1,0 +1,19 @@
+﻿# Crazy Snake - AI Agent Rules
+
+## Project Context
+- **Tech**: Godot 4.5.1, C#, .NET 8.0/10.0.
+- **Architecture**: Manager-based, orchestrated by `Main.cs`. Signal-driven.
+- **Key Files**: `snake/project.godot`, `snake/scripts/Main.cs`.
+
+## Rules & Standards
+- Follow PascalCase for classes/methods, camelCase for local variables.
+- Use file-scoped namespaces.
+- Do not put heavy logic in `Main.cs`; use managers.
+- Always use `dotnet clean` before `dotnet build` or `dotnet test` if "Duplicate attribute" errors occur.
+- Run tests with `dotnet test snake_test\snake_test.csproj`.
+- Refer to `readme_links/AGENTS.md` for detailed instructions.
+
+## Godot Integration
+- Scripts use `Godot.NET.Sdk`.
+- Signals are defined with `[Signal] public delegate void ...EventHandler(...)`.
+- Prefer interfaces from `snake/scripts/interfaces/` for mocking in tests.

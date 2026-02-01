@@ -51,7 +51,7 @@ public partial class BoardManager : GodotObject
     /// Initializes the board manager with the specified board position.
     /// </summary>
     /// <param name="boardPosition"></param>
-    public void Initialize(Vector2 boardPosition)
+    public void SetBoardBoundaries(Vector2 boardPosition)
     {
         BoardLeft = boardPosition.X - ((BoardCellSize * CellPixelSize) / 2);
         BoardRight = boardPosition.X + ((BoardCellSize * CellPixelSize) / 2);
